@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: 'ontar'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F65131B342D54738BBB36F185F32464F }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AD89C1E73D844D9CA77643497EDFE860 }}
