@@ -25,8 +25,8 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build the Docker image
       run:         
-        docker build . --file WebApp.Dockerfile --tag ontar.azurecr.io/sample-app-aoai-chatgpt:$(date +'%Y-%m-%d')_$GITHUB_RUN_NUMBER;
-        docker tag ontar.azurecr.io/sample-app-aoai-chatgpt:$(date +'%Y-%m-%d')_$GITHUB_RUN_NUMBER ontar.azurecr.io/sample-app-aoai-chatgpt:latest;
-        docker push ontar.azurecr.io/sample-app-aoai-chatgpt:$(date +'%Y-%m-%d')_$GITHUB_RUN_NUMBER;
-        docker push ontar.azurecr.io/sample-app-aoai-chatgpt:latest;
+        docker build . --file WebApp.Dockerfile --tag ontar.azurecr.io/ontar-poc:$(date +'%Y-%m-%d')_$GITHUB_RUN_NUMBER;
+        docker tag ontar.azurecr.io/ontar-poc:$(date +'%Y-%m-%d')_$GITHUB_RUN_NUMBER ontar.azurecr.io/ontar-poc:latest;
+        docker push ontar.azurecr.io/ontar-poc:$(date +'%Y-%m-%d')_$GITHUB_RUN_NUMBER;
+        docker push ontar.azurecr.io/ontar-poc:latest;
       
