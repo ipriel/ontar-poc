@@ -15,31 +15,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python version
-        uses: actions/setup-python@v1
+      - name: Azure Container Registry Login
+        uses: Azure/docker-login@v1
         with:
-          python-version: '3.10'
+          # Container registry username
+          username: ${{ secrets.ACR_USERNAME }}
+          # Container registry password
+          password: ${{ secrets.ACR_PASSWORD }}
+          # Container registry server url
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
 
-      - name: Create and start virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-      
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - uses: actions/checkout@v3
+
+      - name: Build the Docker image
+        run:         
+          docker build . --file WebApp.Dockerfile --tag ontar.azurecr.io/ontar-poc:$(date +'%Y-%m-%d')_$GITHUB_RUN_NUMBER;
+          docker tag ontar.azurecr.io/ontar-poc:$(date +'%Y-%m-%d')_$GITHUB_RUN_NUMBER ontar.azurecr.io/ontar-poc:latest;
+          docker push ontar.azurecr.io/ontar-poc:$(date +'%Y-%m-%d')_$GITHUB_RUN_NUMBER;
+          docker push ontar.azurecr.io/ontar-poc:latest;
         
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-      
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v2
-        with:
-          name: python-app
-          path: |
-            . 
-            !venv/
-
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -48,16 +42,10 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v2
-        with:
-          name: python-app
-          path: .
-          
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
         with:
           app-name: 'ontar'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9653ADAF7B7E47B98AF20903857BFA73 }}
+          images: ontar.azurecr.io/ontar-poc:latest
