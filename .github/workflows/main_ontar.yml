@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,15 +33,7 @@ jobs:
           docker tag ontar.azurecr.io/ontar-poc:$(date +'%Y-%m-%d')_$GITHUB_RUN_NUMBER ontar.azurecr.io/ontar-poc:latest;
           docker push ontar.azurecr.io/ontar-poc:$(date +'%Y-%m-%d')_$GITHUB_RUN_NUMBER;
           docker push ontar.azurecr.io/ontar-poc:latest;
-        
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
-    steps:
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
