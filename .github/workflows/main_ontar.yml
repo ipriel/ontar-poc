@@ -40,4 +40,5 @@ jobs:
         with:
           app-name: 'ontar'
           slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9653ADAF7B7E47B98AF20903857BFA73 }}
           images: ontar.azurecr.io/ontar-poc:latest
