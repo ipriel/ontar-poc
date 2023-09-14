@@ -304,6 +304,7 @@ def conversation_without_data(request):
 @app.route("/conversation", methods=["GET", "POST"])
 def conversation():
     try:
+        logging.debug("test python changes")
         use_data = should_use_data()
         if use_data:
             return conversation_with_data(request)
