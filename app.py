@@ -305,6 +305,7 @@ def conversation_without_data(request):
 def conversation():
     try:
         logging.debug("test python changes")
+        print("test python changes####################################")
         use_data = should_use_data()
         if use_data:
             return conversation_with_data(request)
