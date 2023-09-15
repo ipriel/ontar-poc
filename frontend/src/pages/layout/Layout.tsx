@@ -35,12 +35,7 @@ const Layout = () => {
         <div className={styles.layout}>
             <header className={styles.header} role={"banner"}>
                 <div className={styles.headerContainer}>
-                    <Stack horizontal verticalAlign="center">
-                        <img
-                            src={Azure}
-                            className={styles.headerIcon}
-                            aria-hidden="true"
-                        />
+                    <Stack horizontal verticalAlign="center">                        
                         <Link to="/" className={styles.headerTitleContainer}>
                             <h1 className={styles.headerTitle}>ONTAR AI</h1>
                         </Link>
