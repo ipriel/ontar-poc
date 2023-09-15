@@ -309,7 +309,7 @@ def conversation():
         use_data = should_use_data()
         if use_data:
             result = conversation_with_data(request)
-            print(result)
+            print(str(result))
             return result
         else:
             return conversation_without_data(request)
