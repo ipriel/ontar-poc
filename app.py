@@ -308,7 +308,9 @@ def conversation():
         print("test python changes####################################")
         use_data = should_use_data()
         if use_data:
-            return conversation_with_data(request)
+            result = conversation_with_data(request)
+            print(result)
+            return result
         else:
             return conversation_without_data(request)
     except Exception as e:
