@@ -1,24 +1,123 @@
 .layout {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    height: 100%;
+    background-color: #201F27;
+}
+
+.sidebarLayout {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    border-right: 1px solid #706E86;
+    padding: 0 24px;
+}
+
+.sidebarHeaderContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: space-between;
+    text-decoration: none;
+    height: 56px;
+    flex-wrap: wrap;
+    margin-block: 1rem;
+}
+
+.sidebarLogoContainer {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    text-decoration: none;
+}
+
+.sidebarLogoText {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 28px;
+    margin: 0;
+    color: white;
+}
+
+.sidebarLogoTextHighlight {
+    color: #B955E3;
+}
+
+.companyDropdownContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: 12px;
+    color: #C792FF;
+    background-color: #19171B;
+    border-radius: 8px;
+}
+
+.companyDropdownText {
+    font-weight: 500;
+}
+
+.menuList {
+    padding: 0;
+    color: #706E86;
+}
+
+.menuListItem {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.menuListItemActive {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    color: #C792FF;
+}
+
+.menuListItemEmphasis {
+    background-color: #706E86;
+    color: white;
+    border-radius: 4px;
+    padding: 2px 12px;
+    margin-right: 4px;
+}
+
+.menuListItemText {
+    margin-block: 10px;
+}
+
+.menuListItemImage {
+    border-radius: 50%;
+    filter: grayscale();
+    width: 32px;
+    height: 32px;
+}
+
+.menuListItemIcon {
+    width: 32px;
+}
+
+.mainLayout {
     display: flex;
     flex-direction: column;
     height: 100%;
 }
 
-.header {
-    background-color: #f2f2f2;
-}
-
-.headerContainer {
-    display: flex;
-    justify-content: left;
-    align-items: center;
-}
-
 .headerTitleContainer {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
     margin-left: 14px;
     text-decoration: none;
+    height: 56px;
+    flex-wrap: wrap;
+    margin-block: 1rem;
 }
 
 .headerTitle {
@@ -26,15 +125,26 @@
     font-weight: 600;
     font-size: 20px;
     line-height: 28px;
-    display: flex;
-    align-items: flex-end;
-    color: #242424;
+    color: #C792FF;
+    margin: 0;
+}
+
+.headerSubtitle {
+    color: #5C5A73;
+    margin: 0;
+}
+
+.headerIconContainer {
+    padding: 6px 8px;
+    background-color: #141419;
+    border-radius: 8px;
+    margin-right: 20px;
 }
 
 .headerIcon {
     height: 32px;
     width: 32px;
-    margin-left: 36px;
+    /* margin-left: 36px; */
 }
 
 .shareButtonContainer {
@@ -44,15 +154,11 @@
     align-items: center;
     padding: 5px 12px;
     gap: 4px;
-    width: 86px;
     height: 32px;
-    background: radial-gradient(109.81% 107.82% at 100.1% 90.19%, #000000 0%, #888888 70.31%, #FFFFFF 100%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */;
     border-radius: 4px;
     flex: none;
     order: 1;
     flex-grow: 0;
-    position: absolute;
-    right: 20px;
     cursor: pointer;
 }
 
