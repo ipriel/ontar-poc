@@ -45,19 +45,47 @@
     color: #B955E3;
 }
 
+.sidebarToggle {
+    cursor: pointer;
+}
+
 .companyDropdownContainer {
+    position: relative;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    gap: 8px;
     padding-inline: 12px;
+    margin-inline: -12px;
     color: #C792FF;
     background-color: #19171B;
     border-radius: 8px;
+    cursor: pointer;
+}
+
+[data-sidebar="false"] .companyDropdownContainer {
+    margin-right: 0;
+    padding-block: 15.1px;
+}
+
+.companyDropdownIcon {
+    display: inline-flex;
+    place-content: center;
+    width: 32px;
 }
 
 .companyDropdownText {
     font-weight: 500;
+}
+
+.companyDropdownChevron {
+    position: absolute;
+    right: 12px;
+}
+
+[data-sidebar="false"] .companyDropdownText,
+[data-sidebar="false"] .companyDropdownChevron {
+    display: none;
 }
 
 .menuList {
@@ -71,6 +99,7 @@
     flex-direction: row;
     align-items: center;
     gap: 8px;
+    cursor: pointer;
 }
 
 .menuListItemActive {
@@ -79,6 +108,11 @@
     align-items: center;
     gap: 8px;
     color: #C792FF;
+}
+
+[data-sidebar="false"] .menuListItem,
+[data-sidebar="false"] .menuListItemActive {
+    padding-block: 7.1px;
 }
 
 .menuListItemEmphasis {
@@ -93,6 +127,10 @@
     margin-block: 10px;
 }
 
+[data-sidebar="false"] .menuListItemText {
+    display: none;
+}
+
 .menuListItemImage {
     border-radius: 50%;
     filter: grayscale();
@@ -100,13 +138,25 @@
     height: 32px;
 }
 
+[data-sidebar="false"] .menuListItemImage {
+    cursor: pointer;
+}
+
 .menuListItemIcon {
+    display: inline-flex;
+    place-content: center;
     width: 32px;
+    height: 25px;
 }
 
 .menuListItemChevron {
     position: absolute;
     right: 0px;
+    cursor: pointer;
+}
+
+[data-sidebar="false"] .menuListItemChevron {
+    display: none;
 }
 
 .mainLayout {
@@ -133,11 +183,13 @@
     line-height: 28px;
     color: #C792FF;
     margin: 0;
+    user-select: none;
 }
 
 .headerSubtitle {
     color: #5C5A73;
     margin: 0;
+    user-select: none;
 }
 
 .headerIconContainer {
@@ -177,46 +229,4 @@
     position: absolute;
     top: -5px;
     right: 9px;
-}
-
-.urlTextBox {
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 20px;
-    color: #707070;
-    border: 1px solid #D1D1D1;
-    border-radius: 4px;
-}
-
-.copyButtonContainer {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 5px 12px;
-    gap: 4px;
-    background: #FFFFFF;
-    border: 1px solid #D1D1D1;
-    border-radius: 4px;
-}
-
-.copyButtonContainer:hover {
-    cursor: pointer;
-    background: #D1D1D1;
-}
-
-.copyButton {
-    color: #424242;
-}
-
-.copyButtonText {
-    font-style: normal;
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 20px;
-    display: flex;
-    align-items: center;
-    color: #242424;
 }

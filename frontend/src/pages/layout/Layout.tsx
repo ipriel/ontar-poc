@@ -6,51 +6,36 @@ import { useEffect, useState } from "react";
 import ProfilePic from "../../assets/profile.png";
 
 const Layout = () => {
-    const [isSharePanelOpen, setIsSharePanelOpen] = useState<boolean>(false);
-    const [copyClicked, setCopyClicked] = useState<boolean>(false);
-    const [copyText, setCopyText] = useState<string>("Copy URL");
-
-    const handleShareClick = () => {
-        setIsSharePanelOpen(true);
-    };
-
-    const handleSharePanelDismiss = () => {
-        setIsSharePanelOpen(false);
-        setCopyClicked(false);
-        setCopyText("Copy URL");
-    };
-
-    const handleCopyClick = () => {
-        navigator.clipboard.writeText(window.location.href);
-        setCopyClicked(true);
-    };
-
-    useEffect(() => {
-        if (copyClicked) {
-            setCopyText("Copied URL");
-        }
-    }, [copyClicked]);
+    const [isSidebarExpanded, setIsSidebarExpanded] = useState<boolean>(false);
 
     return (
-        <Stack className={styles.layout}>
-            <div className={styles.sidebarLayout}>
+        <Stack className={styles.layout} data-sidebar={isSidebarExpanded}>
+            <div className={styles.sidebarLayout} style={{ width: isSidebarExpanded ? "300px" : "auto" }}>
                 <div className={styles.sidebarHeaderContainer}>
-                    <Link to="/" className={styles.sidebarLogoContainer}>
-                        <svg width="44" height="55" viewBox="0 0 44 55" fill="#B955E3" xmlns="http://www.w3.org/2000/svg">
+                    {isSidebarExpanded ? (
+                        <>
+                            <Link to="/" className={styles.sidebarLogoContainer}>
+                                <svg width="44" height="55" viewBox="0 0 44 55" fill="#B955E3" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M37.9995 11.7211L21.5583 5.82193L5.11717 11.7211V25.6155C5.11717 32.2997 8.31162 38.5672 13.6831 42.4218L21.5583 48.0731L29.4337 42.4218C34.8051 38.5672 37.9995 32.2997 37.9995 25.6155V11.7211ZM21.5583 54.3682L32.3508 46.6233C39.0652 41.8049 43.0583 33.9708 43.0583 25.6155V8.08245L21.5583 0.368164L0.0583496 8.08245V25.6155C0.0583496 33.9708 4.05141 41.8049 10.7658 46.6233L21.5583 54.3682Z" fill="#B955E3" />
+                                </svg>
+                                <h1 className={styles.sidebarLogoText}><span className={styles.sidebarLogoTextHighlight}>ON</span>TAR</h1>
+                            </Link>
+                            <svg className={styles.sidebarToggle} onClick={e => setIsSidebarExpanded(false)} width="21" height="15" viewBox="0 0 21 15" fill="#706E86" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1.05835 7.36816H19.0583M1.05835 1.36816H19.0583M1.05835 13.3682H19.0583" stroke="#706E86" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </>
+                    ) : (
+                        <svg className={styles.sidebarToggle} onClick={e => setIsSidebarExpanded(true)} width="44" height="55" viewBox="0 0 44 55" fill="#B955E3" xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" clip-rule="evenodd" d="M37.9995 11.7211L21.5583 5.82193L5.11717 11.7211V25.6155C5.11717 32.2997 8.31162 38.5672 13.6831 42.4218L21.5583 48.0731L29.4337 42.4218C34.8051 38.5672 37.9995 32.2997 37.9995 25.6155V11.7211ZM21.5583 54.3682L32.3508 46.6233C39.0652 41.8049 43.0583 33.9708 43.0583 25.6155V8.08245L21.5583 0.368164L0.0583496 8.08245V25.6155C0.0583496 33.9708 4.05141 41.8049 10.7658 46.6233L21.5583 54.3682Z" fill="#B955E3" />
                         </svg>
-                        <h1 className={styles.sidebarLogoText}><span className={styles.sidebarLogoTextHighlight}>ON</span>TAR</h1>
-                    </Link>
-                    <svg width="21" height="15" viewBox="0 0 21 15" fill="#706E86" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1.05835 7.36816H19.0583M1.05835 1.36816H19.0583M1.05835 13.3682H19.0583" stroke="#706E86" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
+                    )}
                 </div>
                 <div className={styles.companyDropdownContainer}>
-                    <svg width="19" height="21" viewBox="0 0 19 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg className={styles.companyDropdownIcon} width="19" height="21" viewBox="0 0 19 21" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M6.21981 0.368165H11.8969C12.424 0.368149 12.8788 0.368135 13.2534 0.398737C13.6487 0.431038 14.0419 0.502354 14.4203 0.695148C14.9848 0.982768 15.4438 1.44171 15.7314 2.0062C15.9242 2.38458 15.9955 2.77779 16.0278 3.17314C16.0584 3.54768 16.0584 4.00253 16.0584 4.52962V18.3682H17.0583C17.6106 18.3682 18.0583 18.8159 18.0583 19.3682C18.0583 19.9204 17.6106 20.3682 17.0583 20.3682H1.05835C0.506065 20.3682 0.0583496 19.9204 0.0583496 19.3682C0.0583496 18.8159 0.506065 18.3682 1.05835 18.3682H2.05835L2.05835 4.52962C2.05833 4.00247 2.05832 3.54771 2.08892 3.17314C2.12122 2.77779 2.19254 2.38458 2.38533 2.0062C2.67295 1.44171 3.13189 0.982768 3.69638 0.695148C4.07476 0.502354 4.46798 0.431038 4.86332 0.398737C5.23788 0.368135 5.69269 0.368149 6.21981 0.368165ZM5.05835 5.36817C5.05835 4.81588 5.50606 4.36817 6.05835 4.36817H12.0583C12.6106 4.36817 13.0583 4.81588 13.0583 5.36817C13.0583 5.92045 12.6106 6.36817 12.0583 6.36817H6.05835C5.50606 6.36817 5.05835 5.92045 5.05835 5.36817ZM5.05835 9.36817C5.05835 8.81588 5.50606 8.36817 6.05835 8.36817H12.0583C12.6106 8.36817 13.0583 8.81588 13.0583 9.36817C13.0583 9.92045 12.6106 10.3682 12.0583 10.3682H6.05835C5.50606 10.3682 5.05835 9.92045 5.05835 9.36817ZM6.05835 12.3682C5.50606 12.3682 5.05835 12.8159 5.05835 13.3682C5.05835 13.9205 5.50606 14.3682 6.05835 14.3682H12.0583C12.6106 14.3682 13.0583 13.9205 13.0583 13.3682C13.0583 12.8159 12.6106 12.3682 12.0583 12.3682H6.05835Z" fill="#C792FF" />
                     </svg>
                     <p className={styles.companyDropdownText}>EverBank</p>
-                    <ChevronDownIcon />
+                    <ChevronDownIcon className={styles.companyDropdownChevron} />
                 </div>
                 <ul className={styles.menuList}>
                     <li className={styles.menuListItem}>
@@ -146,7 +131,9 @@ const Layout = () => {
                 </ul>
                 <ul className={styles.menuList}>
                     <li className={styles.menuListItem}>
-                        <SettingsIcon />
+                        <div className={styles.menuListItemIcon}>
+                            <SettingsIcon />
+                        </div>
                         <p className={styles.menuListItemText}>Settings</p>
                     </li>
                     <li className={styles.menuListItem}>
@@ -165,7 +152,7 @@ const Layout = () => {
                         </div>
                         <p className={styles.menuListItemText}>Training</p>
                     </li>
-                    <li className={styles.menuListItem}>
+                    <li className={styles.menuListItem} style={{ cursor: "auto", paddingBlock: !isSidebarExpanded ? "3.6px" : undefined }}>
                         <img
                             src={ProfilePic}
                             className={styles.menuListItemImage}
@@ -200,7 +187,7 @@ const Layout = () => {
                             <h1 className={styles.headerTitle}>Chatbot</h1>
                             <p className={styles.headerSubtitle}>Your threat activity Monday, March 11, 2024</p>
                         </div>
-                        <div className={styles.chatButtonContainer} role="button" tabIndex={0} aria-label="Share" onClick={handleShareClick} onKeyDown={e => e.key === "Enter" || e.key === " " ? handleShareClick() : null}>
+                        <div className={styles.chatButtonContainer} role="button" tabIndex={0} aria-label="Chat">
                             <svg className={styles.chatButtonBadge} width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <circle cx="7.05835" cy="7.36816" r="6" fill="#E87474" stroke="#201F27" stroke-width="2" />
                             </svg>
