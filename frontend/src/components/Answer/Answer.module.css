@@ -48,7 +48,6 @@
     font-weight: 400;
     font-size: 12px;
     line-height: 16px;
-
     display: flex;
     align-items: center;
     text-align: center;
@@ -56,6 +55,7 @@
     flex: none;
     order: 1;
     flex-grow: 0;
+    user-select: none;
 }
 
 .citationContainer {
@@ -159,4 +159,5 @@
 sup {
     font-size: 10px;
     line-height: 10px;
+    cursor: pointer;
 }
