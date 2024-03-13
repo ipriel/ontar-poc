@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { IconButton, Stack } from "@fluentui/react";
-import { BroomRegular, DismissRegular, SquareRegular, ShieldLockRegular, ErrorCircleRegular } from "@fluentui/react-icons";
+import { BroomRegular, DismissRegular, SquareFilled, ShieldLockRegular, ErrorCircleRegular } from "@fluentui/react-icons";
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm'
@@ -112,12 +112,6 @@ const Chat = () => {
         return abortController.abort();
     };
 
-    const clearChat = () => {
-        lastQuestionRef.current = "";
-        setActiveCitation(undefined);
-        setAnswers([]);
-    };
-
     const stopGenerating = () => {
         abortFuncs.current.forEach(a => a.abort());
         setShowLoadingMessage(false);
@@ -164,7 +158,13 @@ const Chat = () => {
                     <h2 className={styles.chatEmptyStateSubtitle} style={{ fontSize: "20px" }}><strong>If you deployed in the last 10 minutes, please wait and reload the page after 10 minutes.</strong></h2>
                 </Stack>
             ) : (
-                <Stack horizontal className={styles.chatRoot}>
+                <Stack 
+                    horizontal
+                    className={styles.chatRoot}
+                    style={{
+                        flex: lastQuestionRef.current ? 1 : 0
+                    }}
+                >
                     <div className={styles.chatContainer}>
                         {!lastQuestionRef.current ? (
                             <Stack className={styles.chatEmptyState}>
@@ -234,26 +234,10 @@ const Chat = () => {
                                     onClick={stopGenerating}
                                     onKeyDown={e => e.key === "Enter" || e.key === " " ? stopGenerating() : null}
                                 >
-                                    <SquareRegular className={styles.stopGeneratingIcon} aria-hidden="true" />
+                                    <SquareFilled className={styles.stopGeneratingIcon} aria-hidden="true" />
                                     <span className={styles.stopGeneratingText} aria-hidden="true">Stop generating</span>
                                 </Stack>
                             )}
-                            <div
-                                role="button"
-                                tabIndex={0}
-                                onClick={clearChat}
-                                onKeyDown={e => e.key === "Enter" || e.key === " " ? clearChat() : null}
-                                aria-label="Clear session"
-                            >
-                                <BroomRegular
-                                    className={styles.clearChatBroom}
-                                    style={{
-                                        background: isLoading || answers.length === 0 ? "#BDBDBD" : "radial-gradient(109.81% 107.82% at 100.1% 90.19%, #000000 0%, #888888 70.31%, #FFFFFF 100%)",
-                                        cursor: isLoading || answers.length === 0 ? "" : "pointer"
-                                    }}
-                                    aria-hidden="true"
-                                />
-                            </div>
                             <QuestionInput
                                 clearOnSend
                                 placeholder="Type a new question..."
@@ -263,22 +247,23 @@ const Chat = () => {
                         </Stack>
                     </div>
                     {answers.length > 0 && isCitationPanelOpen && activeCitation && (
-                        <Stack.Item className={styles.citationPanel} tabIndex={0} role="tabpanel" aria-label="Citations Panel">
-                            <Stack aria-label="Citations Panel Header Container" horizontal className={styles.citationPanelHeaderContainer} horizontalAlign="space-between" verticalAlign="center">
-                                <span aria-label="Citations" className={styles.citationPanelHeader}>Citations</span>
-                                <IconButton iconProps={{ iconName: 'Cancel' }} aria-label="Close citations panel" onClick={() => setIsCitationPanelOpen(false)} />
-                            </Stack>
-                            <h5 className={styles.citationPanelTitle} tabIndex={0}>{activeCitation[2]}</h5>
-                            <div tabIndex={0}>
-                                <ReactMarkdown
-                                    linkTarget="_blank"
-                                    className={styles.citationPanelContent}
-                                    children={activeCitation[0]}
-                                    remarkPlugins={[remarkGfm]}
-                                    rehypePlugins={[rehypeRaw]}
-                                />
+                        <Stack.Item className={styles.citationPanelWrapper}>
+                            <div className={styles.citationPanel} tabIndex={0} role="tabpanel" aria-label="Citations Panel">
+                                <Stack aria-label="Citations Panel Header Container" horizontal className={styles.citationPanelHeaderContainer} horizontalAlign="space-between" verticalAlign="center">
+                                    <span aria-label="Citations" className={styles.citationPanelHeader}>Citations</span>
+                                    <IconButton className={styles.citationPanelDismiss} iconProps={{ iconName: 'Cancel' }} aria-label="Close citations panel" onClick={() => setIsCitationPanelOpen(false)} />
+                                </Stack>
+                                <h5 className={styles.citationPanelTitle} tabIndex={0}>{activeCitation[2]}</h5>
+                                <div className={styles.citationPanelContent} tabIndex={0}>
+                                    <ReactMarkdown
+                                        linkTarget="_blank"
+                                        className={styles.citationPanelContent}
+                                        children={activeCitation[0]}
+                                        remarkPlugins={[remarkGfm]}
+                                        rehypePlugins={[rehypeRaw]}
+                                    />
+                                </div>
                             </div>
-
                         </Stack.Item>
                     )}
                 </Stack>

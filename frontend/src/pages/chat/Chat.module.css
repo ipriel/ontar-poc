@@ -1,9 +1,11 @@
 .container {
-    flex: 1;
+    position: relative;
     display: flex;
     flex-direction: column;
+    flex: 1;
     gap: 20px;
     color: #F2F2F2;
+    justify-content: center;
 }
 
 .chatRoot {
@@ -11,8 +13,7 @@
     display: flex;
     margin-top: 0px;
     margin-bottom: 20px;
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-inline: 20px;
     gap: 20px;
 }
 
@@ -32,6 +33,18 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.chatEmptyStateTitle {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 36px;
+    display: flex;
+    align-items: flex-end;
+    text-align: center;
+    line-height: 24px;
+    margin-top: 36px;
+    margin-bottom: 0px;
 }
 
 .chatEmptyStateSubtitle {
@@ -70,8 +83,8 @@
     max-width: 1028px;
     width: 100%;
     overflow-y: auto;
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-left: 48px;
+    padding-right: 48px;
     display: flex;
     flex-direction: column;
     margin-top: 24px;
@@ -84,15 +97,14 @@
 }
 
 .chatMessageUserMessage {
-    padding: 20px;
-    background: #EDF5FD;
+    padding: 10px;
+    background: #1A191F;
     border-radius: 8px;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12);
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
     line-height: 22px;
-    color: #242424;
+    color: #C792FF;;
     flex: none;
     order: 0;
     flex-grow: 0;
@@ -136,14 +148,12 @@
 
 .chatInput {
     position: sticky;
-    flex: 0 0 100px;
     padding-top: 12px;
-    padding-bottom: 24px;
+    padding-bottom: 4px;
     padding-left: 24px;
     padding-right: 24px;
     width: calc(100% - 100px);
     max-width: 1028px;
-    margin-bottom: 50px;
     margin-top: 8px;
 }
 
@@ -159,66 +169,66 @@
     height: 40px;
     left: 12px;
     top: 66px;
-    color: #FFFFFF;
+    color: white;
     border: 1px solid #D1D1D1;
     border-radius: 20px;
+    background-color: #BDBDBD;
     z-index: 1;
+    cursor: pointer;
 }
 
 .stopGeneratingContainer {
+    position: absolute;
     box-sizing: border-box;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     padding: 5px 16px;
-    gap: 4px;
-    position: absolute;
-    width: 161px;
+    gap: 8px;
     height: 32px;
-    left: calc(50% - 161px/2 + 25.8px);
-    bottom: 116px;
-    border: 1px solid #D1D1D1;
+    left: 50%;
+    top: -48px;
+    transform: translateX(-50%);
+    border: 1px solid #5C5A73;
     border-radius: 16px;
 }
 
 .stopGeneratingIcon {
     width: 14px;
     height: 14px;
-    color: #424242;
+    color: #89859F;
 }
 
 .stopGeneratingText {
-    width: 103px;
-    height: 20px;
-    font-style: normal;
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 20px;
     display: flex;
     align-items: center;
-    color: #242424;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
+    color: #89859F;
+    font-size: 14px;
+}
+
+.citationPanelWrapper {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 8px;
+    padding-block: 8px;
+    max-width: 30%;
+    background: #1A191F;
+    border: 1px solid #C792FF;
 }
 
 .citationPanel {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 16px 16px;
+    padding: 12px 16px;
     gap: 8px;
-    background: #FFFFFF;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12);
-    border-radius: 8px;
     flex: auto;
-    order: 0;
     align-self: stretch;
     flex-grow: 0.3;
-    max-width: 30%;
     overflow-y: scroll;
-    max-height: calc(100vh - 100px);
+    max-height: 80vh;
 }
 
 .citationPanelHeaderContainer {
@@ -230,7 +240,7 @@
     font-weight: 600;
     font-size: 18px;
     line-height: 24px;
-    color: #000000;
+    color: White;
     flex: none;
     order: 0;
     flex-grow: 0;
@@ -239,33 +249,24 @@
 .citationPanelDismiss {
     width: 18px;
     height: 18px;
-    color: #424242;
+    color: #5C5A73;
+    cursor: pointer;
 }
 
 .citationPanelDismiss:hover {
     background-color: #D1D1D1;
-    cursor: pointer;
 }
 
 .citationPanelTitle {
-    font-style: normal;
     font-weight: 600;
     font-size: 16px;
     line-height: 22px;
-    color: #323130;
-    margin-top: 12px;
-    margin-bottom: 12px;
+    color: #D1D1D1;
+    margin-block: 12px;
 } 
 
 .citationPanelContent {
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 20px;
-    color: #000000;
-    flex: none;
-    order: 1;
-    align-self: stretch;
+    color: #D1D1D1;
     flex-grow: 0;
 } 
 
