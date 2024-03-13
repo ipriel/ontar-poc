@@ -1,6 +1,6 @@
 import { Outlet, Link } from "react-router-dom";
 import styles from "./Layout.module.css";
-import { ChatMultiple24Regular as ChatIcon, Settings24Filled as SettingsIcon, ChevronDown24Regular as ChevronDownIcon, ChevronUp24Regular as ChevronUpIcon } from "@fluentui/react-icons";
+import { Settings24Filled as SettingsIcon, ChevronDown24Regular as ChevronDownIcon, ChevronUp24Regular as ChevronUpIcon } from "@fluentui/react-icons";
 import { Stack, TextField } from "@fluentui/react";
 import { useEffect, useState } from "react";
 import ProfilePic from "../../assets/profile.png";
@@ -35,15 +35,15 @@ const Layout = () => {
         <Stack className={styles.layout}>
             <div className={styles.sidebarLayout}>
                 <div className={styles.sidebarHeaderContainer}>
-                <Link to="/" className={styles.sidebarLogoContainer}>
-                    <svg width="44" height="55" viewBox="0 0 44 55" fill="#B955E3" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M37.9995 11.7211L21.5583 5.82193L5.11717 11.7211V25.6155C5.11717 32.2997 8.31162 38.5672 13.6831 42.4218L21.5583 48.0731L29.4337 42.4218C34.8051 38.5672 37.9995 32.2997 37.9995 25.6155V11.7211ZM21.5583 54.3682L32.3508 46.6233C39.0652 41.8049 43.0583 33.9708 43.0583 25.6155V8.08245L21.5583 0.368164L0.0583496 8.08245V25.6155C0.0583496 33.9708 4.05141 41.8049 10.7658 46.6233L21.5583 54.3682Z" fill="#B955E3" />
+                    <Link to="/" className={styles.sidebarLogoContainer}>
+                        <svg width="44" height="55" viewBox="0 0 44 55" fill="#B955E3" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M37.9995 11.7211L21.5583 5.82193L5.11717 11.7211V25.6155C5.11717 32.2997 8.31162 38.5672 13.6831 42.4218L21.5583 48.0731L29.4337 42.4218C34.8051 38.5672 37.9995 32.2997 37.9995 25.6155V11.7211ZM21.5583 54.3682L32.3508 46.6233C39.0652 41.8049 43.0583 33.9708 43.0583 25.6155V8.08245L21.5583 0.368164L0.0583496 8.08245V25.6155C0.0583496 33.9708 4.05141 41.8049 10.7658 46.6233L21.5583 54.3682Z" fill="#B955E3" />
+                        </svg>
+                        <h1 className={styles.sidebarLogoText}><span className={styles.sidebarLogoTextHighlight}>ON</span>TAR</h1>
+                    </Link>
+                    <svg width="21" height="15" viewBox="0 0 21 15" fill="#706E86" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1.05835 7.36816H19.0583M1.05835 1.36816H19.0583M1.05835 13.3682H19.0583" stroke="#706E86" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                    <h1 className={styles.sidebarLogoText}><span className={styles.sidebarLogoTextHighlight}>ON</span>TAR</h1>
-                </Link>
-                <svg width="21" height="15" viewBox="0 0 21 15" fill="#706E86" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.05835 7.36816H19.0583M1.05835 1.36816H19.0583M1.05835 13.3682H19.0583" stroke="#706E86" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
                 </div>
                 <div className={styles.companyDropdownContainer}>
                     <svg width="19" height="21" viewBox="0 0 19 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -172,6 +172,7 @@ const Layout = () => {
                             aria-hidden="true"
                         />
                         <p className={styles.menuListItemText}>John Snow</p>
+                        <ChevronUpIcon className={styles.menuListItemChevron} />
                     </li>
                 </ul>
             </div>
@@ -199,8 +200,13 @@ const Layout = () => {
                             <h1 className={styles.headerTitle}>Chatbot</h1>
                             <p className={styles.headerSubtitle}>Your threat activity Monday, March 11, 2024</p>
                         </div>
-                        <div className={styles.shareButtonContainer} role="button" tabIndex={0} aria-label="Share" onClick={handleShareClick} onKeyDown={e => e.key === "Enter" || e.key === " " ? handleShareClick() : null}>
-                            <ChatIcon primaryFill="#706E86" className={styles.shareButton} />
+                        <div className={styles.chatButtonContainer} role="button" tabIndex={0} aria-label="Share" onClick={handleShareClick} onKeyDown={e => e.key === "Enter" || e.key === " " ? handleShareClick() : null}>
+                            <svg className={styles.chatButtonBadge} width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="7.05835" cy="7.36816" r="6" fill="#E87474" stroke="#201F27" stroke-width="2" />
+                            </svg>
+                            <svg className={styles.chatButton} width="30" height="29" viewBox="0 0 30 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke="#5C5A73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12.3917 18.3685L8.29136 22.5201C7.71942 23.0992 7.43344 23.3887 7.18764 23.4091C6.97439 23.4269 6.76559 23.3411 6.62631 23.1787C6.46578 22.9914 6.46578 22.5845 6.46578 21.7705V19.6906C6.46578 18.9604 5.8678 18.4321 5.14531 18.3263V18.3263C3.39669 18.0701 2.0234 16.6968 1.76727 14.9482C1.72504 14.6599 1.72504 14.3158 1.72504 13.6277V7.43516C1.72504 5.19495 1.72504 4.07484 2.16101 3.21919C2.5445 2.46655 3.15643 1.85462 3.90907 1.47113C4.76472 1.03516 5.88483 1.03516 8.12504 1.03516H17.9917C20.2319 1.03516 21.352 1.03516 22.2077 1.47113C22.9603 1.85462 23.5722 2.46655 23.9557 3.21919C24.3917 4.07484 24.3917 5.19495 24.3917 7.43516V13.0352M24.3917 27.7018L21.4898 25.6843C21.0819 25.4007 20.878 25.2589 20.656 25.1584C20.459 25.0692 20.2518 25.0042 20.0391 24.965C19.7995 24.9209 19.5511 24.9209 19.0543 24.9209H16.6584C15.1649 24.9209 14.4182 24.9209 13.8477 24.6302C13.346 24.3746 12.938 23.9666 12.6824 23.4648C12.3917 22.8944 12.3917 22.1477 12.3917 20.6542V17.3018C12.3917 15.8084 12.3917 15.0616 12.6824 14.4912C12.938 13.9894 13.346 13.5815 13.8477 13.3258C14.4182 13.0352 15.1649 13.0352 16.6584 13.0352H24.125C25.6185 13.0352 26.3652 13.0352 26.9357 13.3258C27.4374 13.5815 27.8454 13.9894 28.1011 14.4912C28.3917 15.0616 28.3917 15.8083 28.3917 17.3018V20.9209C28.3917 22.1634 28.3917 22.7846 28.1887 23.2747C27.9181 23.9281 27.3989 24.4472 26.7455 24.7179C26.2555 24.9209 25.6342 24.9209 24.3917 24.9209V27.7018Z" />
+                            </svg>
                         </div>
                     </Stack>
                 </header>

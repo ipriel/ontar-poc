@@ -66,6 +66,7 @@
 }
 
 .menuListItem {
+    position: relative;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -101,6 +102,11 @@
 
 .menuListItemIcon {
     width: 32px;
+}
+
+.menuListItemChevron {
+    position: absolute;
+    right: 0px;
 }
 
 .mainLayout {
@@ -147,7 +153,8 @@
     /* margin-left: 36px; */
 }
 
-.shareButtonContainer {
+.chatButtonContainer {
+    position: relative;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -162,18 +169,14 @@
     cursor: pointer;
 }
 
-.shareButton {
+.chatButton {
     color: #FFFFFF;
 }
 
-.shareButtonText {
-    font-style: normal;
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 20px;
-    display: flex;
-    align-items: center;
-    color: #FFFFFF;
+.chatButtonBadge {
+    position: absolute;
+    top: -5px;
+    right: 9px;
 }
 
 .urlTextBox {

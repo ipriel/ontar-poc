@@ -4,8 +4,7 @@
     align-items: flex-start;
     padding: 8.1285px;
     gap: 5.42px;
-    background: #FFFFFF;
-    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12);
+    background: #1A191F;
     border-radius: 5.419px;
 }
 
@@ -14,7 +13,7 @@
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
-    color: #323130;
+    color: #EEEEEE;
     flex: none;
     order: 1;
     align-self: stretch;
@@ -24,6 +23,10 @@
     word-wrap: break-word;
     max-width: 800px;
     overflow-x: auto;
+}
+
+.answerText > * {
+    margin-block: 0;
 }
 
 .answerFooter {
@@ -62,19 +65,17 @@
     font-size: 12px;
     line-height: 16px;
 
-    color: #115EA3;
+    color: white;
     display: flex;
     flex-direction: row;
     align-items: center;
     padding: 4px 6px;
     gap: 4px;
-    border: 1px solid #D1D1D1;
-    border-radius: 4px;
+    cursor: pointer;
 }
 
 .citationContainer:hover {
-    text-decoration: underline;
-    cursor: pointer;
+    color: #C792FF;
 }
 
 .citation {
@@ -86,8 +87,6 @@
     padding: 0px;
     width: 14px;
     height: 14px;
-    border: 1px solid #E0E0E0;
-    border-radius: 4px;
     flex: none;
     flex-grow: 0;
     z-index: 2;
@@ -96,12 +95,7 @@
     font-size: 10px;
     line-height: 14px;
     text-align: center;
-    color: #424242;
-    cursor: pointer;
-}
-
-.citation:hover {
-    text-decoration: underline;
+    color: #707070;
     cursor: pointer;
 }
 
@@ -112,7 +106,7 @@
     align-items: center;
     padding: 0px;
     margin-top: 4px;
-    color: #616161;
+    color: #C792FF;
     font-size: 10px;
 }
 
@@ -129,7 +123,7 @@
     line-height: 16px;
     display: flex;
     align-items: center;
-    color: #616161;
+    color: #C792FF;
 }
 
 .accordionTitle:hover {
@@ -145,8 +139,6 @@
     padding: 0px;
     width: 14px;
     height: 14px;
-    border: 1px solid #E0E0E0;
-    border-radius: 4px;
     flex: none;
     order: 2;
     flex-grow: 0;
@@ -162,7 +154,6 @@
 
 .clickableSup:hover {
     text-decoration: underline;
-    cursor: pointer;
 }
 
 sup {
