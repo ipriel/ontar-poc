@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import ProfilePic from "../../assets/profile.png";
 
 const Layout = () => {
-    const [isSidebarExpanded, setIsSidebarExpanded] = useState<boolean>(false);
+    const [isSidebarExpanded, setIsSidebarExpanded] = useState<boolean>(true);
 
     return (
         <Stack className={styles.layout} data-sidebar={isSidebarExpanded}>
