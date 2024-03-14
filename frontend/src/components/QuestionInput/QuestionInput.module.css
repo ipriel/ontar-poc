@@ -4,7 +4,7 @@
     flex-grow: 1;
     background: #1A191F;
     border: 1px solid #C792FF;
-    border-radius: 8px;
+    border-radius: 16px;
 
 }
 
@@ -36,6 +36,7 @@
     bottom: 20px;
     padding: 8px;
     margin-inline: 12px;
+    cursor: pointer;
 }
 
 .questionInputSendButtonContainer:focus {

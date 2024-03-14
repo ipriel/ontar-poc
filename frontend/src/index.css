@@ -9,10 +9,8 @@ body {
     padding: 0;
 }
 
-html {
-    background: #f2f2f2;
-    /* font-family: Inter, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; */
-    font-family: Inter;
+html, [class^="ms-"], [class^="css-"] {
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
