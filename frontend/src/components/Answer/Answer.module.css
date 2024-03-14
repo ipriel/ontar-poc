@@ -9,15 +9,8 @@
 }
 
 .answerText {
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
     line-height: 20px;
     color: #EEEEEE;
-    flex: none;
-    order: 1;
-    align-self: stretch;
-    flex-grow: 0;
     margin: 11px;
     white-space: normal;
     word-wrap: break-word;

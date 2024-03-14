@@ -9,7 +9,7 @@ import { parseAnswer } from "./AnswerParser";
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import supersub from 'remark-supersub'
+import supersub from 'remark-supersub';
 
 interface Props {
     answer: AskResponse;

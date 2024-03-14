@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { IconButton, Stack } from "@fluentui/react";
-import { BroomRegular, DismissRegular, SquareFilled, ShieldLockRegular, ErrorCircleRegular } from "@fluentui/react-icons";
+import { SquareFilled, ShieldLockRegular, ErrorCircleRegular } from "@fluentui/react-icons";
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm'
@@ -55,8 +55,27 @@ const Chat = () => {
             content: question
         };
 
+        if (["What users were compromised?", "What servers were compromised?"].includes(question)) {
+            let result: ChatMessage[] = [];
+            if(question == "What users were compromised?") {
+                result.push({ role: "system-base", content: "You have 4 compromised users:\n1. Jack Smith\n2. Mary Brown\n3. Paul Gold\n4. Alastor Jameson\n\nHowever, only 2 users require your immediate attention:"});
+                result.push({ role: "system-issue", content: "# Alastor Jameson\nThis user is a System Admin and by being compromised an attacker can have the following privileges:\n1. Delete data\n2. Shutdown building access\n3. Delete Backups\n" });
+                result.push({ role: "system-issue", content: "# Mary Brown\nThis user is an Admin and by being compromised an attacker can have the following privileges:\n1. Change policies\n2. Reset admin passwords\n3. Create additional users\n" });
+            } else if (question == "What servers were compromised?") {
+                result.push({ role: "system-base", content: "You have 4 compromised servers:\n1. vmware_124\n2. dc_01\n3. exch_02a\n4. erp254\n\nHowever, only 2 servers require your immediate attention:"});
+                result.push({ role: "system-issue", content: "# dc_01\nThis server is a Domain Controller and by being compromised an attacker can have the following privileges:\n1. Access authentication keys\n2. Reset or create Priviledged Service Accounts\n3. Delete or corrupt Active Directory\n" });
+                result.push({ role: "system-issue", content: "# exch_02a\nThis user is an Exchange Server and by being compromised an attacker can have the following privileges:\n1. Access internal communications and files\n2. Use trusted email addresses to spread attack to partners\n" });
+            }
+            
+            setAnswers([...answers, userMessage, ...result]);
+            setIsLoading(false);
+            setShowLoadingMessage(false);
+            abortFuncs.current = abortFuncs.current.filter(a => a !== abortController);
+            return abortController.abort();
+        }
+
         const request: ConversationRequest = {
-            messages: [...answers.filter((answer) => answer.role !== "error"), userMessage]
+            messages: [...answers.filter((answer) => ["user", "assistant"].includes(answer.role)), userMessage]
         };
 
         let result = {} as ChatResponse;
@@ -144,7 +163,7 @@ const Chat = () => {
 
     const sampleQuestions = [
         "What users were compromised?",
-        "What systems were compromised?",
+        "What servers were compromised?",
         "How can businesses defend against social engineering attacks like pretexting?",
         "How does ransomware work, and how can organizations protect against it?",
         "Define a DDoS attack and suggest strategies to mitigate its impact.",
@@ -191,27 +210,54 @@ const Chat = () => {
                             <div className={styles.chatMessageStream} style={{ marginBottom: isLoading ? "40px" : "0px" }} role="log">
                                 {answers.map((answer, index) => (
                                     <>
-                                        {answer.role === "user" ? (
-                                            <div className={styles.chatMessageUser} tabIndex={0}>
-                                                <div className={styles.chatMessageUserMessage}>{answer.content}</div>
-                                            </div>
-                                        ) : (
-                                            answer.role === "assistant" ? <div className={styles.chatMessageGpt}>
-                                                <Answer
-                                                    answer={{
-                                                        answer: answer.content,
-                                                        citations: parseCitationFromMessage(answers[index - 1]),
-                                                    }}
-                                                    onCitationClicked={c => onShowCitation(c)}
-                                                />
-                                            </div> : answer.role === "error" ? <div className={styles.chatMessageError}>
-                                                <Stack horizontal className={styles.chatMessageErrorContent}>
-                                                    <ErrorCircleRegular className={styles.errorIcon} style={{ color: "rgba(182, 52, 67, 1)" }} />
-                                                    <span>Error</span>
-                                                </Stack>
-                                                <span className={styles.chatMessageErrorContent}>{answer.content}</span>
-                                            </div> : null
-                                        )}
+                                        {
+                                            answer.role === "user" ? (
+                                                <div className={styles.chatMessageUser} tabIndex={0}>
+                                                    <div className={styles.chatMessageUserMessage}>{answer.content}</div>
+                                                </div>
+                                            ) : answer.role === "assistant" ? (
+                                                <div className={styles.chatMessageGpt}>
+                                                    <Answer
+                                                        answer={{
+                                                            answer: answer.content,
+                                                            citations: parseCitationFromMessage(answers[index - 1]),
+                                                        }}
+                                                        onCitationClicked={c => onShowCitation(c)}
+                                                    />
+                                                </div>
+                                            ) : answer.role === "error" ? (
+                                                <div className={styles.chatMessageError}>
+                                                    <Stack horizontal className={styles.chatMessageErrorContent}>
+                                                        <ErrorCircleRegular className={styles.errorIcon} stroke="#b63443" />
+                                                        <span style={{ color: "#b63443" }}>Error</span>
+                                                    </Stack>
+                                                    <span className={styles.chatMessageErrorContent}>{answer.content}</span>
+                                                </div>
+                                            ) : answer.role === "system-base" ? (
+                                                <div className={styles.chatMessageSystem} tabIndex={0}>
+                                                    <ReactMarkdown
+                                                        linkTarget="_blank"
+                                                        remarkPlugins={[remarkGfm]}
+                                                        rehypePlugins={[rehypeRaw]}
+                                                        children={answer.content}
+                                                        className={styles.chatMessageSystemMessage}
+                                                    />
+                                                </div>
+                                            ) : answer.role === "system-issue" ? (
+                                                <div className={styles.chatMessageSystem}>
+                                                    <ReactMarkdown
+                                                        linkTarget="_blank"
+                                                        remarkPlugins={[remarkGfm]}
+                                                        rehypePlugins={[rehypeRaw]}
+                                                        children={answer.content}
+                                                        className={styles.chatMessageSystemIssue}
+                                                    />
+                                                    <div className={styles.chatMessageSystemFooter}>
+                                                        <button className={styles.chatMessageSystemButton}>Mitigate Now</button>
+                                                    </div>
+                                                </div>
+                                            ) : null
+                                        }
                                     </>
                                 ))}
                                 {showLoadingMessage && (
