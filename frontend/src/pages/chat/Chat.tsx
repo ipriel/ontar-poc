@@ -7,6 +7,11 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from "rehype-raw";
 import { CopyBlock, dracula } from "react-code-blocks";
 
+
+import user1Pic from "../../assets/user-1.png";
+import user2Pic from "../../assets/user-2.png";
+import user3Pic from "../../assets/user-3.png";
+import user4Pic from "../../assets/user-4.png";
 import styles from "./Chat.module.css";
 // import Ontar from "../../assets/ocf-white.svg";
 
@@ -63,16 +68,16 @@ const Chat = () => {
             if (question == "What users were compromised?") {
                 result.push({
                     role: "system-base", content: JSON.stringify({
-                        title: "Here are the current impacted users by the phishing event",
-                        tableHeaders: ["Full name", "Email", "Type", "IDM", "Risk Potential", "Audit Trail"],
+                        title: "Here are the current impacted users from the phishing event",
+                        tableHeaders: ["", "Full name", "Email", "Type", "IDM", "Risk Potential", "Audit Trail"],
                         tableBody: [
-                            ["Adam Berman", "adam@bank.com", "Super User", "Azure AD", "High", "Audit"],
+                            ["src:" + user1Pic, "Adam Berman", "adam@bank.com", "Super User", "Azure AD", "High", "Audit"],
                             ["The Superuser is a special user account with unrestricted access to all commands and files on the system. They have the highest level of control over the system and can perform any operation, including modifying critical system files and configurations."],
-                            ["Nora Trek", "nora@bank.com", "Elevated User", "Azure AD", "Medium", "Audit"],
+                            ["src:" + user2Pic, "Nora Trek", "nora@bank.com", "Elevated User", "Azure AD", "Medium", "Audit"],
                             ["*Admins* have elevated privileges beyond regular users. They can manage system settings, install and uninstall software, and perform various administrative tasks. They are responsible for maintaining the system, ensuring its security, and managing user accounts."],
-                            ["Will Orno", "will@bank.com", "User", "Azure AD", "Low", "Audit"],
+                            ["src:" + user3Pic, "Will Orno", "will@bank.com", "User", "Azure AD", "Low", "Audit"],
                             ["Regular *Users* have limited permissions, typically only being able to access certain files, applications, and settings based on their user account's privileges."],
-                            ["Sarah James", "Sarah@bank.com", "User", "Azure AD", "Low", "Audit"],
+                            ["src:" + user4Pic, "Sarah James", "Sarah@bank.com", "User", "Azure AD", "Low", "Audit"],
                             ["Regular *Users* have limited permissions, typically only being able to access certain files, applications, and settings based on their user account's privileges."]
                         ]
                     })
@@ -90,70 +95,69 @@ const Chat = () => {
                             "Notify users of the login details "
                         ],
                         scriptLang: "powershell",
-                        script: `
-                    #Read security group details from CSV file
-                    $CSVRecords = Import-CSV "C:\Temp\SecurityGroups.csv"
-                    $TotalItems = $CSVRecords.Count
-                    $i = 0
-                    
-                    #Iterate groups one by one and create
-                    ForEach ($CSVRecord in $CSVRecords) {
-                      $GroupName = $CSVRecord."GroupName"
-                      $GroupDescription = $CSVRecord."GroupDescription"
-                      #Split owners and members by semi-colon separator (;) and set in array
-                      $Owners = If ($CSVRecord."Owners") { $CSVRecord."Owners" -split ';' } Else { $null }
-                      $Members = If ($CSVRecord."Members") { $CSVRecord."Members" -split ';' } Else { $null }
-                     
-                      Try {
-                        $i++;
-                        Write-Progress -Activity "Creating group $GroupName" -Status  "$i out of $TotalItems groups completed" -Id 1
-                     
-                        #Create a new security group
-                        $NewGroupObj = New-AzureADGroup -DisplayName $GroupName -SecurityEnabled $true -Description $GroupDescription  -MailEnabled $false -MailNickName "NotSet" -ErrorAction Stop
-                     
-                        #Add owners
-                        if ($Owners) {
-                          $TotalOwners = $Owners.Count
-                          $OW = 0
-                          ForEach ($Owner in $Owners) {
-                            $OW++
-                            Write-Progress -Activity "Adding owner $Owner" -Status  "$OW out of $TotalOwners owners completed" -ParentId 1
-                            Try {
-                              $UserObj = Get-AzureADUser -ObjectId $Owner -ErrorAction Stop
-                              #Add owner to the new group
-                              Add-AzureADGroupOwner -ObjectId $NewGroupObj.ObjectId -RefObjectId $UserObj.ObjectId -ErrorAction Stop
-                            }
-                            catch {
-                              Write-Host "Error occurred for $Owner" -f Yellow
-                              Write-Host $_ -f Red
-                            }
-                          }
-                        }
-                        #Add members 
-                        if ($Members) {
-                          $TotalMembers = $Members.Count
-                          $m = 0
-                          ForEach ($Member in $Members) {
-                            $m++;
-                            Write-Progress -Activity "Adding member $Member" -Status  "$m out of $TotalMembers members completed" -ParentId 1
-                            Try {
-                              $UserObj = Get-AzureADUser -ObjectId $Member -ErrorAction Stop
-                              #Add a member to the new group
-                              Add-AzureADGroupMember -ObjectId $NewGroupObj.ObjectId -RefObjectId $UserObj.ObjectId -ErrorAction Stop
-                            }
-                            catch {
-                              Write-Host "Error occurred for $Member" -f Yellow
-                              Write-Host $_ -f Red
-                            }
-                          }
-                        }
-                      }
-                      catch {
-                        Write-Host "Error occurred while creating group: $GroupName" -f Yellow
-                        Write-Host $_ -f Red
-                      }
-                    }
-                    `.toString()
+                        script: `#Read security group details from CSV file
+$CSVRecords = Import-CSV "C:\Temp\SecurityGroups.csv"
+$TotalItems = $CSVRecords.Count
+$i = 0
+
+#Iterate groups one by one and create
+ForEach ($CSVRecord in $CSVRecords) {
+  $GroupName = $CSVRecord."GroupName"
+  $GroupDescription = $CSVRecord."GroupDescription"
+  #Split owners and members by semi-colon separator (;) and set in array
+  $Owners = If ($CSVRecord."Owners") { $CSVRecord."Owners" -split ';' } Else { $null }
+  $Members = If ($CSVRecord."Members") { $CSVRecord."Members" -split ';' } Else { $null }
+ 
+  Try {
+    $i++;
+    Write-Progress -Activity "Creating group $GroupName" -Status  "$i out of $TotalItems groups completed" -Id 1
+ 
+    #Create a new security group
+    $NewGroupObj = New-AzureADGroup -DisplayName $GroupName -SecurityEnabled $true -Description $GroupDescription  -MailEnabled $false -MailNickName "NotSet" -ErrorAction Stop
+ 
+    #Add owners
+    if ($Owners) {
+      $TotalOwners = $Owners.Count
+      $OW = 0
+      ForEach ($Owner in $Owners) {
+        $OW++
+        Write-Progress -Activity "Adding owner $Owner" -Status  "$OW out of $TotalOwners owners completed" -ParentId 1
+        Try {
+          $UserObj = Get-AzureADUser -ObjectId $Owner -ErrorAction Stop
+          #Add owner to the new group
+          Add-AzureADGroupOwner -ObjectId $NewGroupObj.ObjectId -RefObjectId $UserObj.ObjectId -ErrorAction Stop
+        }
+        catch {
+          Write-Host "Error occurred for $Owner" -f Yellow
+          Write-Host $_ -f Red
+        }
+      }
+    }
+    #Add members 
+    if ($Members) {
+      $TotalMembers = $Members.Count
+      $m = 0
+      ForEach ($Member in $Members) {
+        $m++;
+        Write-Progress -Activity "Adding member $Member" -Status  "$m out of $TotalMembers members completed" -ParentId 1
+        Try {
+          $UserObj = Get-AzureADUser -ObjectId $Member -ErrorAction Stop
+          #Add a member to the new group
+          Add-AzureADGroupMember -ObjectId $NewGroupObj.ObjectId -RefObjectId $UserObj.ObjectId -ErrorAction Stop
+        }
+        catch {
+          Write-Host "Error occurred for $Member" -f Yellow
+          Write-Host $_ -f Red
+        }
+      }
+    }
+  }
+  catch {
+    Write-Host "Error occurred while creating group: $GroupName" -f Yellow
+    Write-Host $_ -f Red
+  }
+}
+`.toString()
                     })
                 });
             }
@@ -329,7 +333,7 @@ const Chat = () => {
                                                 <div className={styles.chatMessageSystem} tabIndex={0}>
                                                     {[JSON.parse(answer.content)].map(content => (
                                                         <>
-                                                            <h1 className={styles.headerTitle}>{content.title}</h1>
+                                                            <h1 className={styles.chatMessageSystemHeader}>{content.title}</h1>
                                                             <table className={styles.chatMessageSystemTable}>
                                                                 <thead>
                                                                     <tr className={styles.chatMessageSystemTableHeader}>
@@ -342,7 +346,12 @@ const Chat = () => {
                                                                     {content.tableBody.map((row: string[]) => (
                                                                         <tr className={row.length == 1 ? styles.chatMessageSystemTableTooltip : styles.chatMessageSystemTableRow}>
                                                                             {row.map(cell => (
-                                                                                <td colSpan={(content.tableHeaders.length > row.length) ? content.tableHeaders.length / row.length : undefined}>{cell}</td>
+                                                                                <td
+                                                                                    colSpan={(content.tableHeaders.length > row.length) ? content.tableHeaders.length / row.length : undefined}
+                                                                                    data-severity={["high", "medium", "low"].includes(cell.toLowerCase()) ? cell.toLowerCase() : undefined}
+                                                                                >
+                                                                                    {cell.startsWith("src") ? <img src={cell.slice(4)}></img> : <p>{cell}</p>}
+                                                                                </td>
                                                                             ))}
                                                                         </tr>
                                                                     ))}
@@ -369,26 +378,35 @@ const Chat = () => {
                                                                     </button>
                                                                 ))}
                                                             </div>
-                                                            <IconButton className={styles.tabLayoutDismiss} iconProps={{ iconName: 'Cancel' }} aria-label="Close citations panel" onClick={() => setActiveMitigation(-1)} />
+                                                            <IconButton
+                                                                className={styles.tabLayoutDismiss}
+                                                                iconProps={{ iconName: 'Cancel' }}
+                                                                aria-label="Close mitigations panel"
+                                                                onClick={() => {
+                                                                    setActiveMitigation(-1);
+                                                                    setActiveTab(1);
+                                                                }}
+                                                            />
                                                             <div className={(activeTab === 1) ? styles.tabContainerActive : styles.tabContainer}>
-                                                                <h1>Mitigation plan</h1>
+                                                                <h1 className={styles.tabTitle}>Mitigation plan</h1>
                                                                 <p>The mitigation flow is as follows:</p>
-                                                                <ul>
+                                                                <ol className={styles.tabList}>
                                                                     {content.plan.map((step: string) => (
-                                                                        <li>{step}</li>
+                                                                        <li className={styles.tabListItem}>{step}</li>
                                                                     ))}
-                                                                </ul>
+                                                                </ol>
                                                             </div>
                                                             <div className={(activeTab === 2) ? styles.tabContainerActive : styles.tabContainer}>
-                                                                <h1>Scripts</h1>
+                                                                <h1 className={styles.tabTitle}>Scripts</h1>
                                                                 <p>Below are the necessary scripts to implement the mitigations:</p>
                                                                 <div className={styles.codeBlock}>
                                                                     <CopyBlock
-                                                                    language={content.scriptLang}
-                                                                    text={content.script}
-                                                                    showLineNumbers={true}
-                                                                    theme={dracula}
-                                                                />
+                                                                        language={content.scriptLang}
+                                                                        text={content.script}
+                                                                        showLineNumbers={true}
+                                                                        theme={dracula}
+                                                                        codeBlock
+                                                                    />
                                                                 </div>
                                                             </div>
                                                         </div>
