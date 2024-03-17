@@ -3,23 +3,24 @@ import { IconButton, Stack } from "@fluentui/react";
 import { SquareFilled, ShieldLockRegular, ErrorCircleRegular } from "@fluentui/react-icons";
 
 import ReactMarkdown from "react-markdown";
-import remarkGfm from 'remark-gfm'
+import remarkGfm from 'remark-gfm';
 import rehypeRaw from "rehype-raw";
+import { CopyBlock, dracula } from "react-code-blocks";
 
 import styles from "./Chat.module.css";
-import Ontar from "../../assets/ocf-white.svg";
+// import Ontar from "../../assets/ocf-white.svg";
 
 import {
     ChatMessage,
     ConversationRequest,
     conversationApi,
-    Citation,
     ToolMessageContent,
     ChatResponse,
     getUserInfo
 } from "../../api";
 import { Answer } from "../../components/Answer";
 import { QuestionInput } from "../../components/QuestionInput";
+import { Citation } from '../../api/models';
 
 const Chat = () => {
     const lastQuestionRef = useRef<string>("");
@@ -28,6 +29,8 @@ const Chat = () => {
     const [showLoadingMessage, setShowLoadingMessage] = useState<boolean>(false);
     const [activeCitation, setActiveCitation] = useState<[content: string, id: string, title: string, filepath: string, url: string, metadata: string]>();
     const [isCitationPanelOpen, setIsCitationPanelOpen] = useState<boolean>(false);
+    const [activeMitigation, setActiveMitigation] = useState<number>(-1);
+    const [activeTab, setActiveTab] = useState<number>(1);
     const [answers, setAnswers] = useState<ChatMessage[]>([]);
     const abortFuncs = useRef([] as AbortController[]);
     const [showAuthMessage, setShowAuthMessage] = useState<boolean>(true);
@@ -55,18 +58,106 @@ const Chat = () => {
             content: question
         };
 
-        if (["What users were compromised?", "What servers were compromised?"].includes(question)) {
+        if (["What users were compromised?"].includes(question)) {
             let result: ChatMessage[] = [];
-            if(question == "What users were compromised?") {
-                result.push({ role: "system-base", content: "You have 4 compromised users:\n1. Jack Smith\n2. Mary Brown\n3. Paul Gold\n4. Alastor Jameson\n\nHowever, only 2 users require your immediate attention:"});
-                result.push({ role: "system-issue", content: "# Alastor Jameson\nThis user is a System Admin and by being compromised an attacker can have the following privileges:\n1. Delete data\n2. Shutdown building access\n3. Delete Backups\n" });
-                result.push({ role: "system-issue", content: "# Mary Brown\nThis user is an Admin and by being compromised an attacker can have the following privileges:\n1. Change policies\n2. Reset admin passwords\n3. Create additional users\n" });
-            } else if (question == "What servers were compromised?") {
-                result.push({ role: "system-base", content: "You have 4 compromised servers:\n1. vmware_124\n2. dc_01\n3. exch_02a\n4. erp254\n\nHowever, only 2 servers require your immediate attention:"});
-                result.push({ role: "system-issue", content: "# dc_01\nThis server is a Domain Controller and by being compromised an attacker can have the following privileges:\n1. Access authentication keys\n2. Reset or create Priviledged Service Accounts\n3. Delete or corrupt Active Directory\n" });
-                result.push({ role: "system-issue", content: "# exch_02a\nThis user is an Exchange Server and by being compromised an attacker can have the following privileges:\n1. Access internal communications and files\n2. Use trusted email addresses to spread attack to partners\n" });
+            if (question == "What users were compromised?") {
+                result.push({
+                    role: "system-base", content: JSON.stringify({
+                        title: "Here are the current impacted users by the phishing event",
+                        tableHeaders: ["Full name", "Email", "Type", "IDM", "Risk Potential", "Audit Trail"],
+                        tableBody: [
+                            ["Adam Berman", "adam@bank.com", "Super User", "Azure AD", "High", "Audit"],
+                            ["The Superuser is a special user account with unrestricted access to all commands and files on the system. They have the highest level of control over the system and can perform any operation, including modifying critical system files and configurations."],
+                            ["Nora Trek", "nora@bank.com", "Elevated User", "Azure AD", "Medium", "Audit"],
+                            ["*Admins* have elevated privileges beyond regular users. They can manage system settings, install and uninstall software, and perform various administrative tasks. They are responsible for maintaining the system, ensuring its security, and managing user accounts."],
+                            ["Will Orno", "will@bank.com", "User", "Azure AD", "Low", "Audit"],
+                            ["Regular *Users* have limited permissions, typically only being able to access certain files, applications, and settings based on their user account's privileges."],
+                            ["Sarah James", "Sarah@bank.com", "User", "Azure AD", "Low", "Audit"],
+                            ["Regular *Users* have limited permissions, typically only being able to access certain files, applications, and settings based on their user account's privileges."]
+                        ]
+                    })
+                });
+                result.push({
+                    role: "system-mitigation", content: JSON.stringify({
+                        plan: [
+                            "Revoke users active sessions and MFA tokens",
+                            "Re-Register users to MFA ",
+                            "Create a Conditional access policy to allow access only from NY offices and NY geo region ",
+                            "Block direct and indirect users ",
+                            "Reset users password ",
+                            "Recall phishing emails sent by them to the organization boxes",
+                            "Enable users ",
+                            "Notify users of the login details "
+                        ],
+                        scriptLang: "powershell",
+                        script: `
+                    #Read security group details from CSV file
+                    $CSVRecords = Import-CSV "C:\Temp\SecurityGroups.csv"
+                    $TotalItems = $CSVRecords.Count
+                    $i = 0
+                    
+                    #Iterate groups one by one and create
+                    ForEach ($CSVRecord in $CSVRecords) {
+                      $GroupName = $CSVRecord."GroupName"
+                      $GroupDescription = $CSVRecord."GroupDescription"
+                      #Split owners and members by semi-colon separator (;) and set in array
+                      $Owners = If ($CSVRecord."Owners") { $CSVRecord."Owners" -split ';' } Else { $null }
+                      $Members = If ($CSVRecord."Members") { $CSVRecord."Members" -split ';' } Else { $null }
+                     
+                      Try {
+                        $i++;
+                        Write-Progress -Activity "Creating group $GroupName" -Status  "$i out of $TotalItems groups completed" -Id 1
+                     
+                        #Create a new security group
+                        $NewGroupObj = New-AzureADGroup -DisplayName $GroupName -SecurityEnabled $true -Description $GroupDescription  -MailEnabled $false -MailNickName "NotSet" -ErrorAction Stop
+                     
+                        #Add owners
+                        if ($Owners) {
+                          $TotalOwners = $Owners.Count
+                          $OW = 0
+                          ForEach ($Owner in $Owners) {
+                            $OW++
+                            Write-Progress -Activity "Adding owner $Owner" -Status  "$OW out of $TotalOwners owners completed" -ParentId 1
+                            Try {
+                              $UserObj = Get-AzureADUser -ObjectId $Owner -ErrorAction Stop
+                              #Add owner to the new group
+                              Add-AzureADGroupOwner -ObjectId $NewGroupObj.ObjectId -RefObjectId $UserObj.ObjectId -ErrorAction Stop
+                            }
+                            catch {
+                              Write-Host "Error occurred for $Owner" -f Yellow
+                              Write-Host $_ -f Red
+                            }
+                          }
+                        }
+                        #Add members 
+                        if ($Members) {
+                          $TotalMembers = $Members.Count
+                          $m = 0
+                          ForEach ($Member in $Members) {
+                            $m++;
+                            Write-Progress -Activity "Adding member $Member" -Status  "$m out of $TotalMembers members completed" -ParentId 1
+                            Try {
+                              $UserObj = Get-AzureADUser -ObjectId $Member -ErrorAction Stop
+                              #Add a member to the new group
+                              Add-AzureADGroupMember -ObjectId $NewGroupObj.ObjectId -RefObjectId $UserObj.ObjectId -ErrorAction Stop
+                            }
+                            catch {
+                              Write-Host "Error occurred for $Member" -f Yellow
+                              Write-Host $_ -f Red
+                            }
+                          }
+                        }
+                      }
+                      catch {
+                        Write-Host "Error occurred while creating group: $GroupName" -f Yellow
+                        Write-Host $_ -f Red
+                      }
+                    }
+                    `.toString()
+                    })
+                });
             }
-            
+
             setAnswers([...answers, userMessage, ...result]);
             setIsLoading(false);
             setShowLoadingMessage(false);
@@ -163,12 +254,12 @@ const Chat = () => {
 
     const sampleQuestions = [
         "What users were compromised?",
-        "What servers were compromised?",
         "How can businesses defend against social engineering attacks like pretexting?",
         "How does ransomware work, and how can organizations protect against it?",
         "Define a DDoS attack and suggest strategies to mitigate its impact.",
         "Define a zero-day exploit and discuss how organizations can respond to it.",
-        "What is fishing, and how can individuals avoid falling for it?",
+        "What is phishing, and how can individuals avoid falling for it?",
+        "What is a man-in-the-middle attack, and when might it occur?",
         "Explain the difference between a virus and a worm in cybersecurity."
     ]
 
@@ -236,27 +327,73 @@ const Chat = () => {
                                                 </div>
                                             ) : answer.role === "system-base" ? (
                                                 <div className={styles.chatMessageSystem} tabIndex={0}>
-                                                    <ReactMarkdown
-                                                        linkTarget="_blank"
-                                                        remarkPlugins={[remarkGfm]}
-                                                        rehypePlugins={[rehypeRaw]}
-                                                        children={answer.content}
-                                                        className={styles.chatMessageSystemMessage}
-                                                    />
-                                                </div>
-                                            ) : answer.role === "system-issue" ? (
-                                                <div className={styles.chatMessageSystem}>
-                                                    <ReactMarkdown
-                                                        linkTarget="_blank"
-                                                        remarkPlugins={[remarkGfm]}
-                                                        rehypePlugins={[rehypeRaw]}
-                                                        children={answer.content}
-                                                        className={styles.chatMessageSystemIssue}
-                                                    />
+                                                    {[JSON.parse(answer.content)].map(content => (
+                                                        <>
+                                                            <h1 className={styles.headerTitle}>{content.title}</h1>
+                                                            <table className={styles.chatMessageSystemTable}>
+                                                                <thead>
+                                                                    <tr className={styles.chatMessageSystemTableHeader}>
+                                                                        {content.tableHeaders.map((header: string) => (
+                                                                            <th>{header}</th>
+                                                                        ))}
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody className={styles.chatMessageSystemTableBody}>
+                                                                    {content.tableBody.map((row: string[]) => (
+                                                                        <tr className={row.length == 1 ? styles.chatMessageSystemTableTooltip : styles.chatMessageSystemTableRow}>
+                                                                            {row.map(cell => (
+                                                                                <td colSpan={(content.tableHeaders.length > row.length) ? content.tableHeaders.length / row.length : undefined}>{cell}</td>
+                                                                            ))}
+                                                                        </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                            </table>
+                                                        </>
+                                                    ))}
                                                     <div className={styles.chatMessageSystemFooter}>
-                                                        <button className={styles.chatMessageSystemButton}>Mitigate Now</button>
+                                                        <button className={styles.chatMessageSystemButton} onClick={() => setActiveMitigation(index + 1)}>Mitigate Now</button>
                                                     </div>
                                                 </div>
+                                            ) : answer.role === "system-mitigation" && activeMitigation === index ? (
+                                                <div className={styles.chatMessageSystemMitigation}>
+                                                    {[JSON.parse(answer.content)].map(content => (
+                                                        <div className={styles.tabLayout}>
+                                                            <div className={styles.tabSelectorContainer}>
+                                                                {["Plan", "Scripts"].map((label, index) => (
+                                                                    <button
+                                                                        className={(activeTab === index + 1) ? styles.tabSelectorActive : styles.tabSelector}
+                                                                        onClick={() => setActiveTab(index + 1)}
+                                                                        data-tab={index + 1}
+                                                                    >
+                                                                        {label}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                            <IconButton className={styles.tabLayoutDismiss} iconProps={{ iconName: 'Cancel' }} aria-label="Close citations panel" onClick={() => setActiveMitigation(-1)} />
+                                                            <div className={(activeTab === 1) ? styles.tabContainerActive : styles.tabContainer}>
+                                                                <h1>Mitigation plan</h1>
+                                                                <p>The mitigation flow is as follows:</p>
+                                                                <ul>
+                                                                    {content.plan.map((step: string) => (
+                                                                        <li>{step}</li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                            <div className={(activeTab === 2) ? styles.tabContainerActive : styles.tabContainer}>
+                                                                <h1>Scripts</h1>
+                                                                <p>Below are the necessary scripts to implement the mitigations:</p>
+                                                                <div className={styles.codeBlock}>
+                                                                    <CopyBlock
+                                                                    language={content.scriptLang}
+                                                                    text={content.script}
+                                                                    showLineNumbers={true}
+                                                                    theme={dracula}
+                                                                />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div >
                                             ) : null
                                         }
                                     </>
@@ -327,15 +464,23 @@ const Chat = () => {
                     {answers.length > 0 && isCitationPanelOpen && activeCitation && (
                         <Stack.Item className={styles.citationPanelWrapper}>
                             <div className={styles.citationPanel} tabIndex={0} role="tabpanel" aria-label="Citations Panel">
-                                <Stack aria-label="Citations Panel Header Container" horizontal className={styles.citationPanelHeaderContainer} horizontalAlign="space-between" verticalAlign="center">
-                                    <span aria-label="Citations" className={styles.citationPanelHeader}>Citations</span>
+                                <Stack aria-label="Citations Panel Header Container" horizontal className={styles.citationPanelTitleContainer} horizontalAlign="space-between" verticalAlign="center">
+                                    <span aria-label="Citations" className={styles.citationPanelTitle}>Citations</span>
                                     <IconButton className={styles.citationPanelDismiss} iconProps={{ iconName: 'Cancel' }} aria-label="Close citations panel" onClick={() => setIsCitationPanelOpen(false)} />
                                 </Stack>
-                                <h5 className={styles.citationPanelTitle} tabIndex={0}>{activeCitation[2]}</h5>
+                                <div className={styles.citationPanelHeader}>
+                                    {
+                                        activeCitation[2].replace("url:", "||url:").split("||").map(header => header.split(/(?<=^\w+):\s/)).map((header => (
+                                            <>
+                                                <span className={styles.citationPanelHeaderTitle} tabIndex={0}>{header[0].charAt(0).toUpperCase() + header[0].slice(1)}: </span>
+                                                <span className={styles.citationPanelHeaderContent}>{header[1]}</span>
+                                            </>
+                                        )))
+                                    }
+                                </div>
                                 <div className={styles.citationPanelContent} tabIndex={0}>
                                     <ReactMarkdown
                                         linkTarget="_blank"
-                                        className={styles.citationPanelContent}
                                         children={activeCitation[0]}
                                         remarkPlugins={[remarkGfm]}
                                         rehypePlugins={[rehypeRaw]}

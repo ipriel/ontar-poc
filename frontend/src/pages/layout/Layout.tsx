@@ -8,6 +8,14 @@ import ProfilePic from "../../assets/profile.png";
 const Layout = () => {
     const [isSidebarExpanded, setIsSidebarExpanded] = useState<boolean>(true);
 
+    const getCurrentDateTime = () => {
+        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const date = new Date();
+        //Monday, March 11, 2024
+        return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`
+    }
+
     return (
         <Stack className={styles.layout} data-sidebar={isSidebarExpanded}>
             <div className={styles.sidebarLayout} style={{ width: isSidebarExpanded ? "300px" : "auto" }}>
@@ -185,7 +193,7 @@ const Layout = () => {
                                 </svg>
                             </div>
                             <h1 className={styles.headerTitle}>Chatbot</h1>
-                            <p className={styles.headerSubtitle}>Your threat activity Monday, March 11, 2024</p>
+                            <p className={styles.headerSubtitle}>Your threat activity {getCurrentDateTime()}</p>
                         </div>
                         <div className={styles.chatButtonContainer} role="button" tabIndex={0} aria-label="Chat">
                             <svg className={styles.chatButtonBadge} width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">

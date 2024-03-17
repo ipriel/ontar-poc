@@ -14,11 +14,13 @@
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
     "react": "^18.2.0",
+    "react-code-blocks": "^0.1.6",
     "react-dom": "^18.2.0",
     "react-markdown": "^7.0.1",
     "react-router-dom": "^6.8.1",
     "rehype-raw": "^6.1.1",
     "remark-gfm": "^3.0.1",
+    "remark-grid-tables": "^2.2.1",
     "remark-supersub": "^1.0.0"
   },
   "devDependencies": {
