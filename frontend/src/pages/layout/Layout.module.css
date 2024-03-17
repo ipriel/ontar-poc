@@ -132,6 +132,7 @@
 }
 
 .menuListItemImage {
+    display: block;
     border-radius: 50%;
     filter: grayscale();
     width: 32px;
