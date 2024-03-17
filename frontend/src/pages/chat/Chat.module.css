@@ -117,13 +117,14 @@
     flex-direction: column;
     align-items: flex-start;
     padding: 10px;
+    padding-left: 20px;
     gap: 5.5px;
     background: #1A191F;
     border-radius: 8px;
 }
 
 .chatMessageSystemMessage,
-.chatMessageSystemIssue {
+.chatMessageSystemMitigation {
     color: #EEEEEE;
     margin-inline: 12px;
     font-size: 14px;
@@ -134,6 +135,58 @@
     overflow-x: auto;
 }
 
+.chatMessageSystemMitigation {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 8px;
+    padding: 10px;
+    max-width: 40%;
+    background: #1A191F;
+    border: 1px solid #C792FF;
+}
+
+.codeBlock > * {
+    overflow: scroll;
+    max-height: 50vh;
+}
+
+.tabContainer {
+    display: none;
+}
+
+.tabLayout {
+    position: relative;
+}
+
+.tabLayoutDismiss {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    color: #5C5A73;
+    cursor: pointer;
+}
+
+.tabContainerActive {
+    display: block;
+}
+
+.tabSelector {
+    color: #5C5A73;
+    border-color: #5C5A73;
+    background: #1A191F;
+    border-radius: 8px;
+}
+
+.tabSelectorActive {
+    color: #C792FF;
+    border-color: #C792FF;
+    background: #1A191F;
+    border-radius: 8px;
+}
+
 .chatMessageSystemMessage > * {
     font-size: 14px;
     line-height: 22px;
@@ -142,7 +195,7 @@
     margin-block: 4px;
 }
 
-.chatMessageSystemIssue > * {
+.chatMessageSystemMitigation > * {
     font-size: 14px;
     line-height: 28px;
     white-space: normal;
@@ -150,7 +203,7 @@
     margin-block: 4px;
 }
 
-.chatMessageSystemIssue > h1 {
+.chatMessageSystemMitigation > h1 {
     color: #B692F6;
 }
 
@@ -158,7 +211,7 @@
     padding-inline-start: 24px;
 }
 
-.chatMessageSystemIssue > ol {
+.chatMessageSystemMitigation > ol {
     color: #706E86;
     padding-inline-start: 24px;
 }
@@ -185,6 +238,7 @@
 .chatMessageSystemButton:hover,
 .chatMessageSystemButton:focus,
 .chatMessageSystemButton:focus-within {
+    border-color: #482869;
     background-color: #482869;
     color: #C792FF;
 }
@@ -194,6 +248,70 @@
     margin-bottom: 12px;
     max-width: 80%;
     display: flex;
+}
+
+.chatMessageSystemTable {
+    border-spacing: 0px;
+    color: black;
+    margin-bottom: 20px;
+}
+
+.chatMessageSystemTableCell {
+    margin: 0;
+}
+
+.chatMessageSystemTable td,
+.chatMessageSystemTable th {
+    padding: 5px;
+    border-right: 1px solid white;
+    text-align: center;
+}
+
+.chatMessageSystemTable td:last-child,
+.chatMessageSystemTable th:last-child {
+    border-right: none;
+}
+
+.chatMessageSystemTable td:last-child {
+    text-decoration: underline;
+    color: blue;
+}
+
+.chatMessageSystemTable th {
+    border-bottom: 2px solid white;
+}
+
+.chatMessageSystemTableBody tr:nth-child(4n+1) {
+    background-color: #706e86;
+}
+
+.chatMessageSystemTableBody tr:nth-child(2n+1 of .chatMessageSystemTableRow) {
+    background-color: #706e86;
+}
+
+.chatMessageSystemTableBody tr:nth-child(2n of .chatMessageSystemTableRow) {
+    background-color: lightgrey;
+}
+
+.chatMessageSystemTableHeader {
+    background-color: #3a3946;
+    color: white;
+}
+
+.chatMessageSystemTableTooltip {
+    position: absolute;
+    display: none;
+    background: whitesmoke;
+    border: 1px solid;
+    transform: translate3d(5px, 5px, 0);
+}
+
+.chatMessageSystemTableTooltip:last-child {
+    transform: translate3d(5px, calc(-200% - 3px), 0);
+}
+
+.chatMessageSystemTableRow:hover+.chatMessageSystemTableTooltip:has( p:not(:empty)) {
+    display: block;
 }
 
 .chatMessageError {
@@ -328,7 +446,7 @@
     transform: translateX(-50%);
     border-radius: 8px;
     padding-block: 8px;
-    max-width: 30%;
+    max-width: 40%;
     background: #1A191F;
     border: 1px solid #C792FF;
 }
@@ -337,7 +455,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 12px 16px;
+    padding: 0px 16px 12px;
     gap: 8px;
     flex: auto;
     align-self: stretch;
@@ -346,14 +464,21 @@
     max-height: 80vh;
 }
 
-.citationPanelHeaderContainer {
-    width: 100%;
+.citationPanelTitleContainer {
+    position: sticky;
+    top: 0px;
+    background: #1A191F;
+    padding-block: 10px 15px;
+    margin-bottom: -20px;
+    border-bottom: 1px solid #3C3C47;
+    box-shadow: 0px 10px #1A191F;
+    align-self: stretch;
 }
 
-.citationPanelHeader {
+.citationPanelTitle {
     font-style: normal;
     font-weight: 600;
-    font-size: 18px;
+    font-size: 22px;
     line-height: 24px;
     color: White;
     flex: none;
@@ -372,17 +497,32 @@
     background-color: #D1D1D1;
 }
 
-.citationPanelTitle {
+.citationPanelHeader {
+    display: grid;
+    grid-template-columns: min-content 1fr;
+    padding-block: 12px;
+    margin-top: 12px;
+    gap: 15px;
+    border-block: 1px solid #3C3C47;
+}
+
+.citationPanelHeaderTitle {
     font-weight: 600;
     font-size: 16px;
     line-height: 22px;
     color: #D1D1D1;
-    margin-block: 12px;
-} 
+}
+
+.citationPanelHeaderContent {
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+}
 
 .citationPanelContent {
     color: #D1D1D1;
     flex-grow: 0;
+    overflow-wrap: anywhere;
+    white-space: break-spaces;
 } 
 
 a {
