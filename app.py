@@ -7,11 +7,9 @@ from quart import (
     Blueprint,
     Quart,
     jsonify,
-    make_response,
+    Response,
     request,
-    send_from_directory,
-    render_template,
-    current_app,
+    send_from_directory
 )
 from dotenv import load_dotenv
 
