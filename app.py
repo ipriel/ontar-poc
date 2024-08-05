@@ -3,23 +3,38 @@ import os
 import logging
 import requests
 import openai
-from flask import Flask, Response, request, jsonify, send_from_directory
+from quart import (
+    Blueprint,
+    Quart,
+    jsonify,
+    make_response,
+    request,
+    send_from_directory,
+    render_template,
+    current_app,
+)
 from dotenv import load_dotenv
 
 load_dotenv()
 
-app = Flask(__name__, static_folder="static")
+bp = Blueprint("routes", __name__, static_folder="static", template_folder="static")
+
+def create_app():
+    app = Quart(__name__)
+    app.register_blueprint(bp)
+    app.config["TEMPLATES_AUTO_RELOAD"] = True
+    return app
 
 # Static Files
-@app.route("/")
+@bp.route("/")
 def index():
-    return app.send_static_file("index.html")
+    return bp.send_static_file("index.html")
 
-@app.route("/favicon.ico")
+@bp.route("/favicon.ico")
 def favicon():
-    return app.send_static_file('favicon.ico')
+    return bp.send_static_file('favicon.ico')
 
-@app.route("/assets/<path:path>")
+@bp.route("/assets/<path:path>")
 def assets(path):
     return send_from_directory("static/assets", path)
 
@@ -64,12 +79,6 @@ def is_chat_model():
         return True
     return False
 
-def should_use_data():
-    if AZURE_SEARCH_SERVICE and AZURE_SEARCH_INDEX and AZURE_SEARCH_KEY:
-        return True
-    return False
-
-
 def format_as_ndjson(obj: dict) -> str:
     return json.dumps(obj, ensure_ascii=False) + "\n"
 
@@ -111,7 +120,7 @@ def generateFilterString(userToken):
 
 
 def prepare_body_headers_with_data(request):
-    request_messages = request.json["messages"]
+    request_messages = request.get("messages", [])
 
     # Set query type
     query_type = "simple"
@@ -223,10 +232,7 @@ def conversation_with_data(request):
 
         return Response(format_as_ndjson(r), status=status_code)
     else:
-        if request.method == "POST":
-            return Response(stream_with_data(body, headers, endpoint))
-        else:
-            return Response(None)
+        return Response(stream_with_data(body, headers, endpoint))
 
 def stream_without_data(response):
     responseText = ""
@@ -256,7 +262,8 @@ def conversation_without_data(request):
     openai.api_version = "2023-03-15-preview"
     openai.api_key = AZURE_OPENAI_KEY
 
-    request_messages = request.json["messages"]
+    request_messages = request.get("messages", [])
+
     messages = [
         {
             "role": "system",
@@ -296,18 +303,12 @@ def conversation_without_data(request):
 
         return jsonify(response_obj), 200
     else:
-        if request.method == "POST":
-            return Response(stream_without_data(response))
-        else:
-            return Response(None)
+        return Response(stream_without_data(response))
 
-@app.route("/conversation", methods=["GET", "POST"])
+@bp.route("/conversation", methods=["GET", "POST"])
 def conversation():
     try:
-        logging.debug("test python changes")
-        print("test python changes####################################")
-        use_data = should_use_data()
-        if use_data:
+        if AZURE_SEARCH_SERVICE and AZURE_SEARCH_INDEX and AZURE_SEARCH_KEY:
             result = conversation_with_data(request)
             print(str(result))
             return result
@@ -317,5 +318,4 @@ def conversation():
         logging.exception("Exception in /conversation")
         return jsonify({"error": str(e)}), 500
 
-if __name__ == "__main__":
-    app.run()
+app = create_app()
