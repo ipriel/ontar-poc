@@ -4,15 +4,21 @@ from quart import (
     Quart,
     jsonify,
     request,
-    send_from_directory
+    Response,
+    send_from_directory,
+    websocket
 )
 from backend.settings import app_settings
 from backend.utils.azure import (
     conversation_with_data,
-    conversation_without_data
+    conversation_without_data,
+    fetchUpdate
 )
+from backend.utils.data import serialize
+from backend.broker import Broker
 
 bp = Blueprint("routes", __name__, static_folder="static", template_folder="static")
+broker = Broker()
 
 def create_app():
     app = Quart(__name__)
@@ -33,6 +39,22 @@ async def favicon():
 async def assets(path):
     return await send_from_directory("static/assets", path)
 
+# Webhooks
+@bp.route("/interop/new_event", methods=["POST"])
+async def new_event():
+    await broker.publish("new_event")
+    return Response("OK")
+
+@bp.route("/interop/update_event", methods=["POST"])
+async def update_event():
+    await broker.publish("update_event")
+    return Response("OK")
+
+@bp.route("/interop/close_event", methods=["POST"])
+async def close_event():
+    await broker.publish("close_event")
+    return Response("OK")
+
 # App Routes
 @bp.route("/conversation", methods=["GET", "POST"])
 async def conversation():
@@ -46,6 +68,38 @@ async def conversation():
     except Exception as e:
         logging.exception("Exception in /conversation")
         return jsonify({"error": str(e)}), 500
+
+@bp.route("/api/riskyUsers", methods=["GET"])
+async def getRiskyUsers():
+    data, status_code = fetchUpdate("getRiskyUsers", app_settings.functions.risky_users_key, True)
+    data = [serialize(user) for user in data]
+    return jsonify(data)
+
+@bp.route("/api/alerts", methods=["GET"])
+async def getAlerts():
+    data, status_code = fetchUpdate("getAlerts", app_settings.functions.alerts_key, True)
+    data = [serialize(alert) for alert in data]
+    return jsonify(data)
+
+@bp.route("/api/incidents", methods=["GET"])
+async def getIncidents():
+    data, status_code = fetchUpdate("getIncidents", app_settings.functions.incidents_key, True)
+    return Response(response=data, status=status_code)
+
+@bp.route("/api/recommendations", methods=["GET"])
+async def getRecommendations():
+    data, status_code = fetchUpdate("getRecommendations", app_settings.functions.recommendations_key)
+    return Response(response=data, status=status_code)
+
+@bp.route("/api/remediations", methods=["GET"])
+async def getRemediations():
+    data, status_code = fetchUpdate("getRemediations", app_settings.functions.remediations_key)
+    return Response(response=data, status=status_code)
+
+@bp.websocket("/notifier")
+async def notifier():
+    async for message in broker.subscribe():
+        await websocket.send(message)
 
 # Init App
 app = create_app()

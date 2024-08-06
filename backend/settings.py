@@ -66,8 +66,22 @@ class _AzureOpenAISettings(BaseSettings):
     def base_url(self) -> str:
         return self.endpoint if self.endpoint else f"https://{self.resource}.openai.azure.com/"
 
+class _AzureFunctionsSettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=DOTENV_PATH,
+        env_prefix='AZURE_FUNCTION_',
+        extra='ignore',
+        env_ignore_empty=True
+    )
+    risky_users_key: str|None = Field(default=None)
+    alerts_key: str|None = Field(default=None)
+    incidents_key: str|None = Field(default=None)
+    recommendations_key: str|None = Field(default=None)
+    remediations_key: str|None = Field(default=None)
+
 class _AppSettings():
     search: _AzureSearchSettings = _AzureSearchSettings()
     openai: _AzureOpenAISettings = _AzureOpenAISettings()
+    functions: _AzureFunctionsSettings = _AzureFunctionsSettings()
 
 app_settings = _AppSettings()

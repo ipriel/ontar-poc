@@ -1,6 +1,7 @@
 import openai
 import requests
 import json
+import jsonpickle
 from quart import jsonify, Response, Request
 from backend.settings import app_settings
 from backend.utils.data import format_as_ndjson
@@ -224,3 +225,17 @@ async def conversation_without_data(request: Request):
         return jsonify(response_obj), 200
     else:
         return Response(stream_without_data(response))
+
+def fetchUpdate(function:str, key:str, isPickle:bool = False):
+    base_url = f"https://ontarfuntionsapp.azurewebsites.net/api"
+    endpoint = f"{base_url}/{function}?code={key}"
+    
+    r = requests.post(endpoint)
+    status_code = r.status_code
+
+    if isPickle:
+        r = jsonpickle.decode(r.text)
+    else:
+        r = r.json()
+    
+    return r, status_code
