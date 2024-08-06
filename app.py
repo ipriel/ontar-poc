@@ -73,13 +73,13 @@ async def conversation():
 async def getRiskyUsers():
     data, status_code = fetchUpdate("getRiskyUsers", app_settings.functions.risky_users_key, True)
     data = [serialize(user) for user in data]
-    return jsonify(data)
+    return jsonify(data), status_code
 
 @bp.route("/api/alerts", methods=["GET"])
 async def getAlerts():
     data, status_code = fetchUpdate("getAlerts", app_settings.functions.alerts_key, True)
     data = [serialize(alert) for alert in data]
-    return jsonify(data)
+    return jsonify(data), status_code
 
 @bp.route("/api/incidents", methods=["GET"])
 async def getIncidents():
