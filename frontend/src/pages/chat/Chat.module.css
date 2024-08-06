@@ -350,6 +350,10 @@
     align-items: center;
 }
 
+div.chatMessageErrorContent {
+    margin-bottom: 0.5rem;
+}
+
 .errorIcon {
     color: #b63443
 }
