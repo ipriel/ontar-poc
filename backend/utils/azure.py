@@ -7,14 +7,11 @@ from backend.utils.data import format_as_ndjson
 
 def fetchUserGroups(userToken, nextLink=None):
     # Recursively fetch group membership
-    if nextLink:
-        endpoint = nextLink
-    else:
-        endpoint = "https://graph.microsoft.com/v1.0/me/transitiveMemberOf?$select=id"
-    
+    endpoint = nextLink if nextLink is None else "https://graph.microsoft.com/v1.0/me/transitiveMemberOf?$select=id"
     headers = {
         'Authorization': "bearer " + userToken
     }
+
     try :
         r = requests.get(endpoint, headers=headers)
         if r.status_code != 200:
@@ -48,15 +45,15 @@ async def prepare_body_headers_with_data(request: Request):
 
     # Set query type
     query_type = "simple"
-    if app_settings.search.query_type:
+    if app_settings.search.query_type is not None:
         query_type = app_settings.search.query_type
-    elif app_settings.search.use_semantic_search.lower() == "true" and app_settings.search.semantic_search_config:
+    elif app_settings.search.use_semantic_search and app_settings.search.semantic_search_config is not None:
         query_type = "semantic"
 
     # Set filter
     filter = None
     userToken = None
-    if app_settings.search.permitted_groups_column:
+    if app_settings.search.permitted_groups_column is not None:
         userToken = request.headers.get('X-MS-TOKEN-AAD-ACCESS-TOKEN', "")
         filter = generateFilterString(userToken)
 
@@ -145,17 +142,16 @@ def stream_with_data(body, headers, endpoint):
 
 async def conversation_with_data(request: Request):
     body, headers = await prepare_body_headers_with_data(request)
-    base_url = app_settings.openai.endpoint if app_settings.openai.endpoint else f"https://{app_settings.openai.resource}.openai.azure.com/"
-    endpoint = f"{base_url}openai/deployments/{app_settings.openai.model}/extensions/chat/completions?api-version={app_settings.openai.preview_api_version}"
+    endpoint = f"{app_settings.openai.base_url}openai/deployments/{app_settings.openai.model}/extensions/chat/completions?api-version={app_settings.openai.preview_api_version}"
     
-    if not app_settings.openai.should_stream:
+    if app_settings.openai.should_stream:
+        return Response(stream_with_data(body, headers, endpoint))
+    else:
         r = requests.post(endpoint, headers=headers, json=body)
         status_code = r.status_code
         r = r.json()
 
         return Response(format_as_ndjson(r), status=status_code)
-    else:
-        return Response(stream_with_data(body, headers, endpoint))
 
 def stream_without_data(response):
     responseText = ""
@@ -181,7 +177,7 @@ def stream_without_data(response):
 
 async def conversation_without_data(request: Request):
     openai.api_type = "azure"
-    openai.api_base = app_settings.openai.endpoint if app_settings.openai.endpoint else f"https://{app_settings.openai.resource}.openai.azure.com/"
+    openai.api_base = app_settings.openai.base_url
     openai.api_version = "2023-03-15-preview"
     openai.api_key = app_settings.openai.key
 
