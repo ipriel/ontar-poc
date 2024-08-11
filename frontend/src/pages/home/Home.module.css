@@ -1,0 +1,324 @@
+.container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    color: #F2F2F2;
+    gap: 10px;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.avatarGroup {
+    display: flex;
+}
+
+.avatarGroup> :nth-child(2) {
+    translate: -4px;
+}
+
+.avatarGroup> :nth-child(3) {
+    translate: -8px;
+}
+
+.avatarGroup> :nth-child(4) {
+    translate: -12px;
+}
+
+.avatarGroup>* {
+    z-index: 2;
+}
+
+.avatarGroup>svg {
+    z-index: 1;
+}
+
+.rulerContainer {
+    min-height: 84px;
+    padding-inline: 14px;
+}
+
+.rulerSectionContainer {
+    display: flex;
+    margin-block: 1rem;
+    align-items: center;
+    gap: 24px;
+}
+
+.rulerSectionButtonContainer {
+    gap: 12px;
+}
+
+.rulerSearchbar {
+    display: flex;
+    align-items: center;
+    width: 360px;
+    border: 1px solid #363542;
+    border-radius: 0.5rem;
+}
+
+.rulerSearchbar:focus-within,
+.rulerSearchbar:focus-visible {
+    border-color: #89859F;
+}
+
+.rulerSearchbar>svg {
+    margin-inline: 10px;
+}
+
+.rulerSearchbar>input {
+    padding: 10px 10px 10px 0;
+    background-color: transparent;
+    border: none;
+    color: #706E86;
+    flex-grow: 1;
+}
+
+.rulerSearchbar>input:focus,
+.rulerSearchbar>input:focus-visible {
+    outline: none;
+}
+
+.rulerSearchbar>input::-webkit-search-cancel-button {
+    /* Remove default */
+    -webkit-appearance: none;
+    appearance: none;
+    /*Your new styles */
+    height: 10px;
+    width: 10px;
+    background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIgoJIHdpZHRoPSIxMjNweCIgaGVpZ2h0PSIxMjNweCIgdmlld0JveD0iMCAwIDEyMy4wNSAxMjMuMDUiCgkgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CiAgICA8cGF0aCBkPSJNMTIxLjMyNSwxMC45MjVsLTguNS04LjM5OWMtMi4zLTIuMy02LjEtMi4zLTguNSwwbC00Mi40LDQyLjM5OUwxOC43MjYsMS43MjZjLTIuMzAxLTIuMzAxLTYuMTAxLTIuMzAxLTguNSwwbC04LjUsOC41CgkJYy0yLjMwMSwyLjMtMi4zMDEsNi4xLDAsOC41bDQzLjEsNDMuMWwtNDIuMyw0Mi41Yy0yLjMsMi4zLTIuMyw2LjEsMCw4LjVsOC41LDguNWMyLjMsMi4zLDYuMSwyLjMsOC41LDBsNDIuMzk5LTQyLjRsNDIuNCw0Mi40CgkJYzIuMywyLjMsNi4xLDIuMyw4LjUsMGw4LjUtOC41YzIuMy0yLjMsMi4zLTYuMSwwLTguNWwtNDIuNS00Mi40bDQyLjQtNDIuMzk5QzEyMy42MjUsMTcuMTI1LDEyMy42MjUsMTMuMzI1LDEyMS4zMjUsMTAuOTI1eiIgZmlsbD0iIzg5ODU5RiIvPgo8L3N2Zz4=);
+    background-size: 10px 10px;
+}
+
+.notificationContainer {
+    display: none;
+    margin-inline: 14px;
+    padding-inline: 16px;
+    background: #1A1A20;
+    border-radius: 0.5rem;
+}
+
+.notificationContainerActive {
+    display: flex;
+}
+
+.notificationMessage {
+    display: flex;
+    gap: 16px;
+}
+
+.dataCardContainer {
+    display: grid;
+    margin-inline: 14px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.dataCard {
+    display: grid;
+    grid-template-rows: min-content min-content;
+    grid-template-columns: max-content auto;
+    background: #1A1A20;
+    border-radius: 0.5rem;
+    padding: 24px;
+}
+
+.dataCard>p {
+    margin-block: 0;
+    color: #706E86;
+}
+
+.dataCardIcon {
+    grid-column: 2;
+    grid-row: 1/span 2;
+    justify-self: end;
+    align-self: center;
+}
+
+.dataCardValue {
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 46px;
+}
+
+p.dataCardAccent {
+    color: #E87474;
+}
+
+.dataCardLabel {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 24px;
+}
+
+.dataCardTall {
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content auto;
+    grid-row: span 2;
+}
+
+.dataCardTall>.dataCardIcon {
+    grid-column: 1;
+    grid-row: 2/3;
+    justify-self: center;
+}
+
+.dataCardTall>.dataCardLabel {
+    justify-self: center;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 24px;
+}
+
+.tabContainer {
+    display: none;
+}
+
+.tabContainerActive {
+    display: flex;
+    flex-direction: column;
+}
+
+.tabLayout {
+    position: relative;
+    padding-inline: 14px;
+}
+
+.tabLayoutDismiss {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    color: #5C5A73;
+    cursor: pointer;
+}
+
+.tabTitle {
+    font-size: 25px;
+}
+
+.tabListItem {
+    padding-inline-start: 20px;
+}
+
+.tabSelector {
+    color: #66637B;
+    border: none;
+    border-bottom: 1px solid #201F27;
+    padding: 10px;
+    background: #201F27;
+}
+
+.tabSelectorActive {
+    color: #C792FF;
+    border-color: #C792FF;
+}
+
+.dashboardTable {
+    border-spacing: 0px;
+    color: black;
+}
+
+.dashboardTable td,
+.dashboardTable th {
+    padding: 5px 15px;
+    text-align: left;
+    font-size: 14px;
+    color: #89859F;
+}
+
+.dashboardTable th {
+    font-weight: 400;
+    line-height: 20px;
+    padding-block: 14px;
+    color: #AEACC5;
+}
+
+.dashboardTableHeader>th:last-child {
+    width: 150px;
+    text-align: center;
+}
+
+.dashboardTableHeader {
+    background: black;
+}
+
+.dashboardTableBody {
+    position: relative;
+}
+
+.dashboardTableRow p {
+    margin-block: 0;
+}
+
+.dashboardTableRow:first-child>td>* {
+    margin-top: 4px;
+}
+
+.dashboardTableRow img {
+    display: block;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+}
+
+.dashboardTableRow>td:last-child>p {
+    border: 1px solid #4398F7;
+    color: #4398F7;
+    border-radius: 16px;
+    padding: 5px;
+    text-align: center;
+    user-select: none;
+    cursor: pointer;
+}
+
+.dashboardTablePill {
+    border: 1px solid;
+    border-radius: 16px;
+    padding: 2px 16px;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    min-width: fit-content;
+    max-width: 90px;
+}
+
+.dashboardTableMixedCell {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.dashboardTableUser>p {
+    font-size: 16px;
+    line-height: 20px;
+}
+
+.dashboardTableActionContainer {
+    display: flex;
+    gap: 24px;
+    width: 150px;
+    justify-content: center;
+}
+
+[data-severity="High"],
+[data-state="Inactive"] {
+    border-color: #FF958F !important;
+    color: #FF958F !important;
+}
+
+[data-severity="Medium"],
+[data-state="Pending"] {
+    border-color: #FFCB7C !important;
+    color: #FFCB7C !important;
+}
+
+[data-severity="Low"],
+[data-state="Active"] {
+    border-color: #8AC898 !important;
+    color: #8AC898 !important;
+}

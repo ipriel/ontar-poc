@@ -231,3 +231,15 @@ export type Incident = {
     }[];
     summary: string;
 }
+
+export type PushEvent = {
+	attackType: string,
+	securityScore: number,
+	alert: string,
+	startTime: Date
+}
+
+export type WebsocketMessage = {
+    message_type: "new_event" | "update_event" | "close_event",
+    payload: PushEvent
+}

@@ -4,33 +4,30 @@ import { Stack, TextField } from "@fluentui/react";
 import { useEffect, useState } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { format, intervalToDuration } from "date-fns";
-import { useIncidentsStore, useRecommendationsStore } from "../../api";
+import { useEventStore, WebsocketMessage } from "../../api";
 
 import ProfilePic from "../../assets/profile.png";
 import styles from "./Layout.module.css";
+import { UserPuck } from "../../components/UserPuck";
 
 const WS_URL = "ws://127.0.0.1:800";
 
 const Layout = () => {
     const [isSidebarExpanded, setIsSidebarExpanded] = useState<boolean>(true);
-    const [isLiveAttack, attackStartDate] = useIncidentsStore((state) => [(state.count > 0), state.startDate]);
-    const riskScore = useRecommendationsStore((state) => {
-        const scores = state.recommendations.map((rec) => rec.severity);
-        //return scores.reduce((prev, curr) => prev+curr);
-        return 14;
-    })
+    const [isLiveAttack, attackStartDate, riskScore] = useEventStore((state) => [(state.events.length > 0), state.events[0].startTime, state.events[0].securityScore]);
+    const pushEvent = useEventStore((state) => state.pushEvent);
 
     function getInterval() {
         const dur = intervalToDuration({
             start: attackStartDate ?? new Date(),
             end: new Date()
         });
-        const leftPad = (num: number|undefined) => String(num || 0).padStart(2, '0');
+        const leftPad = (num: number|undefined) => String(num=0).padStart(2, '0');
 
         return `${leftPad(dur.hours)}:${leftPad(dur.minutes)}:${leftPad(dur.seconds)}`;
     }
 
-    const { lastJsonMessage } = useWebSocket(
+    const { lastJsonMessage } = useWebSocket<WebsocketMessage>(
         WS_URL,
         {
             share: true,
@@ -40,6 +37,7 @@ const Layout = () => {
 
     useEffect(() => {
         console.log(`Got a new message: ${lastJsonMessage}`);
+        // pushEvent(lastJsonMessage.payload);
     }, [lastJsonMessage])
 
     return (
@@ -187,11 +185,7 @@ const Layout = () => {
                         <p className={styles.menuListItemText}>Training</p>
                     </li>
                     <li className={styles.menuListItem} style={{ cursor: "auto", paddingBlock: !isSidebarExpanded ? "3.6px" : undefined }}>
-                        <img
-                            src={ProfilePic}
-                            className={styles.menuListItemImage}
-                            aria-hidden="true"
-                        />
+                        <UserPuck imageSrc={ProfilePic} aria-hidden="true"></UserPuck>
                         <p className={styles.menuListItemText}>John Snow</p>
                         <ChevronUpIcon className={styles.menuListItemChevron} />
                     </li>

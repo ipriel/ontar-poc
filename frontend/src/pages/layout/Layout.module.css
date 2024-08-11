@@ -131,14 +131,6 @@
     display: none;
 }
 
-.menuListItemImage {
-    display: block;
-    border-radius: 50%;
-    filter: grayscale();
-    width: 32px;
-    height: 32px;
-}
-
 [data-sidebar="false"] .menuListItemImage {
     cursor: pointer;
 }
