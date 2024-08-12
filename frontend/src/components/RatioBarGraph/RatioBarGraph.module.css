@@ -1,0 +1,73 @@
+.chartContainer {
+    display: grid;
+    align-items: center;
+    column-gap: 24px;
+}
+
+.chartContainer.wideStyle {
+    grid-template-columns: max-content 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
+.chartContainer.blockStyle {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+.chartTitle {
+    margin-block: 0;
+}
+
+.chartLegend {
+    display: flex;
+    justify-content: end;
+    gap: 18px;
+}
+
+.wideStyle > .chartLegend {
+    grid-column: 2/3;
+}
+
+.chartLegendItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+}
+
+.chartBar {
+    justify-self: stretch;
+    height: 10px;
+    border-radius: 5px;
+}
+
+.twoTone {
+    --stop-1: calc((var(--val-1) * 100%) - 0.25%);
+    --stop-2: calc(var(--stop-1) + 0.5%);
+    background: linear-gradient(
+        to right, 
+        var(--color-1) var(--stop-1),
+        transparent var(--stop-1),
+        transparent var(--stop-2),
+        var(--color-2) var(--stop-2)
+    );
+}
+
+.threeTone {
+    --stop-1: calc((var(--val-1) * 100%) - 0.25%);
+    --stop-2: calc(var(--stop-1) + 0.5%);
+    --stop-3: calc(var(--stop-2) + (var(--val-2) * 100%) - 0.5%);
+    --stop-4: calc(var(--stop-3) + 0.5%);
+    background: linear-gradient(
+        to right, 
+        var(--color-1) var(--stop-1),
+        transparent var(--stop-1),
+        transparent var(--stop-2),
+        var(--color-2) var(--stop-2), 
+        var(--color-2) var(--stop-3),
+        transparent var(--stop-3),
+        transparent var(--stop-4),
+        var(--color-3) var(--stop-4)
+    );
+}

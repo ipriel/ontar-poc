@@ -63,7 +63,7 @@ export type RiskyUser = {
     isProcessing: boolean;
     isDeleted: boolean;
     riskDetail: string;
-    riskLevel: string;
+    riskLevel: "low" | "medium" | "high";
     riskState: string;
     userDisplayName: string;
     userPrincipalName: string;

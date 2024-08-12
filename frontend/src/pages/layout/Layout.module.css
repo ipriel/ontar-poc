@@ -233,14 +233,12 @@
 .riskScoreTitle {
     font-size: 20px;
     font-weight: 500;
-    line-height: 42px;
     margin-block: 0;
     color: #5C5A73;
 }
 
 .riskScoreContent {
-    font-size: 32px;
-    line-height: 42px;
+    font-size: 27px;
     margin-block: 0;
     color: white;
 }
