@@ -4,15 +4,48 @@ import { RiskyUser, Alert, Incident, Recommendation, Remediation, PushEvent } fr
 import { compareAsc } from "date-fns";
 
 type RiskyUserState = {
-  count: number;
-  calcCount: (data: RiskyUser[]) => void;
-  reset: () => void
+  users: RiskyUser[];
+  count: {
+    high: number;
+    medium: number;
+    low: number;
+  };
+  parseUsers: (data: RiskyUser[]) => void;
+  reset: () => void;
 }
 
 export const useRiskyUsersStore = create<RiskyUserState>((set) => ({
-  count: 4/*0*/,
-  calcCount: (data: RiskyUser[]) => set({ count: data.length }),
-  reset: () => set({ count: 0 }),
+  users: [
+    {
+      "id": "c2b6c2b9-dddc-acd0-2b39-d519d803dbc3",
+      "riskLastUpdatedDateTime": "2016-01-29T20:03:57.7872426Z",
+      "isProcessing": true,
+      "isDeleted": true,
+      "riskDetail": "adminConfirmedSigninCompromised",
+      "riskLevel": "high",
+      "riskState": "atRisk",
+      "userDisplayName": "Alex Wilbur",
+      "userPrincipalName": "alexw@contoso.com"
+  }
+  ],
+  count: {
+    high: 1/*0*/,
+    medium: 0,
+    low: 0
+  },
+  parseUsers: (data: RiskyUser[]) => {
+    let counter = {high: 0, medium: 0, low: 0};
+    data.forEach(user => {
+      if(user.riskLevel == "high") ++counter.high;
+      else if(user.riskLevel == "medium") ++counter.medium;
+      else /* user.riskLevel == "low" */ ++counter.low;
+    });
+    set({users: [...data], count: Object.assign({}, counter)});
+  },
+  reset: () => set({
+    users: [],
+    count: Object.assign({}, { high: 0, medium: 0, low: 0 })
+  }),
 }));
 
 type AlertState = {
@@ -89,6 +122,7 @@ export const useIncidentsStore = create<IncidentState>((set) => ({
 }));
 
 export type RecommendationSlice = {
+  id: string;
   name: string;
   severity: number;
   scoreImprovement: number;
@@ -101,9 +135,13 @@ type RecommendationState = {
 }
 
 export const useRecommendationsStore = create<RecommendationState>((set) => ({
-  recommendations: [{name: "Turn on Microsoft Defender for Endpoint sensor", severity: 10, scoreImprovement: 10}, {name: "Fix Microsoft Defender for Endpoint sensor data collection", severity: 6, scoreImprovement: 10}]/*[]*/,
+  recommendations: [
+    {id: "scid-2090", name: "Turn on Microsoft Defender for Endpoint sensor", severity: 10, scoreImprovement: 10}, 
+    {id: "scid-2091", name: "Fix Microsoft Defender for Endpoint sensor data collection", severity: 6, scoreImprovement: 10}
+  ]/*[]*/,
   setRecommendations: (data: Recommendation[]) => {
     const list = data.map((recommendation) => ({
+      id: recommendation.id.slice(6),
       name: recommendation.recommendationName,
       severity: recommendation.severityScore,
       scoreImprovement: recommendation.configScoreImpact
@@ -118,9 +156,9 @@ export const useRecommendationsStore = create<RecommendationState>((set) => ({
 
 type RemediationSlice = {
   name: string;
-  date: Date;
-  severity: number;
+  description: string;
   assignedTo: string;
+  recommendationRef: string;
 }
 
 type RemediationsState = {
@@ -136,13 +174,18 @@ function severityToInt(severity: "low" | "medium" | "high"): number {
 }
 
 export const useRemediationsStore = create<RemediationsState>((set) => ({
-  remediations: [],
+  remediations: [
+    {name: "Encrypt all BitLocker-supported drives", description: "See <a href=\"https://docs.microsoft.com/windows/security/information-protection/bitlocker/bitlocker-overview\" target=\"_blank\">BitLocker overview</a> for additional information.<br/>",
+        "relatedComponent": "Security controls (Bitlocker)", assignedTo: "9a3b090b-a1bf-4f7c-9faf-260f4e970e3d", recommendationRef: "scid-2090"},
+    {name: "Open SentinalOne XDR", description: "See <a href=\"https://docs.microsoft.com/windows/security/information-protection/bitlocker/bitlocker-overview\" target=\"_blank\">BitLocker overview</a> for additional information.<br/>",
+        "relatedComponent": "Security controls (Bitlocker)", assignedTo: "9a3b090b-a1bf-4f7c-9faf-260f4e970e3d", recommendationRef: "scid-2091"}
+  ]/*[]*/,
   setRemediations: (data: Remediation[]) => {
     const list = data.map((remediation) => ({
       name: remediation.title,
-      date: new Date(remediation.dueOn),
-      severity: severityToInt(remediation.priority),
-      assignedTo: remediation.requesterId
+      description: remediation.description,
+      assignedTo: remediation.requesterId,
+      recommendationRef: remediation.recommendationReference.slice(5)
     }));
 
     set({ remediations: list });

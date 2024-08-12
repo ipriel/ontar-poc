@@ -33,7 +33,7 @@ type ModalContent = {
 
 const Home = () => {
     const [isLiveAttack, firstEvent] = useEventStore((state) => [(state.events.length > 0), state.events[0]]);
-    const compromisedUserCount = useRiskyUsersStore((state) => state.count);
+    const compromisedUserCount = useRiskyUsersStore((state) => ({...state.count, total: state.count.high+state.count.medium+state.count.low}));
     const [compromisedAppsCount, compromisedNetworkingCount, compromisedResourcesCount] = useAlertsStore((state) => [state.compromisedApps, state.compromisedNetworking, state.compromisedIot_Resources]);
     const recommendations = useRecommendationsStore((state) => state.recommendations);
     const remediations = useRemediationsStore((state) => state.remediations);
@@ -275,7 +275,7 @@ const Home = () => {
                         className={styles.flipCardIcon}
                     />
                     <div className={classNames(styles.dataCard, styles.dataCardFront)}>
-                        <p className={classNames(styles.dataCardValue, { [styles.dataCardAccent]: compromisedUserCount > 0 })}>{compromisedUserCount}</p>
+                        <p className={classNames(styles.dataCardValue, { [styles.dataCardAccent]: compromisedUserCount.total > 0 })}>{compromisedUserCount.total}</p>
                         <p className={styles.dataCardLabel}>Users Compromised</p>
                         <svg className={styles.dataCardIcon} width="56" height="60" viewBox="0 0 56 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M55.3389 49.0528C53.8153 44.4618 52.5444 39.1455 49.9971 34.5564C47.4553 29.9691 42.1135 29.06 42.1135 29.06C47.7098 25.4891 47.248 21.2873 43.6862 17.5073C40.1244 13.7273 39.868 9.10366 37.5825 5.32185C35.2935 1.54003 31.088 0.909119 28.3789 0.909119C25.6698 0.909119 21.4644 1.54003 19.1735 5.32003C16.8825 9.10185 16.6316 13.7255 13.0698 17.5055C9.508 21.2855 9.04618 25.4891 14.6425 29.0582C14.6425 29.0582 9.30072 29.9673 6.75891 34.5546C4.21345 39.1418 2.94072 44.4582 1.41709 49.0509C-0.110185 53.6382 1.068 55.5291 5.39345 55.5291C6.42982 55.5291 8.29891 55.5291 10.528 55.5291C10.9007 54.7473 11.5116 54.1055 12.308 53.7582L9.77527 36.52C9.62254 35.4891 9.91709 34.46 10.5771 33.6946C11.2371 32.9291 12.2098 32.4909 13.2516 32.4909H43.5044C44.548 32.4909 45.5207 32.9291 46.1825 33.6964C46.8462 34.46 47.1371 35.4891 46.9844 36.52L44.4516 53.7582C45.2444 54.1037 45.8571 54.7473 46.228 55.5291C48.4625 55.5291 50.3298 55.5291 51.3662 55.5291C55.6898 55.5291 56.8662 53.64 55.3389 49.0528ZM36.9662 17.3873C36.7644 19.3709 36.2807 22.5982 35.1935 24.9273C33.5207 28.5146 29.9335 30.1091 28.3789 30.1091C26.8244 30.1091 23.2371 28.5146 21.5607 24.9273C20.4771 22.5982 19.9953 19.3691 19.788 17.3873C18.2825 18.4018 16.8225 19.7455 16.8225 19.7455C17.6644 17.82 19.6462 15.6 19.6462 15.6C22.2789 11.2964 28.3789 9.38185 28.3789 9.38185C28.3789 9.38185 34.4771 11.2964 37.108 15.6C37.108 15.6 39.0935 17.8218 39.9316 19.7455C39.9316 19.7455 38.4753 18.4018 36.9662 17.3873Z" fill="#706E86" />
@@ -291,9 +291,9 @@ const Home = () => {
                             title="Compromised Level"
                             style="block"
                             data={[
-                                { label: "Low", value: 0, color: "#8AC898" },
-                                { label: "Medium", value: 2, color: "#FFA903" },
-                                { label: "High", value: 2, color: "#E87474" }
+                                { label: "Low", value: compromisedUserCount.low, color: "#8AC898" },
+                                { label: "Medium", value: compromisedUserCount.medium, color: "#FFA903" },
+                                { label: "High", value: compromisedUserCount.high, color: "#E87474" }
                             ]}
                         />
                     </div>
@@ -371,7 +371,7 @@ const Home = () => {
                                     setModalContent({
                                         title: row.name,
                                         tags: [
-                                            { label: "ID#000143" },
+                                            { label: `ID: ${row.id}` },
                                             { label: `${severity[parseSeverity(row.severity)]} Risk`, severity: severity[parseSeverity(row.severity)] }
                                         ],
                                         component: <RecommendationPane data={row} />

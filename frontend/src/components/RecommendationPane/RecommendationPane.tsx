@@ -1,15 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { Icon, IconButton } from "@fluentui/react";
 import { registerIcons } from '@fluentui/react/lib/Styling';
+import ReactMarkdown from "react-markdown";
 import classNames from "classnames";
 
-import { RecommendationSlice } from "../../api";
+import { RecommendationSlice, useRemediationsStore } from "../../api";
 import { UserPuck } from "../UserPuck";
 
 import styles from "./RecommendationPane.module.css";
 import UserPic1 from "../../assets/user-1.png";
 import { UserPuckGroup } from "../UserPuckGroup";
-import ReactMarkdown from "react-markdown";
 
 interface Props {
     data: RecommendationSlice;
@@ -40,6 +40,7 @@ registerIcons({
 export const RecommendationPane = ({ data }: Props) => {
     const [comment, setComment] = useState<string>("");
     const [comments, setComments] = useState<string[]>(["**Note:** this action was taken 2 times"]);
+    const remediations = useRemediationsStore((state) => state.remediations.filter(item => item.recommendationRef == data.id));
     const commentListEndRef = useRef<null | HTMLDivElement>(null)
 
     const scrollToBottom = () => {
@@ -47,7 +48,7 @@ export const RecommendationPane = ({ data }: Props) => {
     }
 
     useEffect(() => {
-        if(comments.length > 1)
+        if (comments.length > 1)
             scrollToBottom()
     }, [comments]);
 
@@ -91,54 +92,26 @@ export const RecommendationPane = ({ data }: Props) => {
                     <path d="M8.75 8.73183C8.75 7.03229 8.75 6.18253 9.10436 5.7141C9.41307 5.30602 9.88491 5.05349 10.3957 5.023C10.982 4.98799 11.6891 5.45935 13.1032 6.40209L31.5054 18.6702C32.6738 19.4492 33.2581 19.8387 33.4617 20.3296C33.6396 20.7588 33.6396 21.2412 33.4617 21.6704C33.2581 22.1613 32.6738 22.5508 31.5054 23.3297L13.1032 35.5979C11.6891 36.5406 10.982 37.012 10.3957 36.977C9.88491 36.9465 9.41307 36.6939 9.10436 36.2859C8.75 35.8174 8.75 34.9677 8.75 33.2681V8.73183Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
                 <p>Mitigation steps</p>
-                <span><b>Note:</b> You have to take these 3 steps in the next few hours</span>
+                <span><b>Note:</b>{` You have to take ${remediations.length > 1 ? `these ${remediations.length} steps` : 'this step'} in the next few hours`}</span>
             </div>
             <div>
-                <div className={styles.leftRightFlex}>
-                    <div className={styles.remediationItemContainer}>
-                        <svg width="49" height="40" viewBox="0 0 49 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <line x1="20.6074" y1="19.743" x2="46.6274" y2="19.743" stroke="#C792FF" />
-                            <circle cx="20.3179" cy="20" r="3.37256" fill="#C792FF" />
-                        </svg>
-                        <p className={styles.remediationCounter}>1</p>
-                        <p className={styles.remediationLabel}>Open SentinalOne XDR</p>
+                {remediations.map((remediation, i) =>
+                    <div className={styles.leftRightFlex}>
+                        <div className={styles.remediationItemContainer}>
+                            <svg width="49" height="40" viewBox="0 0 49 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <line x1="20.6074" y1="19.743" x2="46.6274" y2="19.743" stroke="#C792FF" />
+                                <circle cx="20.3179" cy="20" r="3.37256" fill="#C792FF" />
+                            </svg>
+                            <p className={styles.remediationCounter}>{i+1}</p>
+                            <p className={styles.remediationLabel}>{remediation.name}</p>
+                        </div>
+                        <div>
+                            <UserPuckGroup>
+                                <UserPuck imageSrc={UserPic1}></UserPuck>
+                            </UserPuckGroup>
+                        </div>
                     </div>
-                    <div>
-                        <UserPuckGroup>
-                            <UserPuck imageSrc={UserPic1}></UserPuck>
-                        </UserPuckGroup>
-                    </div>
-                </div>
-                <div className={styles.leftRightFlex}>
-                    <div className={styles.remediationItemContainer}>
-                        <svg width="49" height="40" viewBox="0 0 49 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <line x1="20.6074" y1="19.743" x2="46.6274" y2="19.743" stroke="#C792FF" />
-                            <circle cx="20.3179" cy="20" r="3.37256" fill="#C792FF" />
-                        </svg>
-                        <p className={styles.remediationCounter}>2</p>
-                        <p className={styles.remediationLabel}>Run Powershell</p>
-                    </div>
-                    <div>
-                        <UserPuckGroup>
-                            <UserPuck imageSrc={UserPic1}></UserPuck>
-                        </UserPuckGroup>
-                    </div>
-                </div>
-                <div className={styles.leftRightFlex}>
-                    <div className={styles.remediationItemContainer}>
-                        <svg width="49" height="40" viewBox="0 0 49 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <line x1="20.6074" y1="19.743" x2="46.6274" y2="19.743" stroke="#C792FF" />
-                            <circle cx="20.3179" cy="20" r="3.37256" fill="#C792FF" />
-                        </svg>
-                        <p className={styles.remediationCounter}>3</p>
-                        <p className={styles.remediationLabel}>Run following script</p>
-                    </div>
-                    <div>
-                        <UserPuckGroup>
-                            <UserPuck imageSrc={UserPic1}></UserPuck>
-                        </UserPuckGroup>
-                    </div>
-                </div>
+                )}
             </div>
             {/* CodeBlock */}
             <div className={classNames(styles.stage, styles.commentList)}>
