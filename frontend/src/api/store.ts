@@ -1,7 +1,6 @@
-import { DocumentLandscapeSplitHint24Filled } from "@fluentui/react-icons";
 import { create } from "zustand";
 import { RiskyUser, Alert, Incident, Recommendation, Remediation, ServerPushEvent, PushEvent } from './models';
-import { compareAsc } from "date-fns";
+import { compareAsc, addHours } from "date-fns";
 
 type RiskyUserState = {
   users: RiskyUser[];
@@ -114,6 +113,7 @@ export type RecommendationSlice = {
   name: string;
   severity: number;
   scoreImprovement: number;
+  dueDate: Date;
 }
 
 type RecommendationState = {
@@ -122,17 +122,23 @@ type RecommendationState = {
   reset: () => void;
 }
 
+function generateDueDate() {
+  const currDate = new Date();
+  const lastDate = addHours(currDate, 96);
+  const diff = lastDate.getTime() - currDate.getTime();
+  let randDateTimestamp = currDate.getTime() + Math.random() * diff;
+  return new Date(randDateTimestamp)
+}
+
 export const useRecommendationsStore = create<RecommendationState>((set) => ({
-  recommendations: [
-    {id: "scid-2090", name: "Turn on Microsoft Defender for Endpoint sensor", severity: 10, scoreImprovement: 10}, 
-    {id: "scid-2091", name: "Fix Microsoft Defender for Endpoint sensor data collection", severity: 6, scoreImprovement: 10}
-  ]/*[]*/,
+  recommendations: [],
   setRecommendations: (data: Recommendation[]) => {
     const list = data.map((recommendation) => ({
       id: recommendation.id.slice(6),
       name: recommendation.recommendationName,
       severity: recommendation.severityScore,
-      scoreImprovement: recommendation.configScoreImpact
+      scoreImprovement: recommendation.configScoreImpact,
+      dueDate: generateDueDate()
     }));
 
     set({ recommendations: list });

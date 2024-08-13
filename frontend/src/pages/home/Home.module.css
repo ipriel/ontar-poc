@@ -283,6 +283,10 @@ p.dataCardAccent {
     background: black;
 }
 
+.dashboardCenteredHeader {
+    text-align: center;
+}
+
 .dashboardTableBody {
     position: relative;
 }
@@ -293,13 +297,6 @@ p.dataCardAccent {
 
 .dashboardTableRow:first-child>td>* {
     margin-top: 4px;
-}
-
-.dashboardTableRow img {
-    display: block;
-    border-radius: 50%;
-    width: 26px;
-    height: 26px;
 }
 
 .dashboardTableRow>td:last-child>p {
@@ -324,10 +321,31 @@ p.dataCardAccent {
     max-width: 90px;
 }
 
-.dashboardTableMixedCell {
+.dashboardTablePillMini {
     display: flex;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+    padding: 5px 10px;
+    margin-inline: auto;
+    font-size: 12px;
+    border: 1px solid #89859F;
+    border-radius: 18px;
+}
+
+.dashboardTableMixedCell {
+    display: grid;
+    grid-template-columns: 25px 1fr;
     gap: 16px;
     align-items: center;
+}
+
+.dashboardTableMixedCell:has(> img) {
+    grid-template-columns:  min-content 1fr;
+}
+
+.dashboardTableMixedCell > svg {
+    justify-self: center;
 }
 
 .dashboardTableUser>p {

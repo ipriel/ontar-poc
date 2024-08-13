@@ -1,8 +1,8 @@
-import { useRef, useState, useEffect, ReactNode } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import { Icon, Stack } from "@fluentui/react";
 import { Settings24Filled as SettingsIcon, ChevronDown24Regular as ChevronDownIcon, ChevronUp24Regular as ChevronUpIcon } from "@fluentui/react-icons";
-import { intlFormatDistance } from "date-fns";
+import { format, differenceInCalendarDays, isPast, isToday } from "date-fns";
 import classNames from "classnames";
 
 import { UserPuck } from "../../components/UserPuck";
@@ -31,12 +31,26 @@ type ModalContent = {
     component: JSX.Element
 };
 
+function getInterval(targetDate: Date) {
+    if (isPast(targetDate) && differenceInCalendarDays(new Date(), targetDate) == 1) {
+        return `Yesterday ${format(targetDate, "h:mmaa")}`;
+    }
+    else if (!isPast(targetDate) && differenceInCalendarDays(targetDate, new Date()) == 1) {
+        return `Tomorrow ${format(targetDate, "h:mmaa")}`;
+    }
+    else if (isToday(targetDate)) {
+        return `Today ${format(targetDate, "h:mmaa")}`;
+    }
+    else {
+        return format(targetDate, "d.M.yyyy h:mmaa");
+    }
+};
+
 const Home = () => {
     const [isLiveAttack, firstEvent] = useEventStore((state) => [(state.events.length > 0), state.events[0]]);
-    const compromisedUserCount = useRiskyUsersStore((state) => ({...state.count, total: state.count.high+state.count.medium+state.count.low}));
+    const compromisedUserCount = useRiskyUsersStore((state) => ({ ...state.count, total: state.count.high + state.count.medium + state.count.low }));
     const [compromisedAppsCount, compromisedNetworkingCount, compromisedResourcesCount] = useAlertsStore((state) => [state.compromisedApps, state.compromisedNetworking, state.compromisedIot_Resources]);
     const recommendations = useRecommendationsStore((state) => state.recommendations);
-    const remediations = useRemediationsStore((state) => state.remediations);
     const [activeTab, setActiveTab] = useState<number>(1);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [modalContent, setModalContent] = useState<ModalContent>({ title: "", tags: [], component: <></> });
@@ -255,26 +269,15 @@ const Home = () => {
                         <path d="M44.8227 32.0152C38.236 32.0152 32.8966 37.3547 32.8966 43.9413C32.8966 50.5279 38.236 55.8675 44.8227 55.8675C51.4094 55.8675 56.7488 50.528 56.7488 43.9414C56.7488 37.3548 51.4093 32.0152 44.8227 32.0152ZM49.178 51.0332L44.8278 46.6992L40.4834 51.0597L37.731 48.2968L42.065 43.9466L37.7044 39.6019L40.4675 36.8495L44.8177 41.1835L49.162 36.8229L51.9146 39.5859L47.5805 43.9364L51.941 48.2805L49.178 51.0332Z" fill="#E87474" />
                     </svg>
                 </div>
-                <div className={styles.flipCard} onClick={() => {
+                <div className={classNames({ [styles.flipCard]: compromisedUserCount.total > 0 })} onClick={() => {
+                    if (compromisedUserCount.total == 0) return;
                     setShowModal(true);
                     setModalContent({
                         title: "Compromised Users",
                         component: <RiskyUsersPane />
                     })
                 }}>
-                    <Icon
-                        iconName="OpenInNewWindow"
-                        aria-label="Open compromised user details"
-                        onClick={() => {
-                            setShowModal(true);
-                            setModalContent({
-                                title: "Compromised Users",
-                                component: <RiskyUsersPane />
-                            })
-                        }}
-                        className={styles.flipCardIcon}
-                    />
-                    <div className={classNames(styles.dataCard, styles.dataCardFront)}>
+                    <div className={classNames(styles.dataCard, { [styles.dataCardFront]: compromisedUserCount.total > 0 })}>
                         <p className={classNames(styles.dataCardValue, { [styles.dataCardAccent]: compromisedUserCount.total > 0 })}>{compromisedUserCount.total}</p>
                         <p className={styles.dataCardLabel}>Users Compromised</p>
                         <svg className={styles.dataCardIcon} width="56" height="60" viewBox="0 0 56 60" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -286,17 +289,31 @@ const Home = () => {
                             <path d="M43.0316 55.5291H42.1044L44.9425 36.2182C45.0771 35.3055 44.428 34.5564 43.5044 34.5564H30.0589C29.1353 34.5564 27.6225 34.5564 26.6989 34.5564H13.2516C12.328 34.5564 11.6825 35.3055 11.8171 36.2182L14.6553 55.5291H13.728C12.8971 55.5291 12.2189 56.2037 12.2189 57.0364V57.5837C12.2189 58.4164 12.8971 59.0909 13.728 59.0909H43.0316C43.8625 59.0909 44.5371 58.4164 44.5371 57.5837V57.0364C44.5371 56.2037 43.8625 55.5291 43.0316 55.5291ZM28.3789 37.7728C30.6335 37.7728 34.4298 39.0764 34.4298 42.8728C34.4298 46.6691 33.5989 46.7746 33.1225 47.86C33.1225 47.86 34.1916 48.9328 33.8371 49.7019C33.4789 50.4691 31.5825 49.7091 31.4044 50.9019C31.2262 52.0946 30.988 52.3109 28.3789 52.3109C25.7698 52.3109 25.5316 52.0946 25.3535 50.9019C25.1753 49.7091 23.2789 50.4691 22.9207 49.7019C22.5662 48.9328 23.6316 47.86 23.6316 47.86C23.1589 46.7728 22.328 46.6691 22.328 42.8728C22.328 39.0764 26.1244 37.7728 28.3789 37.7728ZM37.7353 56.1564H19.0225C18.7316 56.1564 18.4935 55.9182 18.4935 55.6255C18.4935 55.3346 18.7316 55.0964 19.0225 55.0964H37.7371C38.028 55.0964 38.2662 55.3346 38.2662 55.6255C38.2662 55.9182 38.028 56.1564 37.7353 56.1564Z" fill="#E87474" />
                         </svg>
                     </div>
-                    <div className={classNames(styles.dataCard, styles.dataCardBack)}>
-                        <RatioBarGraph
-                            title="Compromised Level"
-                            style="block"
-                            data={[
-                                { label: "Low", value: compromisedUserCount.low, color: "#8AC898" },
-                                { label: "Medium", value: compromisedUserCount.medium, color: "#FFA903" },
-                                { label: "High", value: compromisedUserCount.high, color: "#E87474" }
-                            ]}
+                    {(compromisedUserCount.total > 0) ? <>
+                        <Icon
+                            iconName="OpenInNewWindow"
+                            aria-label="Open compromised user details"
+                            onClick={() => {
+                                setShowModal(true);
+                                setModalContent({
+                                    title: "Compromised Users",
+                                    component: <RiskyUsersPane />
+                                })
+                            }}
+                            className={styles.flipCardIcon}
                         />
-                    </div>
+                        <div className={classNames(styles.dataCard, styles.dataCardBack)}>
+                            <RatioBarGraph
+                                title="Compromised Level"
+                                style="block"
+                                data={[
+                                    { label: "Low", value: compromisedUserCount.low, color: "#8AC898" },
+                                    { label: "Medium", value: compromisedUserCount.medium, color: "#FFA903" },
+                                    { label: "High", value: compromisedUserCount.high, color: "#E87474" }
+                                ]}
+                            />
+                        </div>
+                    </> : null}
                 </div>
                 <div className={styles.dataCard}>
                     <p className={classNames(styles.dataCardValue, { [styles.dataCardAccent]: compromisedResourcesCount > 0 })}>{compromisedResourcesCount}</p>
@@ -360,12 +377,12 @@ const Home = () => {
                                 <th>Task Name</th>
                                 <th>Due Date</th>
                                 <th>Severity Level</th>
-                                <th>Score Improvement</th>
+                                <th className={styles.dashboardCenteredHeader}>Score Improvement</th>
                                 <th>Assigned</th>
                             </tr>
                         </thead>
                         <tbody className={styles.dashboardTableBody}>
-                            {recommendations.map((row) => (
+                            {recommendations && recommendations.map((row) => (
                                 <tr className={classNames(styles.dashboardTableRow, styles.clickable)} onClick={() => {
                                     setShowModal(true);
                                     setModalContent({
@@ -378,16 +395,37 @@ const Home = () => {
                                     })
                                 }}>
                                     <td>{row.name}</td>
-                                    <td>N/A</td>
-                                    <td className={styles.dashboardTableMixedCell}>
-                                        <svg data-severity={severity[parseSeverity(row.severity)]} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M12.7071 4.29289C12.3166 3.90237 11.6834 3.90237 11.2929 4.29289L4.29289 11.2929C3.90237 11.6834 3.90237 12.3166 4.29289 12.7071C4.68342 13.0976 5.31658 13.0976 5.70711 12.7071L11 7.41421L11 19C11 19.5523 11.4477 20 12 20C12.5523 20 13 19.5523 13 19L13 7.41421L18.2929 12.7071C18.6834 13.0976 19.3166 13.0976 19.7071 12.7071C20.0976 12.3166 20.0976 11.6834 19.7071 11.2929L12.7071 4.29289Z" fill="currentColor" />
-                                        </svg>
-                                        <p>{severity[parseSeverity(row.severity)]}</p>
-                                    </td>
-                                    <td>{improvement[parseSeverity(row.severity)]}</td>
                                     <td>
-                                        <UserPuck imageSrc={UserPic1} userState={"offline"}></UserPuck>
+                                        <div className={styles.dashboardTableMixedCell}>
+                                            {isPast(row.dueDate) || isToday(row.dueDate) ?
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M16.5 17H21.5L16.5 22H21.5M21.9506 13C21.9833 12.6711 22 12.3375 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C12.1677 22 12.3344 21.9959 12.5 21.9877C12.6678 21.9795 12.8345 21.9671 13 21.9506M12 6V12L15.7384 13.8692" stroke="#89859F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                </svg> :
+                                                <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M6.66667 4L2.66667 8M29.3333 8L25.3333 4M8 25.3333L5.33333 28M24 25.3333L26.6667 28M12 18L14.6667 20.6667L20.6667 14.6667M16 28C18.829 28 21.5421 26.8762 23.5425 24.8758C25.5429 22.8754 26.6667 20.1623 26.6667 17.3333C26.6667 14.5044 25.5429 11.7912 23.5425 9.79086C21.5421 7.79047 18.829 6.66667 16 6.66667C13.171 6.66667 10.4579 7.79047 8.45753 9.79086C6.45714 11.7912 5.33333 14.5044 5.33333 17.3333C5.33333 20.1623 6.45714 22.8754 8.45753 24.8758C10.4579 26.8762 13.171 28 16 28Z" stroke="#89859F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                </svg>
+                                            }
+                                            <p>{getInterval(row.dueDate)}</p>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className={styles.dashboardTableMixedCell}>
+                                            <svg data-severity={severity[parseSeverity(row.severity)]} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M12.7071 4.29289C12.3166 3.90237 11.6834 3.90237 11.2929 4.29289L4.29289 11.2929C3.90237 11.6834 3.90237 12.3166 4.29289 12.7071C4.68342 13.0976 5.31658 13.0976 5.70711 12.7071L11 7.41421L11 19C11 19.5523 11.4477 20 12 20C12.5523 20 13 19.5523 13 19L13 7.41421L18.2929 12.7071C18.6834 13.0976 19.3166 13.0976 19.7071 12.7071C20.0976 12.3166 20.0976 11.6834 19.7071 11.2929L12.7071 4.29289Z" fill="currentColor" />
+                                            </svg>
+                                            <p>{severity[parseSeverity(row.severity)]}</p>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className={styles.dashboardTablePillMini}>
+                                            <Icon iconName="Add"/>
+                                            <span>{improvement[parseSeverity(row.severity)]}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <UserPuckGroup style="normal">
+                                            <UserPuck imageSrc={UserPic1} userState={"offline"}></UserPuck>
+                                        </UserPuckGroup>
                                     </td>
                                 </tr>
                             ))}
