@@ -50,7 +50,7 @@ export const RatioBarGraph = ({ style, title, data }: Props) => {
                 style={graphVals as CSSWithVars}
             ></div>
             <div className={styles.chartLegend}>
-                {data.map((cat) =>
+                {data && data.map((cat) =>
                     <div className={styles.chartLegendItem}>
                         <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect width="8" height="8" rx="4" fill={cat.color} />

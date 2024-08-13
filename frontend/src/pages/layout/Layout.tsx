@@ -1,7 +1,7 @@
 import { Outlet, Link } from "react-router-dom";
 import { Settings24Filled as SettingsIcon, ChevronDown24Regular as ChevronDownIcon, ChevronUp24Regular as ChevronUpIcon } from "@fluentui/react-icons";
 import { Stack } from "@fluentui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import useWebSocket from "react-use-websocket";
 import { format, intervalToDuration } from "date-fns";
 import { useEventStore, WebsocketMessage } from "../../api";
@@ -18,7 +18,7 @@ const Layout = () => {
     const [isLiveAttack, attackStartDate, riskScore] = useEventStore((state) => [(state.events.length > 0), state.events[0]?.startTime, state.events[0]?.securityScore]);
     const pushEvent = useEventStore((state) => state.pushEvent);
 
-    function getInterval() {
+    const getInterval = useCallback(() => {
         const dur = intervalToDuration({
             start: attackStartDate ?? new Date(),
             end: new Date()
@@ -26,7 +26,7 @@ const Layout = () => {
         const leftPad = (num: number | undefined) => String(num || 0).padStart(2, '0');
 
         return `${dur.days ? dur.days + ' days ' : ''}${leftPad(dur.hours)}:${leftPad(dur.minutes)}:${leftPad(dur.seconds)}`;
-    }
+    }, [attackStartDate]);
 
     const { lastMessage } = useWebSocket(
         WS_URL,
