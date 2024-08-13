@@ -102,6 +102,10 @@
     cursor: pointer;
 }
 
+.hiddenMenuListItem {
+    visibility: hidden;
+}
+
 .menuListItemActive {
     display: flex;
     flex-direction: row;
@@ -201,12 +205,26 @@
 .headerDataContainer {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 21px;
+}
+
+.headerDataIcon {
+    transform: translateX(11px);
 }
 
 .headerDataBlock {
+    position: relative;
     display: flex;
     flex-direction: column;
+}
+
+.headerDataBlock:nth-child(2n+1):before {
+    content: '';
+    position: absolute;
+    height: 100%;
+    top: 0;
+    left: -10px;
+    border-left: 1px solid #706E8680;
 }
 
 .headerDataTitle {

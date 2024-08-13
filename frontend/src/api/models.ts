@@ -232,6 +232,13 @@ export type Incident = {
     summary: string;
 }
 
+export type ServerPushEvent = {
+	AttackType: string,
+	SecurityScore: number,
+	Alert: string,
+	StartTime: Date
+}
+
 export type PushEvent = {
 	attackType: string,
 	securityScore: number,
@@ -241,5 +248,5 @@ export type PushEvent = {
 
 export type WebsocketMessage = {
     message_type: "new_event" | "update_event" | "close_event",
-    payload: PushEvent
+    payload: ServerPushEvent
 }

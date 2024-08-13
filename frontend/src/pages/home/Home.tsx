@@ -113,13 +113,13 @@ const Home = () => {
             >
                 <div className={styles.notificationMessage}>
                     <p style={{ color: "#E87474" }}>You are under attack!</p>
-                    <p style={{ color: "#9896B3" }}>{firstEvent.alert}</p>
+                    <p style={{ color: "#9896B3" }}>{firstEvent?.alert}</p>
                 </div>
                 <ChevronDownIcon style={{ color: "#5C5A73" }} />
             </Stack>
             <div className={styles.dataCardContainer}>
                 <div className={classNames(styles.dataCard, styles.dataCardTall)}>
-                    <p className={classNames(styles.dataCardLabel, styles.dataCardAccent)}>{firstEvent.attackType}</p>
+                    <p className={classNames(styles.dataCardLabel, styles.dataCardAccent)}>{firstEvent?.attackType}</p>
                     <svg className={styles.dataCardIcon} width="114" height="126" viewBox="0 0 163 180" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M139.601 156.915C170.239 126.134 170.239 76.2275 139.601 45.4463C108.962 14.6651 59.287 14.6651 28.6483 45.4463C-1.99033 76.2275 -1.99033 126.134 28.6483 156.915C59.287 187.696 108.962 187.696 139.601 156.915Z" fill="url(#paint0_linear_1509_10027)" />
                         <path d="M84.153 178.47C119.141 178.47 147.504 175.376 147.504 171.559C147.504 167.742 119.141 164.648 84.153 164.648C49.1653 164.648 20.8022 167.742 20.8022 171.559C20.8022 175.376 49.1653 178.47 84.153 178.47Z" fill="#B05454" />

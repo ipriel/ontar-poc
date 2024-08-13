@@ -15,7 +15,7 @@ from backend.utils.azure import (
     fetchUpdate
 )
 from backend.utils.data import serialize
-from backend.broker import Broker
+from backend.broker import Broker, EventType
 
 bp = Blueprint("routes", __name__, static_folder="static", template_folder="static")
 broker = Broker()
@@ -42,18 +42,21 @@ async def assets(path):
 # Webhooks
 @bp.route("/interop/new_event", methods=["POST"])
 async def new_event():
-    await broker.publish("new_event")
-    return Response("OK")
+    request_json = await request.get_json()
+    await broker.publish(EventType.NEW, request_json)
+    return Response("OK"), 200
 
 @bp.route("/interop/update_event", methods=["POST"])
 async def update_event():
-    await broker.publish("update_event")
-    return Response("OK")
+    request_json = await request.get_json()
+    await broker.publish(EventType.UPDATE, request_json)
+    return Response("OK"), 200
 
 @bp.route("/interop/close_event", methods=["POST"])
 async def close_event():
-    await broker.publish("close_event")
-    return Response("OK")
+    request_json = await request.get_json()
+    await broker.publish(EventType.CLOSE, request_json)
+    return Response("OK"), 200
 
 # App Routes
 @bp.route("/conversation", methods=["GET", "POST"])
@@ -98,8 +101,9 @@ async def getRemediations():
 
 @bp.websocket("/notifier")
 async def notifier():
+    await websocket.send(f"OK")
     async for message in broker.subscribe():
-        await websocket.send(message)
+        await websocket.send(f"{message}")
 
 # Init App
 app = create_app()
