@@ -10,9 +10,27 @@ import UserPic1 from "../../assets/user-1.png";
 import UserPic2 from "../../assets/user-2.png";
 import UserPic3 from "../../assets/user-3.png";
 import UserPic4 from "../../assets/user-4.png";
+import UserPic5 from "../../assets/user-5.png";
+import UserPic6 from "../../assets/user-6.png";
+import UserPic7 from "../../assets/user-7.png";
+import UserPic8 from "../../assets/user-8.png";
+import UserPic9 from "../../assets/user-9.png";
+import UserPic10 from "../../assets/profile.png";
 
 interface Props {
     user: RiskyUser;
+}
+
+const imageList = [UserPic1, UserPic2, UserPic3, UserPic4, UserPic5, UserPic6, UserPic7, UserPic8, UserPic9, UserPic10];
+function getPic() {
+    const index = Math.floor(Math.random() * 10);
+    return imageList[index];
+}
+
+const jobList = ["Sysadmin", "Admin", "Operator", "Creator"];
+function getJob() {
+    const index = Math.floor(Math.random() * 4);
+    return jobList[index];
 }
 
 const UserBlock = ({ user }: Props) => {
@@ -29,13 +47,17 @@ const UserBlock = ({ user }: Props) => {
         [user]
     );
 
+    const userPic = useMemo(getPic, [user]);
+
+    const userJob = useMemo(getJob, [user]);
+
     return (
         <div className={classNames(styles.userBlock, styles.dataBlock)}>
-            <img className={styles.userBlockImage} src={UserPic1} alt="" />
+            <img className={styles.userBlockImage} src={userPic} alt="" />
             <span>Name</span>
             <p className={styles.highlightText}>{user.userDisplayName}</p>
             <span>Type</span>
-            <p>CEO</p>
+            <p>{userJob}</p>
             <span>Attack Time</span>
             <p>{parsedDate}</p>
             <span>Compromised Level</span>
@@ -66,7 +88,7 @@ export const RiskyUsersPane = () => {
                 />
             </div>
             <div className={styles.userBlockContainer}>
-                {users.map(user =>
+                {users && users.map(user =>
                     <UserBlock user={user}/>
                 )}
             </div>
