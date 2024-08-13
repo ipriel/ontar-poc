@@ -119,6 +119,46 @@ button.accentButton {
     margin-left: 24px;
 }
 
+.codeBlock {
+    margin-block: 6px;
+    border-radius: 8px;
+    background-color: #141419;
+}
+
+.codeBlock * {
+    background: transparent !important;
+    white-space: pre-line;
+    word-break: break-all;
+}
+
+.codeBlock code {
+    display: grid;
+    grid-template-columns: min-content 1fr;
+}
+
+.codeBlock > div > button {
+    top: -22px;
+    right: 1rem;
+    border: none;
+}
+
+.codeBlock > div > span {
+    max-height: 200px;
+    overflow: auto;
+}
+
+.codeBlockTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: -1rem;
+    color: #E87474;
+}
+
+.codeBlockTitle > p {
+    margin-block: 0;
+}
+
 .commentList {
     grid-template-rows: min-content 1fr;
     min-height: 56px;

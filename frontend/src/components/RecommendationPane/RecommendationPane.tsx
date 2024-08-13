@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Icon, IconButton } from "@fluentui/react";
 import { registerIcons } from '@fluentui/react/lib/Styling';
+import { CopyBlock, dracula } from "react-code-blocks";
 import ReactMarkdown from "react-markdown";
 import classNames from "classnames";
 
@@ -95,14 +96,14 @@ export const RecommendationPane = ({ data }: Props) => {
                 <span><b>Note:</b>{` You have to take ${remediations.length > 1 ? `these ${remediations.length} steps` : 'this step'} in the next few hours`}</span>
             </div>
             <div>
-                {remediations.map((remediation, i) =>
+                {remediations && remediations.map((remediation, i) =>
                     <div className={styles.leftRightFlex}>
                         <div className={styles.remediationItemContainer}>
                             <svg width="49" height="40" viewBox="0 0 49 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <line x1="20.6074" y1="19.743" x2="46.6274" y2="19.743" stroke="#C792FF" />
                                 <circle cx="20.3179" cy="20" r="3.37256" fill="#C792FF" />
                             </svg>
-                            <p className={styles.remediationCounter}>{i+1}</p>
+                            <p className={styles.remediationCounter}>{i + 1}</p>
                             <p className={styles.remediationLabel}>{remediation.name}</p>
                         </div>
                         <div>
@@ -113,14 +114,32 @@ export const RecommendationPane = ({ data }: Props) => {
                     </div>
                 )}
             </div>
-            {/* CodeBlock */}
+            <div className={styles.codeBlock}>
+                <div className={styles.codeBlockTitle}>
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="2" y="1" width="44" height="44" rx="8" fill="#141419" />
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M28.2929 17.2929C28.6834 16.9023 29.3166 16.9023 29.7071 17.2929L34.7071 22.2929C35.0976 22.6834 35.0976 23.3166 34.7071 23.7071L29.7071 28.7071C29.3166 29.0976 28.6834 29.0976 28.2929 28.7071C27.9024 28.3166 27.9024 27.6834 28.2929 27.2929L32.5858 23L28.2929 18.7071C27.9024 18.3166 27.9024 17.6834 28.2929 17.2929Z" fill="#E87474" />
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M19.7071 17.2929C20.0976 17.6834 20.0976 18.3166 19.7071 18.7071L15.4142 23L19.7071 27.2929C20.0976 27.6834 20.0976 28.3166 19.7071 28.7071C19.3166 29.0976 18.6834 29.0976 18.2929 28.7071L13.2929 23.7071C12.9024 23.3166 12.9024 22.6834 13.2929 22.2929L18.2929 17.2929C18.6834 16.9023 19.3166 16.9023 19.7071 17.2929Z" fill="#E87474" />
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M26.2169 13.0238C26.7561 13.1436 27.096 13.6778 26.9762 14.2169L22.9762 32.2169C22.8564 32.756 22.3222 33.096 21.7831 32.9762C21.2439 32.8563 20.904 32.3222 21.0238 31.783L25.0238 13.783C25.1436 13.2439 25.6778 12.904 26.2169 13.0238Z" fill="#E87474" />
+                    </svg>
+                    <p>Copy this script!</p>
+                </div>
+                <CopyBlock
+                    codeContainerStyle={{ background: "#141419" }}
+                    language={"text"}
+                    text={remediations.map(remediation => remediation.description).join("\n\n")}
+                    showLineNumbers={true}
+                    theme={dracula}
+                    codeBlock
+                />
+            </div>
             <div className={classNames(styles.stage, styles.commentList)}>
                 <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12.25 14.875H21M12.25 21H26.25M16.9466 31.5H28.35C31.2903 31.5 32.7604 31.5 33.8834 30.9278C34.8713 30.4244 35.6744 29.6213 36.1778 28.6335C36.75 27.5104 36.75 26.0403 36.75 23.1V13.65C36.75 10.7097 36.75 9.23959 36.1778 8.11655C35.6744 7.1287 34.8713 6.32555 33.8834 5.82222C32.7604 5.25 31.2903 5.25 28.35 5.25H13.65C10.7097 5.25 9.23959 5.25 8.11655 5.82222C7.1287 6.32555 6.32555 7.1287 5.82222 8.11655C5.25 9.23959 5.25 10.7097 5.25 13.65V35.5871C5.25 36.5196 5.25 36.9859 5.44115 37.2253C5.60739 37.4336 5.85947 37.5547 6.12594 37.5545C6.43235 37.5541 6.79642 37.2629 7.52457 36.6803L11.6991 33.3407C12.5519 32.6585 12.9783 32.3174 13.4531 32.0748C13.8743 31.8596 14.3227 31.7023 14.7861 31.6072C15.3084 31.5 15.8545 31.5 16.9466 31.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
                 <p>Comments</p>
                 <div className={styles.commentListContainer}>
-                    {comments.map(comment =>
+                    {comments && comments.map(comment =>
                         <ReactMarkdown
                             children={comment}
                         />
