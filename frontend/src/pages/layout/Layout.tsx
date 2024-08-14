@@ -12,7 +12,7 @@ import ProfilePic from "../../assets/profile.png";
 import styles from "./Layout.module.css";
 import { UserPuck } from "../../components/UserPuck";
 
-const WS_URL = "ws://127.0.0.1:5000/notifier";
+const WS_URL = "ws://ontar.azurewebsites.net/notifier";
 
 async function fetchJson<T>(url: string) {
     const data = await fetch(url);
