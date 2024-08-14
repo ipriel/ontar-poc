@@ -50,13 +50,13 @@ export const useAlertsStore = create<AlertState>((set) => ({
   calcCompromisedDevices: (alerts: Alert[]) => {
     alerts.flatMap(alert => alert.evidence).forEach(alert => {
       switch(alert["@odata.type"]) {
-        case "azureResouceEvidence":
+        case "#microsoft.graph.security.azureResouceEvidence":
           set((state) => ({ compromisedApps: state.compromisedApps + 1 }))
           break;
-        case "ipEvidence":
+        case "#microsoft.graph.security.ipEvidence":
           set((state) => ({ compromisedNetworking: state.compromisedNetworking + 1 }))
           break;
-        case "deviceEvidence":
+        case "#microsoft.graph.security.deviceEvidence":
           set((state) => ({ compromisedIot_Resources: state.compromisedIot_Resources + 1 }))
           break;
       }
@@ -97,7 +97,8 @@ export const useIncidentsStore = create<IncidentState>((set) => ({
       set({
         startDate: mainIncident.startDate,
         description: mainIncident.description,
-        name: mainIncident.name
+        name: mainIncident.name,
+        count: data.length
       });
   },
   reset: () => set({
