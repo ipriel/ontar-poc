@@ -158,6 +158,11 @@
     background-color: #8B66B3 !important;
 }
 
+:local(.menuListItemIcon):has(+ :global(.active:active)),
+:local(.menuListItemIcon):has(+ :global(.active:hover)) {
+    color: #8B66B3 !important;
+}
+
 :local(.menuListItemIcon):has(+ :global(.active)) {
     color: #C792FF;
 }
