@@ -72,12 +72,12 @@
 
 .tag[data-severity="Medium"] {
     background-color: #906209;
-    color: #FFA903;
+    color: #FFA903 !important;
 }
 
 .tag[data-severity="Low"] {
     background-color: #6FCF97;
-    color: #185C34;
+    color: #185C34 !important;
 }
 
 .modalDismissButton {
