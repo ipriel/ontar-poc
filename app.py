@@ -87,17 +87,18 @@ async def getAlerts():
 @bp.route("/api/incidents", methods=["GET"])
 async def getIncidents():
     data, status_code = fetchUpdate("getIncidents", app_settings.functions.incidents_key, True)
-    return Response(response=data, status=status_code)
+    data = [serialize(incident) for incident in data]
+    return jsonify(data), status_code
 
 @bp.route("/api/recommendations", methods=["GET"])
 async def getRecommendations():
     data, status_code = fetchUpdate("getRecommendations", app_settings.functions.recommendations_key)
-    return Response(response=data, status=status_code)
+    return jsonify(data), status_code
 
 @bp.route("/api/remediations", methods=["GET"])
 async def getRemediations():
     data, status_code = fetchUpdate("getRemediations", app_settings.functions.remediations_key)
-    return Response(response=data, status=status_code)
+    return jsonify(data), status_code
 
 @bp.websocket("/notifier")
 async def notifier():
