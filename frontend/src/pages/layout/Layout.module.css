@@ -106,13 +106,7 @@
     visibility: hidden;
 }
 
-.menuListItemActive {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-    color: #C792FF;
-}
+
 
 [data-sidebar="false"] .menuListItem,
 [data-sidebar="false"] .menuListItemActive {
@@ -129,6 +123,43 @@
 
 .menuListItemText {
     margin-block: 10px;
+    text-decoration: none;
+    color: #706E86;
+}
+
+.menuListItem:hover {
+    color: #C792FF !important;
+}
+
+.menuListItem:hover .menuListItemEmphasis {
+    background-color: #C792FF !important;
+}
+
+.menuListItem:hover > .menuListItemIcon,
+.menuListItem:hover > .menuListItemText {
+    color: #C792FF;
+}
+
+:global(.active) {
+    color: #C792FF !important;
+}
+
+:global(.active:active),
+:global(.active:hover) {
+    color: #8B66B3 !important;
+}
+
+:global(.active) > :local(.menuListItemEmphasis) {
+    background-color: #C792FF;
+}
+
+:global(.active:active) > :local(.menuListItemEmphasis),
+:global(.active:hover) > :local(.menuListItemEmphasis) {
+    background-color: #8B66B3 !important;
+}
+
+:local(.menuListItemIcon):has(+ :global(.active)) {
+    color: #C792FF;
 }
 
 [data-sidebar="false"] .menuListItemText {
