@@ -8,3 +8,4 @@ Quart==0.19.6
 pydantic-settings==2.4.0
 pendulum==3.0.0
 msgraph-beta-sdk==1.5.2
+jsonpickle==3.2.2
