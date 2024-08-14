@@ -135,7 +135,7 @@ export const useRecommendationsStore = create<RecommendationState>((set) => ({
   recommendations: [],
   setRecommendations: (data: Recommendation[]) => {
     const list = data.map((recommendation) => ({
-      id: recommendation.id.slice(6),
+      id: recommendation.id.slice(5),
       name: recommendation.recommendationName,
       severity: recommendation.severityScore,
       scoreImprovement: recommendation.configScoreImpact,
