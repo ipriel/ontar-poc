@@ -48,7 +48,7 @@
 
 .stage>p {
     margin: 0;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
 }
 
@@ -67,7 +67,7 @@
     display: flex;
     align-items: center;
     width: fit-content;
-    padding: 10px;
+    padding: 6px;
     gap: 8px;
     border: none;
     border-radius: 8px;
@@ -86,6 +86,34 @@ button.accentButton {
     color: #C792FFCC;
 }
 
+.remediationList {
+    max-height: 130px;
+    overflow: auto;
+}
+
+.remediationList>:first-child,
+.remediationList>:last-child {
+    position: relative;
+}
+
+.remediationList>:first-child::before {
+    content: '▼';
+    position: absolute;
+    left: 16.4px;
+    top: -2.2px;
+    font-size: 8px;
+    color: #C792FF;
+}
+
+.remediationList>:last-child::after {
+    content: '▲';
+    position: absolute;
+    left: 16.4px;
+    bottom: -6px;
+    font-size: 8px;
+    color: #C792FF;
+}
+
 .remediationItemContainer {
     position: relative;
     display: flex;
@@ -101,15 +129,23 @@ button.accentButton {
     border-left: 1px solid #C792FF;
 }
 
+.commentListContainer p,
+.remediationItemContainer>p {
+    margin-block: 6px;
+    max-width: 510px;
+    text-wrap: wrap;
+    word-break: break-all;
+}
+
 .remediationCounter {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 36px;
-    min-width: 36px;
+    min-height: 24px;
+    min-width: 24px;
     border-radius: 8px;
-    padding: 6px;
-    font-size: 18px;
+    padding: 3px;
+    font-size: 16px;
     line-height: 18px;
     background-color: #141419;
     color: white;
@@ -134,17 +170,31 @@ button.accentButton {
 .codeBlock code {
     display: grid;
     grid-template-columns: min-content 1fr;
+    white-space: pre-line !important;
+    word-break: break-all;
 }
 
-.codeBlock > div > button {
+.codeBlock code > * {
+    font-size: 12px;
+}
+
+.codeBlock>div>button {
     top: -22px;
     right: 1rem;
     border: none;
 }
 
-.codeBlock > div > span {
-    max-height: 200px;
+.codeBlock>div>span {
+    max-height: 100px;
     overflow: auto;
+}
+
+.codeBlock>div:has( code) {
+    font-size: 12px;
+}
+
+:local(.codeBlock) :global(.linenumber) {
+    grid-column: 1/2;
 }
 
 .codeBlockTitle {
@@ -155,7 +205,7 @@ button.accentButton {
     color: #E87474;
 }
 
-.codeBlockTitle > p {
+.codeBlockTitle>p {
     margin-block: 0;
 }
 
@@ -173,12 +223,8 @@ button.accentButton {
     overflow-x: scroll;
 }
 
-.commentListContainer p,
-.remediationItemContainer>p {
-    margin-block: 0;
-    max-width: 510px;
-    text-wrap: wrap;
-    word-break: break-all;
+.commentListContainer p {
+    margin-block: 2px;
 }
 
 .commentListContainer>* {

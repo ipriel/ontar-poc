@@ -30,13 +30,13 @@
     grid-template-columns: 1fr min-content;
     grid-template-rows: 1fr min-content;
     align-items: center;
-    row-gap: 8px;
+    row-gap: 4px;
 }
 
 .modalTitle {
     grid-row: 1/2;
     margin-block: 0;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 600;
     line-height: 28px;
 }
@@ -54,12 +54,11 @@
     gap: 4px;
     border-radius: 16px;
     padding: 2px 8px;
-    font-size: 12px;
+    font-size: 10px;
     line-height: 20px;
     text-align: center;
     cursor: pointer;
-    min-width: fit-content;
-    max-width: 90px;
+    width: fit-content;
     background-color: #363542;
     color: #89859F;
 

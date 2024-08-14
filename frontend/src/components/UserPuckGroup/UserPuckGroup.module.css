@@ -3,6 +3,11 @@
     gap: 4px;
 }
 
+.userPuckGroup:has(> .userAvatarPuckSmall) > svg {
+    width: 24px;
+    height: 24px;
+}
+
 .userPuckGroup.dense {
     gap: 0;
 }

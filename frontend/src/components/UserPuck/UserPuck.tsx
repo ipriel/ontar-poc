@@ -9,21 +9,23 @@ interface Props {
     imageSrc: string;
     imageAlt?: string;
     userState?: UserState;
+    size?: "small" | "normal"
 }
 
 export const UserPuck = ({
     imageSrc,
     imageAlt = "",
     userState,
+    size = "normal",
     ...attrs
 }: Props) => {
     return (
         (userState != undefined) ? (
             <div className={classNames({[styles.hasBadge]: (userState != undefined)})} data-status={userState}>
-                <img src={imageSrc} className={styles.userAvatarPuck} alt={imageAlt} {...attrs}></img>
+                <img src={imageSrc} className={classNames(styles.userAvatarPuck, {[styles.userAvatarPuckSmall]: size == "small"})} alt={imageAlt} {...attrs}></img>
             </div>
         ) : (
-            <img src={imageSrc} className={styles.userAvatarPuck} alt={imageAlt} {...attrs}></img>
+            <img src={imageSrc} className={classNames(styles.userAvatarPuck, {[styles.userAvatarPuckSmall]: size == "small"})} alt={imageAlt} {...attrs}></img>
         )
     )
 };

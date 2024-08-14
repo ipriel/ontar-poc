@@ -95,13 +95,13 @@ export const RecommendationPane = ({ data }: Props) => {
                 <p>Mitigation steps</p>
                 <span><b>Note:</b>{` You have to take ${remediations.length > 1 ? `these ${remediations.length} steps` : 'this step'} in the next few hours`}</span>
             </div>
-            <div>
+            <div className={styles.remediationList}>
                 {remediations && remediations.map((remediation, i) =>
                     <div className={styles.leftRightFlex}>
                         <div className={styles.remediationItemContainer}>
-                            <svg width="49" height="40" viewBox="0 0 49 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <line x1="20.6074" y1="19.743" x2="46.6274" y2="19.743" stroke="#C792FF" />
-                                <circle cx="20.3179" cy="20" r="3.37256" fill="#C792FF" />
+                            <svg viewBox="0 16.28 46.826 7.343" width="46.826px" height="7.343px" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <line x1="20.6074" y1="19.743" x2="46.6274" y2="19.743" stroke="#C792FF" transform="matrix(1.0000000000000002, 0, 0, 1.0000000000000002, 0, 0)" />
+                                <circle cx="20.3179" cy="20" r="3.37256" fill="#C792FF" transform="matrix(1.0000000000000002, 0, 0, 1.0000000000000002, 0, 0)" />
                             </svg>
                             <p className={styles.remediationCounter}>{i + 1}</p>
                             <p className={styles.remediationLabel}>{remediation.name}</p>

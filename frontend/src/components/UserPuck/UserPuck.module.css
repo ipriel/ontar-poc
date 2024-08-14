@@ -7,6 +7,11 @@
     border: 1px solid black;
 }
 
+.userAvatarPuckSmall {
+    width: 24px;
+    height: 24px;
+}
+
 .hasBadge {
     position: relative;
     width: fit-content;
