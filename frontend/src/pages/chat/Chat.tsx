@@ -327,7 +327,7 @@ ForEach ($CSVRecord in $CSVRecords) {
                                                         <ErrorCircleRegular className={styles.errorIcon} stroke="#b63443" />
                                                         <span style={{ color: "#b63443" }}>Error</span>
                                                     </Stack>
-                                                    <span className={styles.chatMessageErrorContent}>{answer.content}</span>
+                                                    <span className={styles.chatMessageErrorContent} style={{color: "#706e86"}}>{answer.content}</span>
                                                 </div>
                                             ) : answer.role === "system-base" ? (
                                                 <div className={styles.chatMessageSystem} tabIndex={0}>

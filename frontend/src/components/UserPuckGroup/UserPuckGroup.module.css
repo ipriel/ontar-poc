@@ -1,0 +1,33 @@
+.userPuckGroup {
+    display: flex;
+    gap: 4px;
+}
+
+.userPuckGroup:has(> .userAvatarPuckSmall) > svg {
+    width: 24px;
+    height: 24px;
+}
+
+.userPuckGroup.dense {
+    gap: 0;
+}
+
+.userPuckGroup.dense > :nth-child(2) {
+    translate: -4px;
+}
+
+.userPuckGroup.dense > :nth-child(3) {
+    translate: -8px;
+}
+
+.userPuckGroup.dense > :nth-child(4) {
+    translate: -12px;
+}
+
+.userPuckGroup.dense >* {
+    z-index: 2;
+}
+
+.userPuckGroup.dense >svg {
+    z-index: 1;
+}
