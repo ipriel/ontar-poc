@@ -14,8 +14,8 @@ from backend.utils.azure import (
     conversation_without_data,
     fetchUpdate
 )
-from backend.utils.data import serialize
-from backend.broker import Broker, EventType
+from backend.utils.data import serialize, Message, EventType
+from backend.broker import Broker
 
 bp = Blueprint("routes", __name__, static_folder="static", template_folder="static")
 broker = Broker()
@@ -27,15 +27,15 @@ def create_app():
     return app
 
 # Static File Routes
-@bp.route("/")
+@bp.route("/", methods=["GET"])
 async def index():
     return await bp.send_static_file("index.html")
 
-@bp.route("/favicon.ico")
+@bp.route("/favicon.ico", methods=["GET"])
 async def favicon():
     return await bp.send_static_file('favicon.ico')
 
-@bp.route("/assets/<path:path>")
+@bp.route("/assets/<path:path>", methods=["GET"])
 async def assets(path):
     return await send_from_directory("static/assets", path)
 
@@ -43,19 +43,19 @@ async def assets(path):
 @bp.route("/interop/new_event", methods=["POST"])
 async def new_event():
     request_json = await request.get_json()
-    await broker.publish(EventType.NEW, request_json)
+    await broker.publish(Message(EventType.NEW, request_json))
     return Response("OK"), 200
 
 @bp.route("/interop/update_event", methods=["POST"])
 async def update_event():
     request_json = await request.get_json()
-    await broker.publish(EventType.UPDATE, request_json)
+    await broker.publish(Message(EventType.UPDATE, request_json))
     return Response("OK"), 200
 
 @bp.route("/interop/close_event", methods=["POST"])
 async def close_event():
     request_json = await request.get_json()
-    await broker.publish(EventType.CLOSE, request_json)
+    await broker.publish(Message(EventType.CLOSE, request_json))
     return Response("OK"), 200
 
 # App Routes

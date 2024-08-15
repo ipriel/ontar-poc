@@ -24,7 +24,7 @@ def fetchUserGroups(userToken, nextLink=None):
             r['value'].extend(nextLinkData)
         
         return r['value']
-    except Exception as e:
+    except Exception:
         return []
 
 
@@ -52,11 +52,11 @@ async def prepare_body_headers_with_data(request: Request):
         query_type = "semantic"
 
     # Set filter
-    filter = None
+    filterStr = None
     userToken = None
     if app_settings.search.permitted_groups_column is not None:
         userToken = request.headers.get('X-MS-TOKEN-AAD-ACCESS-TOKEN', "")
-        filter = generateFilterString(userToken)
+        filterStr = generateFilterString(userToken)
 
     body = {
         "messages": request_messages,
@@ -86,7 +86,7 @@ async def prepare_body_headers_with_data(request: Request):
                     "roleInformation": app_settings.openai.system_message,
                     "embeddingEndpoint": app_settings.openai.embedding_endpoint,
                     "embeddingKey": app_settings.openai.embedding_key,
-                    "filter": filter
+                    "filter": filterStr
                 }
             }
         ]
@@ -230,7 +230,7 @@ def fetchUpdate(function:str, key:str, isPickle:bool = False):
     base_url = f"https://ontarfuntionsapp.azurewebsites.net/api"
     endpoint = f"{base_url}/{function}?code={key}"
     
-    r = requests.post(endpoint)
+    r = requests.get(endpoint)
     status_code = r.status_code
 
     if isPickle:
