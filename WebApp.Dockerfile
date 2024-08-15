@@ -28,4 +28,4 @@ COPY . /usr/src/app/
 COPY --from=frontend /home/node/app/static  /usr/src/app/static/
 WORKDIR /usr/src/app  
 EXPOSE 80  
-CMD ["uwsgi", "--http", ":80", "--wsgi-file", "app.py", "--callable", "app", "-b","32768"]  
+CMD ["hypercorn", "app:app", "--bind", "0.0.0.0:80"]  
