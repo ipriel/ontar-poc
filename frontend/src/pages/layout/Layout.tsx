@@ -5,7 +5,7 @@ import { useEffect, useState, useCallback } from "react";
 import useWebSocket from "react-use-websocket";
 import { format, intervalToDuration } from "date-fns";
 import { useEventStore, useRiskyUsersStore, useAlertsStore, useRecommendationsStore, useRemediationsStore, useIncidentsStore } from "../../api/store";
-import { WebsocketMessage, RiskyUser, Alert, Incident, Recommendation, Remediation } from '../../api/models'
+import { WebsocketMessage, RiskyUser, Alert, Incident, Recommendation, Remediation, ServerPushEvent } from '../../api/models'
 import classNames from "classnames";
 
 import ProfilePic from "../../assets/profile.png";
@@ -21,14 +21,13 @@ async function fetchJson<T>(url: string) {
 }
 
 const Layout = () => {
+    const [isLiveAttack, attackStartDate, riskScore, pushEvent, updateEvent, clearEvent] = useEventStore((state) => [(state.events.length > 0), state.events[0]?.startTime, state.events[0]?.securityScore, state.pushEvent, state.updateEvent, state.reset]);
+    const [parseUsers, clearUsers] = useRiskyUsersStore((state) => [state.parseUsers, state.reset]);
+    const [calcCompromisedDevices, clearDevices] = useAlertsStore((state) => [state.calcCompromisedDevices, state.reset]);
+    const [setMainIncident, clearIncidents] = useIncidentsStore((state) => [state.setMainIncident, state.reset]);
+    const [setRecommendations, clearRecommendations] = useRecommendationsStore((state) => [state.setRecommendations, state.reset]);
+    const [setRemediations, clearRemediations] = useRemediationsStore((state) => [state.setRemediations, state.reset]);
     const [isSidebarExpanded, setIsSidebarExpanded] = useState<boolean>(true);
-    const [isLiveAttack, attackStartDate, riskScore] = useEventStore((state) => [(state.events.length > 0), state.events[0]?.startTime, state.events[0]?.securityScore]);
-    const parseUsers = useRiskyUsersStore((state) => state.parseUsers);
-    const calcCompromisedDevices = useAlertsStore((state) => state.calcCompromisedDevices);
-    const setMainIncident = useIncidentsStore((state) => state.setMainIncident);
-    const setRecommendations = useRecommendationsStore((state) => state.setRecommendations);
-    const setRemediations = useRemediationsStore((state) => state.setRemediations);
-    const pushEvent = useEventStore((state) => state.pushEvent);
     const navigate = useNavigate();
     let location = useLocation();
 
@@ -74,11 +73,28 @@ const Layout = () => {
 
         try {
             const data: WebsocketMessage = JSON.parse(lastMessage.data);
-            pushEvent(data.payload);
+            if (data.message_type == "close_event") {
+                clearUsers();
+                clearDevices();
+                clearRecommendations();
+                clearEvent();
+                clearIncidents();
+                clearRemediations();
+                navigate("/");
+            }
+            else {
+                if (data.message_type == "new_event")
+                    pushEvent(data.payload as ServerPushEvent);
+                else /* data.message_type == "update_event" */
+                    updateEvent(data.payload);
 
-            const fetchPromises = fetchData();
-            Promise.allSettled(fetchPromises)
-                .then(() => navigate("/home"));
+                const fetchPromises = fetchData();
+                Promise.allSettled(fetchPromises)
+                    .then(() => {
+                        if (location.pathname != "/home")
+                            navigate("/home");
+                    });
+            }
         } catch (e) { /* Ignore the error */ }
     }, [lastMessage]);
 
@@ -131,7 +147,7 @@ const Layout = () => {
                                 <path d="M0.0583496 13.3682C0.0583496 12.2636 0.95378 11.3682 2.05835 11.3682H3.05835V15.3682H2.05835C0.95378 15.3682 0.0583496 14.4727 0.0583496 13.3682Z" fill="currentColor" />
                             </svg>
                         </div>
-                        <NavLink to="/chat" className={classNames(styles.menuListItemText, {'active': location.pathname == "/"})}>Ask Chatbot</NavLink>
+                        <NavLink to="/chat" className={classNames(styles.menuListItemText, { 'active': location.pathname == "/" })}>Ask Chatbot</NavLink>
                     </li>
                     <li className={styles.menuListItem}>
                         <div className={styles.menuListItemIcon}>

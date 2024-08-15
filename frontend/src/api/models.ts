@@ -248,5 +248,5 @@ export type PushEvent = {
 
 export type WebsocketMessage = {
     message_type: "new_event" | "update_event" | "close_event",
-    payload: ServerPushEvent
+    payload: ServerPushEvent | Partial<ServerPushEvent>
 }

@@ -11,7 +11,7 @@ import { RecommendationPane } from "../../components/RecommendationPane";
 import { RiskyUsersPane } from "../../components/RiskyUsersPane";
 import { UserPuckGroup } from "../../components/UserPuckGroup";
 import { RatioBarGraph } from "../../components/RatioBarGraph";
-import { useAlertsStore, useEventStore, useRecommendationsStore, useRemediationsStore, useRiskyUsersStore } from "../../api";
+import { useAlertsStore, useEventStore, useRecommendationsStore, useRiskyUsersStore, useModalStore } from "../../api";
 
 import UserPic1 from "../../assets/user-1.png";
 import UserPic2 from "../../assets/user-2.png";
@@ -52,8 +52,7 @@ const Home = () => {
     const [compromisedAppsCount, compromisedNetworkingCount, compromisedResourcesCount] = useAlertsStore((state) => [state.compromisedApps, state.compromisedNetworking, state.compromisedIot_Resources]);
     const recommendations = useRecommendationsStore((state) => state.recommendations);
     const [activeTab, setActiveTab] = useState<number>(1);
-    const [showModal, setShowModal] = useState<boolean>(false);
-    const [modalContent, setModalContent] = useState<ModalContent>({ title: "", tags: [], component: <></> });
+    const modal = useModalStore();
 
     return (
         <div className={styles.container} role="main">
@@ -271,11 +270,10 @@ const Home = () => {
                 </div>
                 <div className={classNames({ [styles.flipCard]: compromisedUserCount.total > 0 })} onClick={() => {
                     if (compromisedUserCount.total == 0) return;
-                    setShowModal(true);
-                    setModalContent({
+                    modal.open({
                         title: "Compromised Users",
                         component: <RiskyUsersPane />
-                    })
+                    });
                 }}>
                     <div className={classNames(styles.dataCard, { [styles.dataCardFront]: compromisedUserCount.total > 0 })}>
                         <p className={classNames(styles.dataCardValue, { [styles.dataCardAccent]: compromisedUserCount.total > 0 })}>{compromisedUserCount.total}</p>
@@ -294,11 +292,10 @@ const Home = () => {
                             iconName="OpenInNewWindow"
                             aria-label="Open compromised user details"
                             onClick={() => {
-                                setShowModal(true);
-                                setModalContent({
+                                modal.open({
                                     title: "Compromised Users",
                                     component: <RiskyUsersPane />
-                                })
+                                });
                             }}
                             className={styles.flipCardIcon}
                         />
@@ -384,15 +381,14 @@ const Home = () => {
                         <tbody className={styles.dashboardTableBody}>
                             {recommendations && recommendations.map((row) => (
                                 <tr className={classNames(styles.dashboardTableRow, styles.clickable)} onClick={() => {
-                                    setShowModal(true);
-                                    setModalContent({
+                                    modal.open({
                                         title: row.name,
                                         tags: [
                                             { label: `ID: ${row.id}` },
                                             { label: `${severity[parseSeverity(row.severity)]} Risk`, severity: severity[parseSeverity(row.severity)] }
                                         ],
                                         component: <RecommendationPane data={row} />
-                                    })
+                                    });
                                 }}>
                                     <td>{row.name}</td>
                                     <td>
@@ -418,7 +414,7 @@ const Home = () => {
                                     </td>
                                     <td>
                                         <div className={styles.dashboardTablePillMini}>
-                                            <Icon iconName="Add"/>
+                                            <Icon iconName="Add" />
                                             <span>{improvement[parseSeverity(row.severity)]}</span>
                                         </div>
                                     </td>
@@ -520,10 +516,11 @@ const Home = () => {
                     </table>
                 </div>
             </div>
-            {showModal && createPortal(
-                <Modal title={modalContent.title} {...(modalContent.tags ? { tags: modalContent.tags } : {})} onClose={() => setShowModal(false)}>
-                    {modalContent.component}
-                </Modal>, document.body)}
+            {modal.isVisible && modal.content && createPortal(
+                <Modal title={modal.content.title} {...(modal.content.tags ? { tags: modal.content.tags } : {})} onClose={modal.close}>
+                    {modal.content.component}
+                </Modal>,
+                document.body)}
         </div>
     );
 };
