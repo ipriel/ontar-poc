@@ -102,8 +102,10 @@ async def getRemediations():
 
 @bp.websocket("/notifier")
 async def notifier():
+    print("WS connection received from: ", websocket.remote_addr)
     await websocket.send(f"OK")
     async for message in broker.subscribe():
+        print(f"{message}")
         await websocket.send(f"{message}")
 
 # Init App
