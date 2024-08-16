@@ -29,6 +29,7 @@ def create_app():
 # Static File Routes
 @bp.route("/", methods=["GET"])
 async def index():
+    print("Page loaded")
     return await bp.send_static_file("index.html")
 
 @bp.route("/favicon.ico", methods=["GET"])
