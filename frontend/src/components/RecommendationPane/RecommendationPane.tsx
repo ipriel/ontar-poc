@@ -127,7 +127,7 @@ export const RecommendationPane = ({ data }: Props) => {
                 <CopyBlock
                     codeContainerStyle={{ background: "#141419" }}
                     language={"text"}
-                    text={remediations.map(remediation => remediation.description).join("\n\n")}
+                    text={remediations.map(remediation => remediation.notes).join("\n")}
                     showLineNumbers={true}
                     theme={dracula}
                     codeBlock

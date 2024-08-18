@@ -161,7 +161,7 @@ export const useRecommendationsStore = create<RecommendationState>((set) => ({
 
 type RemediationSlice = {
   name: string;
-  description: string;
+  notes: string;
   assignedTo: string;
   recommendationRef: string;
 };
@@ -177,7 +177,7 @@ export const useRemediationsStore = create<RemediationsState>((set) => ({
   setRemediations: (data: Remediation[]) => {
     const list = data.map((remediation) => ({
       name: remediation.title,
-      description: remediation.description,
+      notes: remediation.requesterNotes,
       assignedTo: remediation.requesterId,
       recommendationRef: remediation.recommendationReference.slice(5),
     }));
