@@ -176,6 +176,7 @@ export type Remediation = {
     createdOn: string;
     requesterId: string;
     requesterEmail: string;
+    requesterNotes: string;
     status: string;
     statusLastModifiedOn: string;
     description: string;
@@ -183,7 +184,6 @@ export type Remediation = {
     targetDevices: number;
     rbacGroupNames: string[];
     fixedDevices: number;
-    requesterNotes: null;
     dueOn: string;
     category: string;
     productivityImpactRemediationType: null;
