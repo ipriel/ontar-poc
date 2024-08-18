@@ -1,10 +1,15 @@
+import logging
 import openai
 import requests
 import json
 import jsonpickle
+import re
 from quart import jsonify, Response, Request
 from backend.settings import app_settings
-from backend.utils.data import format_as_ndjson
+from backend.utils.data import format_as_ndjson, serialize
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
 
 def fetchUserGroups(userToken, nextLink=None):
     # Recursively fetch group membership
@@ -229,12 +234,30 @@ async def conversation_without_data(request: Request):
 def fetchUpdate(function:str, key:str, isPickle:bool = False):
     base_url = f"https://ontarfuntionsapp.azurewebsites.net/api"
     endpoint = f"{base_url}/{function}?code={key}"
+    logger.info(f"Fetching {function[3:]}")
     
     r = requests.get(endpoint)
     status_code = r.status_code
 
+    # Log-related only section
+    logStr = r.text
+    if "py/object" in logStr:
+        matches = re.findall('py/object": "(msgraph[^"]+)"', logStr)
+        filtered = filter(lambda match: match == matches[0], matches)
+        matches = list(filtered)
+        objectName = function[3:] if len(matches)>1 else function[3:-1]  
+        logStr = str(f"{len(matches)} {objectName}")
+    elif '{"id":' in logStr:
+        matches = re.findall('{"id": "([^"]+)"', logStr)
+        objectName = function[3:] if len(matches)>1 else function[3:-1]  
+        logStr = str(f"{len(matches)} {objectName}")
+    logger.info(f"[{function}] Received {logStr}")
+
+    # Serialize response into JSON
     if isPickle:
         r = jsonpickle.decode(r.text)
+        if r is not None:
+            r = [serialize(item) for item in r]
     else:
         r = r.json()
     
