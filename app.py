@@ -14,13 +14,16 @@ from backend.utils.azure import (
     conversation_without_data,
     fetchUpdate
 )
-from backend.utils.data import serialize, Message, EventType
+from backend.utils.data import Message, EventType, setupLogging
 from backend.broker import Broker
 
 bp = Blueprint("routes", __name__, static_folder="static", template_folder="static")
 broker = Broker()
+logger = logging.getLogger(__name__)
 
 def create_app():
+    setupLogging()
+    
     app = Quart(__name__)
     app.register_blueprint(bp)
     app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -29,7 +32,7 @@ def create_app():
 # Static File Routes
 @bp.route("/", methods=["GET"])
 async def index():
-    print("Page loaded")
+    logger.debug("Page loaded")
     return await bp.send_static_file("index.html")
 
 @bp.route("/favicon.ico", methods=["GET"])
@@ -65,49 +68,67 @@ async def conversation():
     try:
         if app_settings.search.service and app_settings.search.index and app_settings.search.key:
             result = await conversation_with_data(request)
-            print(str(result))
             return result
         else:
             return await conversation_without_data(request)
     except Exception as e:
-        logging.exception("Exception in /conversation")
-        return jsonify({"error": str(e)}), 500
+        logger.exception("Exception in /conversation: %s", repr(e))
+        return jsonify({"error": repr(e)}), 500
 
 @bp.route("/api/riskyUsers", methods=["GET"])
 async def getRiskyUsers():
-    data, status_code = fetchUpdate("getRiskyUsers", app_settings.functions.risky_users_key, True)
-    data = [serialize(user) for user in data]
-    return jsonify(data), status_code
+    try:
+        data, status_code = fetchUpdate("getRiskyUsers", app_settings.functions.risky_users_key, True)
+        return jsonify(data), status_code
+    except Exception as e:
+        logger.exception("Exception in /api/riskyUsers: %s", repr(e))
+        return jsonify({"error": repr(e)}), 500
 
 @bp.route("/api/alerts", methods=["GET"])
 async def getAlerts():
-    data, status_code = fetchUpdate("getAlerts", app_settings.functions.alerts_key, True)
-    data = [serialize(alert) for alert in data]
-    return jsonify(data), status_code
+    try:
+        data, status_code = fetchUpdate("getAlerts", app_settings.functions.alerts_key, True)
+        return jsonify(data), status_code
+    except Exception as e:
+        logger.exception("Exception in /api/alerts: %s", repr(e))
+        return jsonify({"error": repr(e)}), 500
 
 @bp.route("/api/incidents", methods=["GET"])
 async def getIncidents():
-    data, status_code = fetchUpdate("getIncidents", app_settings.functions.incidents_key, True)
-    data = [serialize(incident) for incident in data]
-    return jsonify(data), status_code
+    try:
+        data, status_code = fetchUpdate("getIncidents", app_settings.functions.incidents_key, True)
+        return jsonify(data), status_code
+    except Exception as e:
+        logger.exception("Exception in /api/incidents: %s", repr(e))
+        return jsonify({"error": repr(e)}), 500
 
 @bp.route("/api/recommendations", methods=["GET"])
 async def getRecommendations():
-    data, status_code = fetchUpdate("getRecommendations", app_settings.functions.recommendations_key)
-    return jsonify(data), status_code
+    try:
+        data, status_code = fetchUpdate("getRecommendations", app_settings.functions.recommendations_key)
+        return jsonify(data), status_code
+    except Exception as e:
+        logger.exception("Exception in /api/recommendations: %s", repr(e))
+        return jsonify({"error": repr(e)}), 500
 
 @bp.route("/api/remediations", methods=["GET"])
 async def getRemediations():
-    data, status_code = fetchUpdate("getRemediations", app_settings.functions.remediations_key)
-    return jsonify(data), status_code
+    try:
+        data, status_code = fetchUpdate("getRemediations", app_settings.functions.remediations_key)
+        return jsonify(data), status_code
+    except Exception as e:
+        logger.exception("Exception in /api/remediations: %s", repr(e))
+        return jsonify({"error": repr(e)}), 500
 
 @bp.websocket("/notifier")
 async def notifier():
-    print("WS connection received from: ", websocket.remote_addr)
+    logger.info("WS connection received from: %s", websocket.remote_addr)
     await websocket.send(f"OK")
     async for message in broker.subscribe():
-        print(f"{message}")
+        logger.debug(f"{message}")
         await websocket.send(f"{message}")
+
+
 
 # Init App
 app = create_app()
