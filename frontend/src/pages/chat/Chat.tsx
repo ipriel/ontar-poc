@@ -22,12 +22,12 @@ import {
     ToolMessageContent,
     ChatResponse,
     getUserInfo
-} from "../../api";
+} from "../../lib";
 import { Answer } from "../../components/Answer";
 import { QuestionInput } from "../../components/QuestionInput";
-import { Citation } from '../../api/models';
+import { Citation } from '../../lib/models';
 
-const Chat = () => {
+export const Chat = () => {
     const lastQuestionRef = useRef<string>("");
     const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -471,7 +471,7 @@ ForEach ($CSVRecord in $CSVRecords) {
                                 </Stack>
                                 <div className={styles.sampleQuestionGrid}>
                                     {sampleQuestions.map((question) => (
-                                        <div className={styles.sampleQuestionItem} onClick={e => makeApiRequest(question)}>
+                                        <div className={styles.sampleQuestionItem} onClick={() => makeApiRequest(question)}>
                                             <p className={styles.sampleQuestionText}>{question}</p>
                                         </div>
                                     ))}
@@ -512,5 +512,3 @@ ForEach ($CSVRecord in $CSVRecords) {
         </div>
     );
 };
-
-export default Chat;
