@@ -26,10 +26,8 @@
 }
 
 .sidebarLogoContainer {
-    display: flex;
-    gap: 16px;
-    align-items: center;
     text-decoration: none;
+    padding-inline: 0;
 }
 
 .sidebarLogoText {
@@ -47,6 +45,7 @@
 
 .sidebarToggle {
     cursor: pointer;
+    margin-block: auto;
 }
 
 .companyDropdownContainer {
