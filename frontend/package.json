@@ -19,7 +19,7 @@
     "react-code-blocks": "^0.1.6",
     "react-dom": "^18.2.0",
     "react-markdown": "^7.0.1",
-    "react-router-dom": "^6.8.1",
+    "react-router-dom": "^6.26.1",
     "react-use-websocket": "^4.8.1",
     "rehype-raw": "^6.1.1",
     "remark-gfm": "^3.0.1",
