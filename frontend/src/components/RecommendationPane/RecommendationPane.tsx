@@ -1,25 +1,26 @@
 import { useState, useRef, useEffect } from "react";
 import { Icon, IconButton } from "@fluentui/react";
 import { registerIcons } from '@fluentui/react/lib/Styling';
-import { CopyBlock, dracula } from "react-code-blocks";
+import { CodeBlock, dracula } from "react-code-blocks";
 import ReactMarkdown from "react-markdown";
 import classNames from "classnames";
 
-import { RecommendationSlice, useRemediationsStore } from "../../api";
+import { RecommendationSlice, useRemediationsStore, isDefined } from "../../lib";
 import { UserPuck } from "../UserPuck";
 
 import styles from "./RecommendationPane.module.css";
 import UserPic1 from "../../assets/user-1.png";
 import { UserPuckGroup } from "../UserPuckGroup";
+import { ShowIf } from "../ShowIf";
 
 interface Props {
     data: RecommendationSlice;
 }
 
-function parseSeverity(severity: number) {
-    const severityLabel = ["Low", "Medium", "High"];
-    const index = Math.floor(severity / 4);
-    return severityLabel[index];
+const priority: { [k: string]: number } = {
+    high: 1,
+    medium: 2,
+    low: 3
 }
 
 registerIcons({
@@ -41,7 +42,20 @@ registerIcons({
 export const RecommendationPane = ({ data }: Props) => {
     const [comment, setComment] = useState<string>("");
     const [comments, setComments] = useState<string[]>(["**Note:** this action was taken 2 times"]);
-    const remediations = useRemediationsStore((state) => state.remediations.filter(item => item.recommendationRef == data.id));
+    const remediations = useRemediationsStore((state) => {
+        return state.remediations
+            .filter(item =>
+                item.recommendationRef == data.id &&
+                item.status.toLowerCase() == "active"
+            )
+            .sort((a, b) => {
+                const aNum = priority[a.priority.toLowerCase()];
+                const bNum = priority[b.priority.toLowerCase()];
+                if (aNum < bNum) return -1;
+                else if (aNum > bNum) return 1;
+                return 0;
+            })
+    });
     const commentListEndRef = useRef<null | HTMLDivElement>(null)
 
     const scrollToBottom = () => {
@@ -96,23 +110,25 @@ export const RecommendationPane = ({ data }: Props) => {
                 <span><b>Note:</b>{` You have to take ${remediations.length > 1 ? `these ${remediations.length} steps` : 'this step'} in the next few hours`}</span>
             </div>
             <div className={styles.remediationList}>
-                {remediations && remediations.map((remediation, i) =>
-                    <div className={styles.leftRightFlex}>
-                        <div className={styles.remediationItemContainer}>
-                            <svg viewBox="0 16.28 46.826 7.343" width="46.826px" height="7.343px" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <line x1="20.6074" y1="19.743" x2="46.6274" y2="19.743" stroke="#C792FF" transform="matrix(1.0000000000000002, 0, 0, 1.0000000000000002, 0, 0)" />
-                                <circle cx="20.3179" cy="20" r="3.37256" fill="#C792FF" transform="matrix(1.0000000000000002, 0, 0, 1.0000000000000002, 0, 0)" />
-                            </svg>
-                            <p className={styles.remediationCounter}>{i + 1}</p>
-                            <p className={styles.remediationLabel}>{remediation.name}</p>
+                <ShowIf condition={isDefined(remediations)}>
+                    {remediations.map((remediation, i) =>
+                        <div className={styles.leftRightFlex} key={`title-${i}`}>
+                            <div className={styles.remediationItemContainer}>
+                                <svg viewBox="0 16.28 46.826 7.343" width="46.826px" height="7.343px" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <line x1="20.6074" y1="19.743" x2="46.6274" y2="19.743" stroke="#C792FF" transform="matrix(1.0000000000000002, 0, 0, 1.0000000000000002, 0, 0)" />
+                                    <circle cx="20.3179" cy="20" r="3.37256" fill="#C792FF" transform="matrix(1.0000000000000002, 0, 0, 1.0000000000000002, 0, 0)" />
+                                </svg>
+                                <p className={styles.remediationCounter}>{i + 1}</p>
+                                <p className={styles.remediationLabel}>{remediation.name}</p>
+                            </div>
+                            <div>
+                                <UserPuckGroup>
+                                    <UserPuck imageSrc={UserPic1}></UserPuck>
+                                </UserPuckGroup>
+                            </div>
                         </div>
-                        <div>
-                            <UserPuckGroup>
-                                <UserPuck imageSrc={UserPic1}></UserPuck>
-                            </UserPuckGroup>
-                        </div>
-                    </div>
-                )}
+                    )}
+                </ShowIf>
             </div>
             <div className={styles.codeBlock}>
                 <div className={styles.codeBlockTitle}>
@@ -124,14 +140,22 @@ export const RecommendationPane = ({ data }: Props) => {
                     </svg>
                     <p>Copy this script!</p>
                 </div>
-                <CopyBlock
-                    codeContainerStyle={{ background: "#141419" }}
-                    language={"text"}
-                    text={remediations.map(remediation => remediation.notes).join("\n")}
-                    showLineNumbers={true}
-                    theme={dracula}
-                    codeBlock
-                />
+                <ShowIf condition={isDefined(remediations)}>
+                    <div className={styles.codeBlockContainer}>
+                        {remediations.map((remediation, i) =>
+                            <div className={styles.codeSectionContainer}>
+                                <p className={styles.codeLanguageTag}>{remediation.language}</p>
+                                <CodeBlock
+                                    codeContainerStyle={{ background: "#141419" }}
+                                    language={remediation.language}
+                                    text={remediation.notes}
+                                    theme={dracula}
+                                    key={`note-${i}`}
+                                />
+                            </div>
+                        )}
+                    </div>
+                </ShowIf>
             </div>
             <div className={classNames(styles.stage, styles.commentList)}>
                 <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -139,7 +163,7 @@ export const RecommendationPane = ({ data }: Props) => {
                 </svg>
                 <p>Comments</p>
                 <div className={styles.commentListContainer}>
-                    {comments && comments.map(comment =>
+                    {isDefined(comments) && comments.map(comment =>
                         <ReactMarkdown
                             children={comment}
                         />

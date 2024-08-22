@@ -99,7 +99,7 @@ button.accentButton {
 .remediationList>:first-child::before {
     content: '▼';
     position: absolute;
-    left: 16.4px;
+    left: 14.8px;
     top: -2.2px;
     font-size: 8px;
     color: #C792FF;
@@ -108,7 +108,7 @@ button.accentButton {
 .remediationList>:last-child::after {
     content: '▲';
     position: absolute;
-    left: 16.4px;
+    left: 14.8px;
     bottom: -6px;
     font-size: 8px;
     color: #C792FF;
@@ -124,7 +124,7 @@ button.accentButton {
     content: '';
     position: absolute;
     top: 0;
-    left: 20px;
+    left: 18px;
     height: 100%;
     border-left: 1px solid #C792FF;
 }
@@ -134,7 +134,6 @@ button.accentButton {
     margin-block: 6px;
     max-width: 510px;
     text-wrap: wrap;
-    word-break: break-all;
 }
 
 .remediationCounter {
@@ -161,7 +160,7 @@ button.accentButton {
     background-color: #141419;
 }
 
-.codeBlock * {
+.codeSectionContainer > span {
     background: transparent !important;
     white-space: pre-line;
     word-break: break-all;
@@ -176,6 +175,7 @@ button.accentButton {
 
 .codeBlock code > * {
     font-size: 12px;
+    grid-column: 2/3;
 }
 
 .codeBlock>div>button {
@@ -184,17 +184,19 @@ button.accentButton {
     border: none;
 }
 
-.codeBlock>div>span {
+.codeBlockContainer {
     max-height: 100px;
     overflow: auto;
+    margin-top: 5px;
 }
 
 .codeBlock>div:has( code) {
     font-size: 12px;
 }
 
-:local(.codeBlock) :global(.linenumber) {
+:local(.codeBlock) code > :global(.linenumber) {
     grid-column: 1/2;
+    min-width: 1.25em !important;
 }
 
 .codeBlockTitle {
@@ -209,6 +211,22 @@ button.accentButton {
     margin-block: 0;
 }
 
+.codeSectionContainer {
+    position: relative;
+    margin-top: 14px;
+}
+
+.codeLanguageTag {
+    position: absolute;
+    top: -14;
+    left: 0;
+    padding: 0px 8px;
+    margin-block: 0;
+    border-bottom-right-radius: 5px;
+    background-color: #363542;
+    color: #aeaeae;
+}
+
 .commentList {
     grid-template-rows: min-content 1fr;
     min-height: 56px;
@@ -218,7 +236,7 @@ button.accentButton {
 }
 
 .commentListContainer {
-    max-height: 210px;
+    max-height: 60px;
     width: 518px;
     overflow-x: scroll;
 }
