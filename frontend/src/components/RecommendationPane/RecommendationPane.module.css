@@ -168,7 +168,7 @@ button.accentButton {
 
 .codeBlock code {
     display: grid;
-    grid-template-columns: min-content 1fr;
+    grid-template-columns: auto 1fr;
     white-space: pre-line !important;
     word-break: break-all;
 }
