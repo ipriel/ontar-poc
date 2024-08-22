@@ -1,6 +1,10 @@
 import { PropsWithChildren } from "react";
+import { createPortal } from "react-dom";
 import { IconButton } from "@fluentui/react";
 
+import { isDefined } from "../../lib";
+
+import { useModalStore, ModalContent } from "./Modal.utils";
 import styles from "./Modal.module.css";
 
 interface Props {
@@ -9,7 +13,7 @@ interface Props {
     onClose: () => void;
 }
 
-export const Modal = ({ title, tags, onClose, children }: PropsWithChildren<Props>) => {
+const ModalElement = ({ title, tags, onClose, children }: PropsWithChildren<Props>) => {
     return (
         <div className={styles.modalWrapper}>
             <div className={styles.modalContainer}>
@@ -39,3 +43,24 @@ export const Modal = ({ title, tags, onClose, children }: PropsWithChildren<Prop
         </div>
     );
 };
+
+const Modal = () => {
+    const state = useModalStore();
+
+    if(!isDefined(state.isVisible) || !isDefined(state.content)) return null;
+    return (
+        <>
+            {state.isVisible && state.content && createPortal(
+                <ModalElement title={state.content.title} {...(state.content.tags ? { tags: state.content.tags } : {})} onClose={state.close}>
+                    {state.content.component}
+                </ModalElement>,
+                document.body)
+            }
+        </>
+    );
+}
+
+export function useModal(): [() => JSX.Element | null, (content?: ModalContent) => void] {
+    const setModal = useModalStore((state) => state.open);
+    return [Modal, setModal];
+}

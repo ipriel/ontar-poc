@@ -115,7 +115,12 @@
     margin-inline: 14px;
 }
 
+p.dataCardAccent, div.dataCardAccent>:first-child {
+    color: #E87474;
+}
+
 .dataCard {
+    position: relative;
     display: grid;
     grid-template-rows: min-content min-content;
     grid-template-columns: max-content auto;
@@ -124,85 +129,25 @@
     padding: 24px;
 }
 
-.dataCard>p {
-    margin-block: 0;
-    color: #706E86;
-}
-
-.dataCardIcon {
-    grid-column: 2;
-    grid-row: 1/span 2;
-    justify-self: end;
-    align-self: center;
-}
-
-.dataCardValue {
-    font-size: 26px;
-    font-weight: 700;
-    line-height: 32px;
-}
-
-p.dataCardAccent {
-    color: #E87474;
-}
-
-.dataCardLabel {
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 24px;
-}
-
 .dataCardTall {
     grid-template-columns: 1fr;
     grid-template-rows: min-content auto;
     grid-row: span 2;
 }
 
-.dataCardTall>.dataCardIcon {
+.dataCardTall>.dataCardImage {
     grid-column: 1;
     grid-row: 2/3;
     justify-self: center;
+    align-self: center;
 }
 
 .dataCardTall>.dataCardLabel {
     justify-self: center;
     font-size: 18px;
     font-weight: 600;
-}
-
-.flipCard {
-    position: relative;
-    cursor: pointer;
-}
-
-.flipCardIcon {
-    display: none;
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    color: #706E86;
-}
-
-.flipCard:hover > .dataCardFront,
-.flipCard > :hover > .dataCardFront,
-.dataCardBack {
-    display: none;
-}
-
-.flipCard:hover > :is(.dataCardBack, .flipCardIcon),
-.flipCard > :hover > :is(.dataCardBack, .flipCardIcon) {
-    display: block;
-}
-
-.dataCardBack {
-    background: #26242E;
-    border: 2px solid #1A1A20;
-    padding-block: 14.1px 13.1px;
-}
-
-.dataCardBack > * {
-    width: 238px;
-    color: #706E86;
+    line-height: 24px;
+    margin-block: 0;
 }
 
 .tabContainer {
