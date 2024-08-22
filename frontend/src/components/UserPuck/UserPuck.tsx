@@ -1,7 +1,6 @@
 import classNames from "classnames";
 
 import styles from "./UserPuck.module.css";
-import { HashRouter } from 'react-router-dom';
 
 type UserState = "online" | "offline" | "busy"
 
@@ -21,11 +20,11 @@ export const UserPuck = ({
 }: Props) => {
     return (
         (userState != undefined) ? (
-            <div className={classNames({[styles.hasBadge]: (userState != undefined)})} data-status={userState}>
-                <img src={imageSrc} className={classNames(styles.userAvatarPuck, {[styles.userAvatarPuckSmall]: size == "small"})} alt={imageAlt} {...attrs}></img>
+            <div className={classNames({ [styles.hasBadge]: (userState != undefined) })} data-status={userState}>
+                <img src={imageSrc} className={classNames(styles.userAvatarPuck, { [styles.userAvatarPuckSmall]: size == "small" })} alt={imageAlt} {...attrs}></img>
             </div>
         ) : (
-            <img src={imageSrc} className={classNames(styles.userAvatarPuck, {[styles.userAvatarPuckSmall]: size == "small"})} alt={imageAlt} {...attrs}></img>
+            <img src={imageSrc} className={classNames(styles.userAvatarPuck, { [styles.userAvatarPuckSmall]: size == "small" })} alt={imageAlt} {...attrs}></img>
         )
     )
 };
