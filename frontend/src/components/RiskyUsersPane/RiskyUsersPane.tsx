@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import classNames from "classnames";
-import { intlFormatDistance, parse } from "date-fns";
+import { intlFormatDistance } from "date-fns";
 
 import { RatioBarGraph } from "../../components/RatioBarGraph";
-import { useRiskyUsersStore, RiskyUser } from "../../api";
+import { useRiskyUsersStore, RiskyUser } from "../../lib";
 
 import styles from "./RiskyUsersPane.module.css";
 import UserPic1 from "../../assets/user-1.png";

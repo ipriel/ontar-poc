@@ -1,18 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { createHashRouter, RouterProvider } from "react-router-dom";
 import { initializeIcons } from "@fluentui/react";
 
 import "./index.css";
 
 import Layout from "./pages/layout/Layout";
 import NoPage from "./pages/NoPage";
-import Chat from "./pages/chat/Chat";
-import Home from "./pages/home/Home";
 
 initializeIcons();
 
-export default function App() {
+/*export default function App() {
     return (
         <HashRouter>
             <Routes>
@@ -25,10 +23,44 @@ export default function App() {
             </Routes>
         </HashRouter>
     );
-}
+}*/
+
+const router = createHashRouter([
+    {
+        path: "/",
+        element: <Layout/>,
+        children: [
+            {
+                path: "/",
+                async lazy() {
+                    let { Chat } = await import("./pages/chat/Chat");
+                    return {Component: Chat};
+                }
+            },
+            {
+                path: "/home",
+                async lazy() {
+                    let { Home } = await import("./pages/home/Home");
+                    return {Component: Home};
+                }
+            },
+            {
+                path: "/chat",
+                async lazy() {
+                    let { Chat } = await import("./pages/chat/Chat");
+                    return {Component: Chat};
+                }
+            },
+            {
+                path: "*",
+                Component: NoPage
+            }
+        ]
+    },
+]);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <React.StrictMode>
-        <App />
+        <RouterProvider router={router} />
     </React.StrictMode>
 );

@@ -1,6 +1,15 @@
 import { create } from "zustand";
-import { RiskyUser, Alert, Incident, Recommendation, Remediation, ServerPushEvent, PushEvent } from './models';
+import {
+  RiskyUser,
+  Alert,
+  Incident,
+  Recommendation,
+  Remediation,
+  ServerPushEvent,
+  PushEvent,
+} from "./models";
 import { compareAsc, addHours } from "date-fns";
+import { isDefined } from "./utils";
 
 type RiskyUserState = {
   users: RiskyUser[];
@@ -25,7 +34,7 @@ export const useRiskyUsersStore = create<RiskyUserState>((set) => ({
     data.forEach((user) => {
       if (user.riskLevel == "high") ++counter.high;
       else if (user.riskLevel == "medium") ++counter.medium;
-      else /* user.riskLevel == "low" */ ++counter.low;
+      /* user.riskLevel == "low" */ else ++counter.low;
     });
     set({ users: [...data], count: Object.assign({}, counter) });
   },
@@ -162,7 +171,10 @@ export const useRecommendationsStore = create<RecommendationState>((set) => ({
 type RemediationSlice = {
   name: string;
   notes: string;
+  language: string;
   assignedTo: string;
+  status: string;
+  priority: "low" | "medium" | "high";
   recommendationRef: string;
 };
 
@@ -172,15 +184,30 @@ type RemediationsState = {
   reset: () => void;
 };
 
+function parseNotes(text: string) {
+  if (/^(\[\[lang=(\w+)\]\]\n?)/m.test(text)) {
+    const matches = text.match(/^(\[\[lang=(\w+)\]\]\n?)/m);
+    if (isDefined(matches))
+      return { lang: matches[2], text: text.slice(matches[1].length) };
+  }
+  return { lang: "text", text: text };
+}
+
 export const useRemediationsStore = create<RemediationsState>((set) => ({
   remediations: [],
   setRemediations: (data: Remediation[]) => {
-    const list = data.map((remediation) => ({
-      name: remediation.title,
-      notes: remediation.requesterNotes,
-      assignedTo: remediation.requesterId,
-      recommendationRef: remediation.recommendationReference.slice(5),
-    }));
+    const list = data.map((remediation) => {
+      const {lang, text} = parseNotes(remediation.requesterNotes);
+      return {
+        name: remediation.title,
+        notes: text,
+        language: lang,
+        assignedTo: remediation.requesterId,
+        status: remediation.status,
+        priority: remediation.priority,
+        recommendationRef: remediation.recommendationReference.slice(5),
+      };
+    });
 
     set({ remediations: list });
   },
@@ -190,17 +217,19 @@ export const useRemediationsStore = create<RemediationsState>((set) => ({
     }),
 }));
 
-function convertEvent(event: ServerPushEvent | Partial<ServerPushEvent>): PushEvent | Partial<PushEvent> {
+function convertEvent(
+  event: ServerPushEvent | Partial<ServerPushEvent>
+): PushEvent | Partial<PushEvent> {
   let entries = Object.entries(event);
-  entries = entries.map(entry => {
+  entries = entries.map((entry) => {
     entry[0] = entry[0].charAt(0).toLowerCase() + entry[0].slice(1);
-    return entry
-  }); 
+    return entry;
+  });
   return Object.fromEntries(entries);
 }
 
 type PushEventState = {
-  events: PushEvent[];
+  events: (PushEvent | undefined)[];
   pushEvent: (event: ServerPushEvent) => void;
   updateEvent: (event: Partial<ServerPushEvent>) => void;
   reset: () => void;
@@ -215,55 +244,15 @@ export const useEventStore = create<PushEventState>((set) => ({
   updateEvent: (update: Partial<ServerPushEvent>) =>
     set((state) => {
       const lastIndex = state.events.length - 1;
-      const newEvent = {...state.events[lastIndex], ...(convertEvent(update) as Partial<PushEvent>)}; 
-      state.events.pop()
+      const newEvent = {
+        ...state.events[lastIndex],
+        ...(convertEvent(update) as Partial<PushEvent>),
+      } as PushEvent;
+      state.events.pop();
       return { events: [...state.events, newEvent] };
     }),
   reset: () =>
     set({
       events: [],
     }),
-}));
-
-type Tag = {
-  label: string;
-  severity?: "Low" | "Medium" | "High";
-};
-
-type ModalContent = {
-  title: string;
-  tags?: Tag[];
-  component?: JSX.Element;
-};
-
-type ModalState = {
-  isVisible: boolean;
-  content: ModalContent | null;
-  open: (content?: ModalContent) => void;
-  close: () => void;
-  setContent: (content: ModalContent) => void;
-};
-
-export const useModalStore = create<ModalState>((set) => ({
-  isVisible: false,
-  content: null,
-  open: (content) => {
-    if(content)
-      set({content})
-
-    set((state) => {
-      if (state.content == null)
-        return state;
-
-      return {isVisible: true};
-    })
-  },
-  close: () =>
-    set({
-      isVisible: false,
-      content: null
-    }),
-  setContent: (content: ModalContent) => {
-    set({content});
-  },
 }));

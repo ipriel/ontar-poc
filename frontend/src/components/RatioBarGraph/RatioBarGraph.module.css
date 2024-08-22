@@ -40,7 +40,7 @@
     justify-self: stretch;
     height: 10px;
     border-radius: 5px;
-    background: var(--color-1);
+    background: var(--color-1, #363542);
 }
 
 .twoTone {
