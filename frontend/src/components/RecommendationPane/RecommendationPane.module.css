@@ -160,17 +160,12 @@ button.accentButton {
     background-color: #141419;
 }
 
-.codeSectionContainer > span {
-    background: transparent !important;
-    white-space: pre-line;
-    word-break: break-all;
-}
-
 .codeBlock code {
     display: grid;
     grid-template-columns: auto 1fr;
     white-space: pre-line !important;
     word-break: break-all;
+    padding-block: 2px !important;
 }
 
 .codeBlock code > * {
@@ -213,18 +208,16 @@ button.accentButton {
 
 .codeSectionContainer {
     position: relative;
-    margin-top: 14px;
 }
 
-.codeLanguageTag {
-    position: absolute;
-    top: -14;
-    left: 0;
-    padding: 0px 8px;
-    margin-block: 0;
-    border-bottom-right-radius: 5px;
-    background-color: #363542;
-    color: #aeaeae;
+.codeSectionContainer:last-child {
+    padding-bottom: 6px;
+}
+
+.codeSectionContainer > span {
+    background: transparent !important;
+    white-space: pre-line;
+    word-break: break-all;
 }
 
 .commentList {

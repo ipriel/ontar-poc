@@ -39,6 +39,12 @@ registerIcons({
     }
 });
 
+function getLineCount(note: string) {
+    if(note == null) return 0;
+
+    return note.split("\n").length;
+}
+
 export const RecommendationPane = ({ data }: Props) => {
     const [comment, setComment] = useState<string>("");
     const [comments, setComments] = useState<string[]>(["**Note:** this action was taken 2 times"]);
@@ -142,15 +148,15 @@ export const RecommendationPane = ({ data }: Props) => {
                 </div>
                 <ShowIf condition={isDefined(remediations)}>
                     <div className={styles.codeBlockContainer}>
-                        {remediations.map((remediation, i) =>
+                        {remediations.map((remediation, i) => 
                             <div className={styles.codeSectionContainer}>
-                                <p className={styles.codeLanguageTag}>{remediation.language}</p>
                                 <CodeBlock
                                     codeContainerStyle={{ background: "#141419" }}
                                     language={remediation.language}
                                     text={remediation.notes}
                                     theme={dracula}
                                     key={`note-${i}`}
+                                    startingLineNumber={getLineCount(remediations[i-1]?.notes)+1}
                                 />
                             </div>
                         )}
