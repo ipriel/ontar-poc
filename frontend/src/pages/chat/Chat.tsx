@@ -12,8 +12,8 @@ import user1Pic from "../../assets/user-1.png";
 import user2Pic from "../../assets/user-2.png";
 import user3Pic from "../../assets/user-3.png";
 import user4Pic from "../../assets/user-4.png";
+import logo from '../../assets/logo-wide.png';
 import styles from "./Chat.module.css";
-// import Ontar from "../../assets/ocf-white.svg";
 
 import {
     ChatMessage,
@@ -294,12 +294,7 @@ ForEach ($CSVRecord in $CSVRecords) {
                     <div className={styles.chatContainer}>
                         {!lastQuestionRef.current ? (
                             <Stack className={styles.chatEmptyState}>
-                                <div className={styles.logoContainer}>
-                                    <svg width="44" height="55" viewBox="0 0 44 55" fill="#B955E3" xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M37.9995 11.7211L21.5583 5.82193L5.11717 11.7211V25.6155C5.11717 32.2997 8.31162 38.5672 13.6831 42.4218L21.5583 48.0731L29.4337 42.4218C34.8051 38.5672 37.9995 32.2997 37.9995 25.6155V11.7211ZM21.5583 54.3682L32.3508 46.6233C39.0652 41.8049 43.0583 33.9708 43.0583 25.6155V8.08245L21.5583 0.368164L0.0583496 8.08245V25.6155C0.0583496 33.9708 4.05141 41.8049 10.7658 46.6233L21.5583 54.3682Z" fill="#B955E3" />
-                                    </svg>
-                                    <h1 className={styles.logoText}><span className={styles.logoTextHighlight}>ON</span>TAR</h1>
-                                </div>
+                                <img src={logo}/>
                                 <h2 className={styles.chatEmptyStateSubtitle}>How can I help you today?</h2>
                             </Stack>
                         ) : (
@@ -327,7 +322,7 @@ ForEach ($CSVRecord in $CSVRecords) {
                                                         <ErrorCircleRegular className={styles.errorIcon} stroke="#b63443" />
                                                         <span style={{ color: "#b63443" }}>Error</span>
                                                     </Stack>
-                                                    <span className={styles.chatMessageErrorContent} style={{color: "#706e86"}}>{answer.content}</span>
+                                                    <span className={styles.chatMessageErrorContent} style={{ color: "#706e86" }}>{answer.content}</span>
                                                 </div>
                                             ) : answer.role === "system-base" ? (
                                                 <div className={styles.chatMessageSystem} tabIndex={0}>

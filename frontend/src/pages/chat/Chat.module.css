@@ -61,27 +61,6 @@
     width: 700px;
 }
 
-.logoContainer {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    text-decoration: none;
-}
-
-.logoText {
-    font-style: normal;
-    font-weight: 600;
-    font-size: 20px;
-    line-height: 28px;
-    margin: 0;
-    color: white;
-    user-select: none;
-}
-
-.logoTextHighlight {
-    color: #B955E3;
-}
-
 .chatMessageStream {
     flex-grow: 1;
     max-width: 1028px;
