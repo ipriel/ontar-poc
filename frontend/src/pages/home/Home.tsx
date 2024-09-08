@@ -1,55 +1,80 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Icon, Stack } from '@fluentui/react';
 import { ChevronDown24Regular as ChevronDownIcon } from "@fluentui/react-icons";
-import { format, differenceInCalendarDays, isPast, isToday } from "date-fns";
+import { isPast, isToday } from "date-fns";
 import classNames from "classnames";
 
 import { UserPuck } from "../../components/UserPuck";
-import { RecommendationPane } from "../../components/RecommendationPane";
 import { RiskyUsersPane } from "../../components/RiskyUsersPane";
+import { RecommendationPane } from "../../components/RecommendationPane";
 import { UserPuckGroup } from "../../components/UserPuckGroup";
 import { RatioBarGraph } from "../../components/RatioBarGraph";
 import { SVG, registerSVGs } from "../../components/SVG";
-import { DataCard, FlipCard } from "../../components/DataCard";
+import { DataCard, FallbackCard, FlipCard } from "../../components/DataCard";
 import { ShowIf, Else } from "../../components/ShowIf";
-import { useAlertsStore, useEventStore, useRecommendationsStore, useRiskyUsersStore } from "../../lib";
+import { AwaitQuery } from "../../components/AwaitQuery";
+import { isDefined } from "../../lib";
 import { useModal } from "../../components/Modal";
-import svgCollection from "./Home.data";
 
 import UserPic1 from "../../assets/user-1.png";
 import UserPic2 from "../../assets/user-2.png";
 import UserPic3 from "../../assets/user-3.png";
+import { Recommendation, Remediation } from "../../lib/models";
+import { jsonQuery, queryClient, useJsonQuery, useLastEventQuery } from "../../lib/react-query";
 import styles from "./Home.module.css";
+import svgCollection from "./Home.data";
+import { generateDueDate, getInterval, parseSeverity, riskyUserSelector, alertSelector } from "./Home.utils";
 
-function parseSeverity(severity: number) {
-    return Math.floor(severity / 4);
-}
+registerSVGs(svgCollection);
 
 const severity: Array<"Low" | "Medium" | "High"> = ["Low", "Medium", "High"];
 const improvement = [5, 10, 20];
 
-function getInterval(targetDate: Date) {
-    if (isPast(targetDate) && differenceInCalendarDays(new Date(), targetDate) == 1) {
-        return `Yesterday ${format(targetDate, "h:mmaa")}`;
-    }
-    else if (!isPast(targetDate) && differenceInCalendarDays(targetDate, new Date()) == 1) {
-        return `Tomorrow ${format(targetDate, "h:mmaa")}`;
-    }
-    else if (isToday(targetDate)) {
-        return `Today ${format(targetDate, "h:mmaa")}`;
-    }
-    else {
-        return format(targetDate, "d.M.yyyy h:mmaa");
-    }
-};
-
-registerSVGs(svgCollection);
-
 export const Home = () => {
-    const [isLiveAttack, firstEvent] = useEventStore((state) => [(state.events.length > 0), state.events[0]]);
-    const compromisedUserCount = useRiskyUsersStore((state) => ({ ...state.count, total: state.count.high + state.count.medium + state.count.low }));
-    const [compromisedAppsCount, compromisedNetworkingCount, compromisedResourcesCount] = useAlertsStore((state) => [state.compromisedApps, state.compromisedNetworking, state.compromisedIot_Resources]);
-    const recommendations = useRecommendationsStore((state) => state.recommendations);
+    const riskyUserQuery = useJsonQuery('/api/riskyUsers', ["live-attack", "riskyUsers"], riskyUserSelector);
+    const alertQuery = useJsonQuery('/api/alerts', ["live-attack", "alerts"], alertSelector);
+    queryClient.prefetchQuery(jsonQuery<Remediation[]>('/api/remediations', ["live-attack", "remediations"]));
+    const recommendationQuery = useJsonQuery<Recommendation[]>('/api/recommendations', ["live-attack", "recommendations"], (data: Recommendation[])=>{
+        if(data != null && data.length == 0) {
+            return [{
+                id: "va-_-microsoft-_-windows_11",
+                productName: "Microsoft Windows 11",
+                recommendationName: "Install Updates",
+                weaknesses: 0,
+                vendor: "Microsoft",
+                recommendedVersion: "9.11",
+                recommendedVendor: "Microsoft",
+                recommendedProgram: "Windows 11",
+                recommendationCategory: "Operating System",
+                subCategory: "Operating System",
+                severityScore: 0,
+                publicExploit: false,
+                activeAlert: true,
+                associatedThreats: ["Zero day"],
+                remediationType: "update",
+                status: "open",
+                configScoreImpact: 5,
+                exposureImpact: 5,
+                totalMachineCount: 3,
+                exposedMachinesCount: 1,
+                nonProductivityImpactedAssets: 1,
+                relatedComponent: "none",
+                hasUnpatchableCve: false,
+                tags: ["windows"],
+                exposedCriticalDevices: 1
+            }];
+        }
+
+        return data;
+    });
+
+    const { data: serverEvent } = useLastEventQuery();
+    const { isLiveAttack, firstEvent } = useMemo(() => {
+        if (isDefined(serverEvent)) return serverEvent;
+
+        return { isLiveAttack: false, firstEvent: undefined };
+    }, [serverEvent]);
+
     const [activeTab, setActiveTab] = useState<number>(1);
     const [Modal, setModal] = useModal();
 
@@ -80,7 +105,7 @@ export const Home = () => {
                     {["dashboard_home", "dashboard_kanban", "dashboard_gantt", "hacker_small",
                         "dashboard_attack_flow", "dashboard_server_tree", "dashboard_map"]
                         .map((svg, i) => (
-                            <SVG svgName={svg} key={`pane-${i}`}/>
+                            <SVG svgName={svg} key={`pane-${i}`} />
                         ))}
                 </div>
             </Stack>
@@ -101,66 +126,114 @@ export const Home = () => {
                     <p className={classNames(styles.dataCardLabel, styles.dataCardAccent)}>{firstEvent?.attackType}</p>
                     <SVG svgName="attack_globe" className={styles.dataCardImage} />
                 </div>
-                <DataCard
-                    heading={`${compromisedAppsCount}`}
-                    subheading="Compute Apps"
-                    image={<SVG svgName="compromised_apps" />}
-                    className={classNames({ [styles.dataCardAccent]: compromisedAppsCount > 0 })}
-                />
-                <DataCard
-                    heading={`${compromisedNetworkingCount}`}
-                    subheading="Networking"
-                    image={<SVG svgName="compromised_networking" />}
-                    className={classNames({ [styles.dataCardAccent]: compromisedNetworkingCount > 0 })}
-                />
+                <AwaitQuery
+                    query={alertQuery}
+                    fallback={
+                        <FallbackCard
+                            label="ComputeApps"
+                            image={<SVG svgName="compromised_apps" />}
+                        />
+                    }
+                >
+                    {(count) =>
+                        <DataCard
+                            heading={`${count.compromisedApps}`}
+                            subheading="Compute Apps"
+                            image={<SVG svgName="compromised_apps" />}
+                            className={classNames({ [styles.dataCardAccent]: count.compromisedApps > 0 })}
+                        />
+                    }
+                </AwaitQuery>
+                <AwaitQuery
+                    query={alertQuery}
+                    fallback={
+                        <FallbackCard
+                            label="Networking"
+                            image={<SVG svgName="compromised_networking" />}
+                        />
+                    }
+                >
+                    {(count) =>
+                        <DataCard
+                            heading={`${count.compromisedNetworking}`}
+                            subheading="Networking"
+                            image={<SVG svgName="compromised_networking" />}
+                            className={classNames({ [styles.dataCardAccent]: count.compromisedNetworking > 0 })}
+                        />
+                    }
+                </AwaitQuery>
                 <DataCard
                     heading={`${0}`}
                     subheading="Data & Storage"
                     image={<SVG svgName="compromised_storage" />}
                 // className={classNames({[styles.dataCardAccent]: compromisedStorageCount > 0})}
                 />
-                <FlipCard.Container
-                    isActive={compromisedUserCount.total > 0}
-                    onClick={() => {
-                        if (compromisedUserCount.total == 0) return;
-                        setModal({
-                            title: "Compromised Users",
-                            component: <RiskyUsersPane />
-                        });
-                    }}
-                >
-                    <FlipCard.Front
-                        heading={`${compromisedUserCount.total}`}
-                        subheading="Users Compromised"
-                        image={<SVG svgName="hacker_large" />}
-                        className={classNames({ [styles.dataCardAccent]: compromisedUserCount.total > 0 })}
-                    />
-                    <FlipCard.Back
-                        badgeIconName="OpenInNewWindow"
-                        badgeClick={() => {
-                            setModal({
-                                title: "Compromised Users",
-                                component: <RiskyUsersPane />
-                            });
-                        }}
-                    >
-                        <RatioBarGraph
-                            title="Compromised Level"
-                            style="block"
-                            data={[
-                                { label: "Low", value: compromisedUserCount.low, color: "#8AC898" },
-                                { label: "Medium", value: compromisedUserCount.medium, color: "#FFA903" },
-                                { label: "High", value: compromisedUserCount.high, color: "#E87474" }
-                            ]}
+                <AwaitQuery
+                    query={riskyUserQuery}
+                    fallback={
+                        <FallbackCard
+                            label="Users Compromised"
+                            image={<SVG svgName="hacker_large" />}
                         />
-                    </FlipCard.Back>
-                </FlipCard.Container>
-                <DataCard
-                    heading={`${compromisedResourcesCount}`}
-                    subheading="IoT Hubs & Resources"
-                    image={<SVG svgName="compromised_resources" />}
-                    className={classNames({ [styles.dataCardAccent]: compromisedResourcesCount > 0 })}
-                />
+                    }
+                >
+                    {({ users, count }) =>
+                        <FlipCard.Container
+                            isActive={count.total > 0}
+                            onClick={() => {
+                                if (count.total == 0) return;
+                                setModal({
+                                    title: "Compromised Users",
+                                    component: <RiskyUsersPane users={users} count={count} />
+                                });
+                            }}
+                        >
+                            <FlipCard.Front
+                                heading={`${count.total}`}
+                                subheading="Users Compromised"
+                                image={<SVG svgName="hacker_large" />}
+                                className={classNames({ [styles.dataCardAccent]: count.total > 0 })}
+                            />
+                            <FlipCard.Back
+                                badgeIconName="OpenInNewWindow"
+                                badgeClick={() => {
+                                    setModal({
+                                        title: "Compromised Users",
+                                        component: <RiskyUsersPane users={users} count={count} />
+                                    });
+                                }}
+                            >
+                                <RatioBarGraph
+                                    title="Compromised Level"
+                                    style="block"
+                                    data={[
+                                        { label: "Low", value: count.low, color: "#8AC898" },
+                                        { label: "Medium", value: count.medium, color: "#FFA903" },
+                                        { label: "High", value: count.high, color: "#E87474" }
+                                    ]}
+                                />
+                            </FlipCard.Back>
+                        </FlipCard.Container>
+                    }
+                </AwaitQuery>
+                <AwaitQuery
+                    query={alertQuery}
+                    fallback={
+                        <FallbackCard
+                            label="IoT Hubs & Resources"
+                            image={<SVG svgName="compromised_resources" />}
+                        />
+                    }
+                >
+                    {(count) =>
+                        <DataCard
+                            heading={`${count.compromisedResources}`}
+                            subheading="IoT Hubs & Resources"
+                            image={<SVG svgName="compromised_resources" />}
+                            className={classNames({ [styles.dataCardAccent]: count.compromisedResources > 0 })}
+                        />
+                    }
+                </AwaitQuery>
                 <DataCard
                     heading={`${0}`}
                     subheading="Identity & Access"
@@ -211,50 +284,67 @@ export const Home = () => {
                             </tr>
                         </thead>
                         <tbody className={styles.dashboardTableBody}>
-                            {recommendations && recommendations.map((row) => (
-                                <tr className={classNames(styles.dashboardTableRow, styles.clickable)} onClick={() => {
-                                    setModal({
-                                        title: row.name,
-                                        tags: [
-                                            { label: `ID: ${row.id}` },
-                                            { label: `${severity[parseSeverity(row.severity)]} Risk`, severity: severity[parseSeverity(row.severity)] }
-                                        ],
-                                        component: <RecommendationPane data={row} />
-                                    });
-                                }}>
-                                    <td>{row.name}</td>
-                                    <td>
-                                        <div className={styles.dashboardTableMixedCell}>
-                                            <ShowIf condition={isPast(row.dueDate) || isToday(row.dueDate)}>
-                                                <SVG svgName="clock_snooze" />
-                                                <Else>
-                                                    <SVG svgName="clock_alarm" />
-                                                </Else>
-                                            </ShowIf>
-                                            <p>{getInterval(row.dueDate)}</p>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className={styles.dashboardTableMixedCell}>
-                                            <svg data-severity={severity[parseSeverity(row.severity)]} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M12.7071 4.29289C12.3166 3.90237 11.6834 3.90237 11.2929 4.29289L4.29289 11.2929C3.90237 11.6834 3.90237 12.3166 4.29289 12.7071C4.68342 13.0976 5.31658 13.0976 5.70711 12.7071L11 7.41421L11 19C11 19.5523 11.4477 20 12 20C12.5523 20 13 19.5523 13 19L13 7.41421L18.2929 12.7071C18.6834 13.0976 19.3166 13.0976 19.7071 12.7071C20.0976 12.3166 20.0976 11.6834 19.7071 11.2929L12.7071 4.29289Z" fill="currentColor" />
-                                            </svg>
-                                            <p>{severity[parseSeverity(row.severity)]}</p>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className={styles.dashboardTablePillMini}>
-                                            <Icon iconName="Add" />
-                                            <span>{improvement[parseSeverity(row.severity)]}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <UserPuckGroup style="normal">
-                                            <UserPuck imageSrc={UserPic1} userState={"offline"}></UserPuck>
-                                        </UserPuckGroup>
-                                    </td>
-                                </tr>
-                            ))}
+                            <AwaitQuery
+                                query={recommendationQuery}
+                                fallback={
+                                    <tr className={styles.dashboardTableRow}>
+                                        <td colSpan={5} className={styles.loader}>&nbsp;</td>
+                                    </tr>
+                                }
+                            >
+                                {(recommendations) => (
+                                    <>
+                                        {recommendations.map((row, i) => {
+                                            const dueDate = generateDueDate();
+                                            return (
+                                                <tr className={classNames(styles.dashboardTableRow, styles.clickable)} key={`recommendation-${i}`} onClick={() => {
+                                                    setModal({
+                                                        title: row.recommendationName,
+                                                        tags: [
+                                                            { label: `ID: ${row.id}` },
+                                                            { label: `${severity[parseSeverity(row.severityScore)]} Risk`, severity: severity[parseSeverity(row.severityScore)] }
+                                                        ],
+                                                        component: <RecommendationPane recommendationId={row.id} />
+                                                    });
+                                                }}>
+                                                    <td>{row.recommendationName}</td>
+                                                    <td>
+                                                        <div className={styles.dashboardTableMixedCell}>
+                                                            <ShowIf condition={isPast(dueDate) || isToday(dueDate)}>
+                                                                <SVG svgName="clock_snooze" />
+                                                                <Else>
+                                                                    <SVG svgName="clock_alarm" />
+                                                                </Else>
+                                                            </ShowIf>
+                                                            <p>{getInterval(dueDate)}</p>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div className={styles.dashboardTableMixedCell}>
+                                                            <svg data-severity={severity[parseSeverity(row.severityScore)]} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M12.7071 4.29289C12.3166 3.90237 11.6834 3.90237 11.2929 4.29289L4.29289 11.2929C3.90237 11.6834 3.90237 12.3166 4.29289 12.7071C4.68342 13.0976 5.31658 13.0976 5.70711 12.7071L11 7.41421L11 19C11 19.5523 11.4477 20 12 20C12.5523 20 13 19.5523 13 19L13 7.41421L18.2929 12.7071C18.6834 13.0976 19.3166 13.0976 19.7071 12.7071C20.0976 12.3166 20.0976 11.6834 19.7071 11.2929L12.7071 4.29289Z" fill="currentColor" />
+                                                            </svg>
+                                                            <p>{severity[parseSeverity(row.severityScore)]}</p>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div className={styles.dashboardTablePillMini}>
+                                                            <Icon iconName="Add" />
+                                                            <span>{improvement[parseSeverity(row.severityScore)]}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <UserPuckGroup style="normal">
+                                                            <UserPuck imageSrc={UserPic1} userState={"offline"}></UserPuck>
+                                                        </UserPuckGroup>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        }
+                                        )}
+                                    </>
+                                )}
+                            </AwaitQuery>
                         </tbody>
                     </table>
                 </div>
@@ -346,7 +436,9 @@ export const Home = () => {
                     </table>
                 </div>
             </div>
-            <Modal/>
+            <Modal />
         </div>
     );
 };
+
+export default Home;
