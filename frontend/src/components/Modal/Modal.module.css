@@ -6,7 +6,7 @@
     height: 100%;
     overflow: hidden;
     z-index: 99999;
-    background-color:rgba(32, 31, 39, 0.9);
+    background-color: rgba(32, 31, 39, 0.9);
     display: flex;
     flex-direction: row-reverse;
 }
@@ -16,12 +16,12 @@
     flex-direction: column;
     gap: 10px;
     padding: 24px;
-    background-color:#2A2934;
+    background-color: #2A2934;
     border-left: 1px solid#363542;
     width: 620px;
 }
 
-.modalContainer > * {
+.modalContainer>* {
     color: #706E86;
 }
 
@@ -65,7 +65,7 @@
 }
 
 .tag[data-severity="High"] {
-    background-color:#C85757;
+    background-color: #C85757;
     color: #FFB4B4 !important;
 
 }
@@ -94,6 +94,21 @@
     color: #AEACC5;
 }
 
-.tagContainer + .modalDismissButton {
+.tagContainer+.modalDismissButton {
     margin-top: -4px;
+}
+
+.loader {
+    width: 120px;
+    height: 20px;
+    -webkit-mask: linear-gradient(90deg, #201f27 70%, #201f2700 0) left/20% 100%;
+    mask: linear-gradient(90deg, #201f27 70%, #201f2700 0) left/20% 100%;
+    background: linear-gradient(#89859f 0 0) left -25% top 0 /20% 100% no-repeat #363542;
+    animation: modalLoader 1.5s infinite steps(6);
+}
+
+@keyframes modalLoader {
+    100% {
+        background-position: right -25% top 0
+    }
 }
