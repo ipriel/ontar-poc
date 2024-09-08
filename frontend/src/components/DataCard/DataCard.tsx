@@ -38,7 +38,7 @@ interface ImageNodeProps extends GenericNodeProps {
     image: JSX.Element | undefined;
 }
 
-const ImageNode = ({ className, image, ...props }: ImageNodeProps) => {
+export const ImageNode = ({ className, image, ...props }: ImageNodeProps) => {
     if (!isDefined(image)) return null;
     const Child = cloneElement(image, { className: className, ...props })
     return (<>{Child}</>);
@@ -87,7 +87,7 @@ export const DataCard = ({
             </ShowIf>
             <TextNode className={styles.dataCardValue} data={heading} />
             <TextNode className={styles.dataCardLabel} data={subheading} />
-            <ImageNode className={styles.dataCardImage} image={image} data-test={"foo"} />
+            <ImageNode className={styles.dataCardImage} image={image} />
             {children}
         </div>
     );

@@ -1,14 +1,29 @@
-import { Children, useMemo, PropsWithChildren, isValidElement } from "react";
+import { Children, useMemo, PropsWithChildren, isValidElement, ReactNode } from "react";
 
-interface Props {
-    condition: boolean;
+interface ResolveRenderFunction<TFnArgument> {
+    (data: TFnArgument): void | ReactNode | ReactNode[];
+}
+
+interface ThenProps<TData> {
+    using: TData
+    children: ReactNode | ResolveRenderFunction<NonNullable<TData>>;
+}
+
+export const Then = <TData,>({children, using}: ThenProps<TData>) => {
+    if(using == null) return null;
+    const toRender = typeof children === "function" ? children(using) : children;
+    return (<>{toRender}</>);
 }
 
 export const Else = ({ children }: PropsWithChildren) => {
     return (<>{children}</>);
 };
 
-export const ShowIf = ({ condition, children }: PropsWithChildren<Props>) => {
+interface ShowProps {
+    condition: boolean;
+}
+
+export const ShowIf = ({ condition, children }: PropsWithChildren<ShowProps>) => {
     const blocks = useMemo(() => {
         const ifTrueChildren: JSX.Element[] = [];
         let elseChild: JSX.Element | null = null;

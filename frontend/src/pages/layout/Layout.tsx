@@ -1,11 +1,8 @@
 import { Outlet, Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { Settings24Filled as SettingsIcon, ChevronDown24Regular as ChevronDownIcon, ChevronUp24Regular as ChevronUpIcon } from "@fluentui/react-icons";
 import { Stack } from "@fluentui/react";
-import { useEffect, useState, useCallback, useMemo } from "react";
-import useWebSocket from "react-use-websocket";
+import { useEffect, useState, useMemo, useContext } from "react";
 import { format, intervalToDuration } from "date-fns";
-import { useEventStore, useRiskyUsersStore, useAlertsStore, useRecommendationsStore, useRemediationsStore, useIncidentsStore } from "../../lib/store";
-import { WebsocketMessage, RiskyUser, Alert, Incident, Recommendation, Remediation, ServerPushEvent } from '../../lib/models'
 import classNames from "classnames";
 
 import ProfilePic from "../../assets/profile.png";
@@ -15,20 +12,27 @@ import { ShowIf, Else } from "../../components/ShowIf";
 import { registerSVGs, SVG } from "../../components/SVG";
 import { isDefined } from "../../lib";
 import svgCollection from "./Layout.data";
-import { fetchJson, getWSUrl } from "./Layout.utils";
+import { WebsocketContext, useLastEventQuery } from "../../lib";
 
 registerSVGs(svgCollection);
 
 const Layout = () => {
-    const [isLiveAttack, attackStartDate, riskScore, pushEvent, updateEvent, clearEvent] = useEventStore((state) => [(state.events.length > 0), state.events[0]?.startTime, state.events[0]?.securityScore, state.pushEvent, state.updateEvent, state.reset]);
-    const [parseUsers, clearUsers] = useRiskyUsersStore((state) => [state.parseUsers, state.reset]);
-    const [calcCompromisedDevices, clearDevices] = useAlertsStore((state) => [state.calcCompromisedDevices, state.reset]);
-    const [setMainIncident, clearIncidents] = useIncidentsStore((state) => [state.setMainIncident, state.reset]);
-    const [setRecommendations, clearRecommendations] = useRecommendationsStore((state) => [state.setRecommendations, state.reset]);
-    const [setRemediations, clearRemediations] = useRemediationsStore((state) => [state.setRemediations, state.reset]);
     const [isSidebarExpanded, setIsSidebarExpanded] = useState<boolean>(true);
     const navigate = useNavigate();
     let location = useLocation();
+    useContext(WebsocketContext);
+    const {data: serverEvent} = useLastEventQuery();
+    const {isLiveAttack, attackStartDate, riskScore} = useMemo(()=>{
+        if(isDefined(serverEvent)) { 
+            return {
+                isLiveAttack: serverEvent.isLiveAttack,
+                attackStartDate: serverEvent.firstEvent?.startTime, 
+                riskScore: serverEvent.firstEvent?.securityScore
+            };
+        }
+
+        return {isLiveAttack: false, attackStartDate: undefined, riskScore: undefined};
+    }, [serverEvent]);
 
     const attackDuration = useMemo(() => {
         if (!isDefined(attackStartDate)) return undefined;
@@ -48,62 +52,14 @@ const Layout = () => {
         return format(attackStartDate, "d.M.yyyy h:mmaa");
     }, [attackStartDate]);
 
-    const { lastMessage } = useWebSocket(
-        getWSUrl,
-        {
-            share: true,
-            shouldReconnect: () => true,
-        },
-    );
-
-    const fetchData = useCallback(() => {
-        const users = fetchJson<RiskyUser[]>('/api/riskyUsers')
-            .then(parseUsers);
-
-        const alerts = fetchJson<Alert[]>('/api/alerts')
-            .then(calcCompromisedDevices);
-
-        const incidents = fetchJson<Incident[]>('/api/incidents')
-            .then(setMainIncident);
-
-        const recommendations = fetchJson<Recommendation[]>('/api/recommendations')
-            .then(setRecommendations);
-
-        const remediations = fetchJson<Remediation[]>('/api/remediations')
-            .then(setRemediations);
-
-        return [users, alerts, incidents, recommendations, remediations];
-    }, []);
-
     useEffect(() => {
-        if (lastMessage == null) return;
-
-        try {
-            const data: WebsocketMessage = JSON.parse(lastMessage.data);
-            if (data.message_type == "close_event") {
-                clearUsers();
-                clearDevices();
-                clearRecommendations();
-                clearEvent();
-                clearIncidents();
-                clearRemediations();
-                navigate("/");
-            }
-            else {
-                if (data.message_type == "new_event")
-                    pushEvent(data.payload as ServerPushEvent);
-                else /* data.message_type == "update_event" */
-                    updateEvent(data.payload);
-
-                const fetchPromises = fetchData();
-                Promise.allSettled(fetchPromises)
-                    .then(() => {
-                        if (location.pathname != "/home")
-                            navigate("/home");
-                    });
-            }
-        } catch (e) { /* Ignore the error */ }
-    }, [lastMessage]);
+        if (!isLiveAttack && location.pathname === "/home") {
+            navigate("/");
+        }
+        else if (isLiveAttack && location.pathname != "/home") {
+            navigate("/home");
+        }
+    }, [isLiveAttack]);
 
     return (
         <Stack className={styles.layout} data-sidebar={isSidebarExpanded}>

@@ -115,7 +115,8 @@
     margin-inline: 14px;
 }
 
-p.dataCardAccent, div.dataCardAccent>:first-child {
+p.dataCardAccent,
+div.dataCardAccent>:first-child {
     color: #E87474;
 }
 
@@ -286,10 +287,10 @@ p.dataCardAccent, div.dataCardAccent>:first-child {
 }
 
 .dashboardTableMixedCell:has(> img) {
-    grid-template-columns:  min-content 1fr;
+    grid-template-columns: min-content 1fr;
 }
 
-.dashboardTableMixedCell > svg {
+.dashboardTableMixedCell>svg {
     justify-self: center;
 }
 
@@ -303,6 +304,19 @@ p.dataCardAccent, div.dataCardAccent>:first-child {
     gap: 24px;
     width: 150px;
     justify-content: center;
+}
+
+.loader {
+    background:
+        linear-gradient(90deg, transparent 33%, #5c5a73 50%, transparent 66%);
+    background-size: 300% 100%;
+    animation: tableLoader 3s infinite linear;
+}
+
+@keyframes tableLoader {
+    0% {
+        background-position: right
+    }
 }
 
 [data-severity="High"],

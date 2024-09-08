@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { intlFormatDistance } from "date-fns";
 
 import { RatioBarGraph } from "../../components/RatioBarGraph";
-import { useRiskyUsersStore, RiskyUser } from "../../lib";
+import { RiskyUser } from "../../lib";
 
 import styles from "./RiskyUsersPane.module.css";
 import UserPic1 from "../../assets/user-1.png";
@@ -17,23 +17,15 @@ import UserPic8 from "../../assets/user-8.png";
 import UserPic9 from "../../assets/user-9.png";
 import UserPic10 from "../../assets/profile.png";
 
-interface Props {
+const imageList = [UserPic1, UserPic2, UserPic3, UserPic4, UserPic5, UserPic6, UserPic7, UserPic8, UserPic9, UserPic10];
+const jobList = ["Sysadmin", "Admin", "Operator", "Creator"];
+
+
+interface UserBlockProps {
     user: RiskyUser;
 }
 
-const imageList = [UserPic1, UserPic2, UserPic3, UserPic4, UserPic5, UserPic6, UserPic7, UserPic8, UserPic9, UserPic10];
-function getPic() {
-    const index = Math.floor(Math.random() * 10);
-    return imageList[index];
-}
-
-const jobList = ["Sysadmin", "Admin", "Operator", "Creator"];
-function getJob() {
-    const index = Math.floor(Math.random() * 4);
-    return jobList[index];
-}
-
-const UserBlock = ({ user }: Props) => {
+const UserBlock = ({ user }: UserBlockProps) => {
     const riskLevel = useMemo(
         () => (user.riskLevel as string).charAt(0).toUpperCase() + (user.riskLevel as string).slice(1),
         [user]
@@ -47,9 +39,15 @@ const UserBlock = ({ user }: Props) => {
         [user]
     );
 
-    const userPic = useMemo(getPic, [user]);
+    const userPic = useMemo(() => {
+        const index = Math.floor(Math.random() * 10);
+        return imageList[index];
+    }, [user.id]);
 
-    const userJob = useMemo(getJob, [user]);
+    const userJob = useMemo(() => {
+        const index = Math.floor(Math.random() * 4);
+        return jobList[index];
+    }, [user.id]);
 
     return (
         <div className={classNames(styles.userBlock, styles.dataBlock)}>
@@ -71,9 +69,17 @@ const UserBlock = ({ user }: Props) => {
     );
 };
 
-export const RiskyUsersPane = () => {
-    const [users, count] = useRiskyUsersStore((state) => [state.users, state.count]);
+interface RiskyUsersPaneProps {
+    users: RiskyUser[];
+    count: {
+        low: number,
+        medium: number,
+        high: number,
+        total: number
+    }
+}
 
+export const RiskyUsersPane = ({users, count}: RiskyUsersPaneProps) => {
     return (
         <>
             <div className={styles.dataBlock}>
