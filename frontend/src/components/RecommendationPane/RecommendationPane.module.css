@@ -57,6 +57,22 @@
     font-weight: 400;
 }
 
+.errorStage {
+    grid-template-rows: 1fr;
+}
+
+.errorStage > p {
+    font-weight: normal;
+}
+
+.errorStage > p > b {
+    padding-right: 8px;
+}
+
+.spacer {
+    height: 32px;
+}
+
 .actionGroup {
     display: flex;
     align-items: center;
@@ -192,6 +208,10 @@ button.accentButton {
 :local(.codeBlock) code > :global(.linenumber) {
     grid-column: 1/2;
     min-width: 1.25em !important;
+}
+
+.codeBlock:has(> .codeBlockContainer:empty) {
+    display: none;
 }
 
 .codeBlockTitle {
