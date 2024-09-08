@@ -1,55 +1,43 @@
-import React from "react";
+import React, { lazy } from "react";
 import ReactDOM from "react-dom/client";
 import { createHashRouter, RouterProvider } from "react-router-dom";
 import { initializeIcons } from "@fluentui/react";
+import { QueryClientProvider } from "@tanstack/react-query";
 
 import "./index.css";
+import { queryClient, WebsocketProvider } from "./lib";
 
-import Layout from "./pages/layout/Layout";
 import NoPage from "./pages/NoPage";
+
+const Layout = lazy(() => 
+    import("./pages/layout/Layout")
+);
+
+const Chat = lazy(() => 
+    import("./pages/chat/Chat")
+);
+
+const Home = lazy(() => 
+    import("./pages/home/Home")
+);
 
 initializeIcons();
 
-/*export default function App() {
-    return (
-        <HashRouter>
-            <Routes>
-                <Route path="/" element={<Layout />}>
-                    <Route index element={<Chat />} />
-                    <Route path="/home" element={<Home />} />
-                    <Route path="/chat" element={<Chat />} />
-                    <Route path="*" element={<NoPage />} />
-                </Route>
-            </Routes>
-        </HashRouter>
-    );
-}*/
-
 const router = createHashRouter([
     {
-        path: "/",
-        element: <Layout/>,
+        element: <Layout />,
         children: [
             {
                 path: "/",
-                async lazy() {
-                    let { Chat } = await import("./pages/chat/Chat");
-                    return {Component: Chat};
-                }
+                Component: Chat
             },
             {
                 path: "/home",
-                async lazy() {
-                    let { Home } = await import("./pages/home/Home");
-                    return {Component: Home};
-                }
+                Component: Home
             },
             {
                 path: "/chat",
-                async lazy() {
-                    let { Chat } = await import("./pages/chat/Chat");
-                    return {Component: Chat};
-                }
+                Component: Chat
             },
             {
                 path: "*",
@@ -61,6 +49,10 @@ const router = createHashRouter([
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <React.StrictMode>
-        <RouterProvider router={router} />
+        <QueryClientProvider client={queryClient}>
+            <WebsocketProvider>
+                <RouterProvider router={router} />
+            </WebsocketProvider>
+        </QueryClientProvider>
     </React.StrictMode>
 );
