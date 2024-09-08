@@ -81,3 +81,41 @@
 .dataCardBack > * {
     color: #706E86;
 }
+
+.fallbackCard {
+    grid-template-columns: 1fr;
+}
+
+.loader {
+  width: 32px;
+  aspect-ratio: 1;
+  display: grid;
+  border: 3px solid #0000;
+  border-radius: 50%;
+  border-color: #706E86 #0000;
+  animation: rotateSpinner 2s infinite linear;
+}
+
+.loader::before,
+.loader::after {    
+  content: "";
+  grid-area: 1/1;
+  margin: 3px;
+  border: inherit;
+  border-radius: 50%;
+}
+
+.loader::before {
+  border-color: #e87474 #0000;
+  animation: inherit; 
+  animation-duration: 1s;
+  animation-direction: reverse;
+}
+
+.loader::after {
+  margin: 8px;
+}
+
+@keyframes rotateSpinner { 
+  100%{transform: rotate(1turn)}
+}
