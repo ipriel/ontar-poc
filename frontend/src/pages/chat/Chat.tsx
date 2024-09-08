@@ -507,3 +507,5 @@ ForEach ($CSVRecord in $CSVRecords) {
         </div>
     );
 };
+
+export default Chat;
