@@ -8,10 +8,11 @@
 .sidebarLayout {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
+    justify-content: start;
+    gap: 10px;
     border-right: 1px solid #706E86;
-    padding: 0 24px;
+    padding-inline: 24px;
+    padding-block: 0px 16px;
 }
 
 .sidebarHeaderContainer {
@@ -60,6 +61,7 @@
     background-color: #19171B;
     border-radius: 8px;
     cursor: pointer;
+    margin-bottom: 16px;
 }
 
 [data-sidebar="false"] .companyDropdownContainer {
@@ -90,6 +92,11 @@
 .menuList {
     padding: 0;
     color: #706E86;
+    margin-block: 0;
+}
+
+.sidebarLayout > .menuList:last-child {
+    margin-top: auto;
 }
 
 .menuListItem {
