@@ -1,8 +1,10 @@
 .container {
     position: relative;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
+    display: grid;
+    grid-auto-flow: row;
+    grid-template-rows: auto auto auto minmax(0,1fr);
+    max-height: calc(100vh - 88px);
+    max-height: calc(100dvh - 88px);
     color: #F2F2F2;
     gap: 10px;
 }
@@ -156,12 +158,15 @@ div.dataCardAccent>:first-child {
 }
 
 .tabContainerActive {
+    position: relative;
     display: flex;
     flex-direction: column;
 }
 
 .tabLayout {
     position: relative;
+    display: grid;
+    grid-template-rows: min-content minmax(0, 1fr);
     padding-inline: 14px;
 }
 
@@ -200,59 +205,8 @@ div.dataCardAccent>:first-child {
     border-color: #C792FF;
 }
 
-.dashboardTable {
-    border-spacing: 0px;
-    color: black;
-}
-
-.dashboardTable td,
-.dashboardTable th {
-    padding: 5px 15px;
-    text-align: left;
-    font-size: 14px;
-    color: #89859F;
-}
-
-.dashboardTable th {
-    font-weight: 400;
-    line-height: 20px;
-    padding-block: 14px;
-    color: #AEACC5;
-}
-
-.dashboardTableHeader>th:last-child {
-    width: 150px;
-    text-align: center;
-}
-
-.dashboardTableHeader {
-    background: black;
-}
-
 .dashboardCenteredHeader {
     text-align: center;
-}
-
-.dashboardTableBody {
-    position: relative;
-}
-
-.dashboardTableRow p {
-    margin-block: 0;
-}
-
-.dashboardTableRow:first-child>td>* {
-    margin-top: 4px;
-}
-
-.dashboardTableRow>td:last-child>p {
-    border: 1px solid #4398F7;
-    color: #4398F7;
-    border-radius: 16px;
-    padding: 5px;
-    text-align: center;
-    user-select: none;
-    cursor: pointer;
 }
 
 .dashboardTablePill {
@@ -304,19 +258,6 @@ div.dataCardAccent>:first-child {
     gap: 24px;
     width: 150px;
     justify-content: center;
-}
-
-.loader {
-    background:
-        linear-gradient(90deg, transparent 33%, #5c5a73 50%, transparent 66%);
-    background-size: 300% 100%;
-    animation: tableLoader 3s infinite linear;
-}
-
-@keyframes tableLoader {
-    0% {
-        background-position: right
-    }
 }
 
 [data-severity="High"],
