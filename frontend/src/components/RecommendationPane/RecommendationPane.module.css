@@ -26,12 +26,6 @@
     background: #363542;
 }
 
-.leftRightFlex {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
 .stage {
     display: grid;
     grid-template-columns: min-content 1fr;
@@ -115,7 +109,7 @@ button.accentButton {
 .remediationList>:first-child::before {
     content: '▼';
     position: absolute;
-    left: 14.8px;
+    left: 16px;
     top: -2.2px;
     font-size: 8px;
     color: #C792FF;
@@ -124,23 +118,33 @@ button.accentButton {
 .remediationList>:last-child::after {
     content: '▲';
     position: absolute;
-    left: 14.8px;
+    left: 16.1px;
     bottom: -6px;
     font-size: 8px;
     color: #C792FF;
 }
 
 .remediationItemContainer {
+    display: grid;
+    grid-template-columns: min-content 1fr 100px;
+    gap: 15px;
+    align-items: stretch;
+    margin-left: 1px;
+    margin-right: 8px;
+    
+}
+
+.remediationItemMarker {
     position: relative;
     display: flex;
     align-items: center;
 }
 
-.remediationItemContainer::before {
+.remediationItemMarker::before {
     content: '';
     position: absolute;
     top: 0;
-    left: 18px;
+    left: 20px;
     height: 100%;
     border-left: 1px solid #C792FF;
 }
@@ -167,7 +171,12 @@ button.accentButton {
 }
 
 .remediationLabel {
-    margin-left: 24px;
+    margin-block: 0px;
+}
+
+.remediationUsers {
+    align-self: center;
+    justify-self: end;
 }
 
 .codeBlock {
