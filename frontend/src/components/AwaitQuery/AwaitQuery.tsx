@@ -20,7 +20,7 @@ export const AwaitQuery = <TQueryReturn,>({ query, fallback, error, children }: 
     const { data, isLoading, isError, error: errorMsg } = query;
 
     if (isLoading) return (<>{ fallback }</>);
-    if (error && isError) {
+    if (isError && error) {
         const renderedError = typeof error === "function" ? error(errorMsg as Error) : error;
         return (<>{ renderedError }</>)
     };
