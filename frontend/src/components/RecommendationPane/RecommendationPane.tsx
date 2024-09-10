@@ -116,7 +116,7 @@ function parseMitigation(remediation: Extend<Remediation, LinesCount> | Recommen
     //typeof remediation = RecommendationAction
     else {
         const text = remediation.text.slice(remediation.text.indexOf(" ") + 1);
-        const link = (
+        const link = (isDefined(remediation.actionUrl)) ? (
             <a
                 href={remediation.actionUrl.url}
                 target="_blank"
@@ -124,7 +124,7 @@ function parseMitigation(remediation: Extend<Remediation, LinesCount> | Recommen
             >
                 {remediation.actionUrl.displayName}
             </a>
-        );
+        ) : null;
         label = <>{text}{link}</>
     }
 
@@ -164,7 +164,7 @@ export const RecommendationPane = ({ recommendationId, type, data }: Recommendat
         <AwaitQuery query={remediationsQuery as UseQueryResult<QueryDataType>} fallback={<ModalFallback />}>
             <>
                 <ShowIf condition={remediations.length > 0}>
-                    <div className={styles.leftRightFlex}>
+                    <div className={styles.actionBar}>
                         <div>
                             <UserPuckGroup>
                                 <UserPuck imageSrc={UserPic1}></UserPuck>

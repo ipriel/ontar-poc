@@ -67,6 +67,13 @@
     height: 32px;
 }
 
+.actionBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-block: 24px 16px;
+}
+
 .actionGroup {
     display: flex;
     align-items: center;
@@ -99,6 +106,12 @@ button.accentButton {
 .remediationList {
     max-height: 130px;
     overflow: auto;
+}
+
+@media screen and (min-height: 850px) {
+    .remediationList:has(+ .commentList) {
+        max-height: 260px;
+    }
 }
 
 .remediationList>:first-child,
