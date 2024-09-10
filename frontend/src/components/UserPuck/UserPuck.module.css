@@ -40,3 +40,7 @@
 .hasBadge[data-status="busy"]:after {
     background-color: #FF958F;
 }
+
+.loading {
+    display: none;
+}
