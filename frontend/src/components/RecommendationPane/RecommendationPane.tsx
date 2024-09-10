@@ -1,24 +1,41 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback, ReactNode } from "react";
 import { Icon, IconButton } from "@fluentui/react";
 import { registerIcons } from '@fluentui/react/lib/Styling';
 import { CodeBlock, dracula } from "react-code-blocks";
 import ReactMarkdown from "react-markdown";
 import classNames from "classnames";
 
-import { isDefined, Remediation } from "../../lib";
+import { isDefined, RecommendationAction, Remediation, Extend } from "../../lib";
 import { UserPuck } from "../UserPuck";
 
 import styles from "./RecommendationPane.module.css";
 import UserPic1 from "../../assets/user-1.png";
 import { UserPuckGroup } from "../UserPuckGroup";
-import { Else, ShowIf } from "../ShowIf";
+import { Else, ShowIf, Then } from "../ShowIf";
 import { useJsonQuery } from "../../lib/react-query";
 import { AwaitQuery } from "../AwaitQuery";
 import { ModalFallback } from "../Modal";
 import classnames from "classnames";
+import { UseQueryResult } from "@tanstack/react-query";
 
-interface Props {
+export enum RecommendationType {
+    RECOMMENDATION,
+    AD_RECOMMENDATION
+}
+
+interface BaseProps {
     recommendationId: string;
+    type: RecommendationType;
+    data?: unknown;
+}
+
+interface RecommendationProps extends BaseProps {
+    type: RecommendationType.RECOMMENDATION;
+}
+
+interface ADRecommendationProps extends BaseProps {
+    type: RecommendationType.AD_RECOMMENDATION;
+    data: RecommendationAction[];
 }
 
 const priority: { [k: string]: number } = {
@@ -26,6 +43,8 @@ const priority: { [k: string]: number } = {
     medium: 2,
     low: 3
 }
+
+type LinesCount = { lines?: number };
 
 registerIcons({
     icons: {
@@ -58,17 +77,20 @@ function parseNotes(text: string) {
     return { language: "text", notes: text };
 }
 
-export const RecommendationPane = ({ recommendationId }: Props) => {
-    const [comment, setComment] = useState<string>("");
-    const [comments, setComments] = useState<string[]>(["**Note:** this action was taken 2 times"]);
+function usePaneQuery(type: RecommendationType.RECOMMENDATION, id: string, data?: undefined): [Extend<Remediation, LinesCount>[], UseQueryResult<Remediation[], Error>];
+function usePaneQuery(type: RecommendationType.AD_RECOMMENDATION, id: string | undefined, data: RecommendationAction[]): [RecommendationAction[], UseQueryResult<RecommendationAction[], Error>];
+function usePaneQuery(type: RecommendationType, id?: string, data?: RecommendationAction[]) {
+    if (type == RecommendationType.AD_RECOMMENDATION) {
+        return [data, { data, isPending: false, isError: false }];
+    }
 
-    const remediationsQuery = useJsonQuery<Remediation[]>('/api/remediations', ["live-attack", "remediations"])
-    const remediations: Array<Remediation & { lines?: number }> = useMemo(() => {
-        if (!isDefined(remediationsQuery.data)) return [];
+    const query = useJsonQuery<Remediation[]>('/api/remediations', ["live-attack", "remediations"]);
+    const result: Extend<Remediation, LinesCount>[] = useMemo(() => {
+        if (!isDefined(query.data)) return [];
 
-        return remediationsQuery.data
+        return query.data
             .filter(item =>
-                item.recommendationReference == recommendationId &&
+                item.recommendationReference == id &&
                 item.status.toLowerCase() == "active"
             )
             .sort((a, b) => {
@@ -78,7 +100,46 @@ export const RecommendationPane = ({ recommendationId }: Props) => {
                 else if (aNum > bNum) return 1;
                 return 0;
             });
-    }, [remediationsQuery.data]);
+    }, [query.data]);
+
+    return [result, query] as [typeof result, typeof query];
+}
+
+function parseMitigation(remediation: Extend<Remediation, LinesCount> | RecommendationAction, index: number) {
+    const count = ("stepNumber" in remediation) ? remediation.stepNumber : index + 1;
+    let label: ReactNode | undefined;
+
+    // typeof remediation = Extend<Remediation, LinesCount>
+    if ("title" in remediation) {
+        label = <>{remediation.title}</>
+    }
+    //typeof remediation = RecommendationAction
+    else {
+        const text = remediation.text.slice(remediation.text.indexOf(" ") + 1);
+        const link = (
+            <a
+                href={remediation.actionUrl.url}
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                {remediation.actionUrl.displayName}
+            </a>
+        );
+        label = <>{text}{link}</>
+    }
+
+    return { count, text: label };
+}
+
+export const RecommendationPane = ({ recommendationId, type, data }: RecommendationProps | ADRecommendationProps) => {
+    const [comment, setComment] = useState<string>("");
+    const [comments, setComments] = useState<string[]>(["**Note:** this action was taken 2 times"]);
+    const [username] = useState<string>("John Snow");
+
+    const [remediations, remediationsQuery] = type == RecommendationType.RECOMMENDATION
+        ? usePaneQuery(type as number, recommendationId)
+        : usePaneQuery(type as number, undefined, data);
+    type QueryDataType = typeof remediations;
 
     const commentListEndRef = useRef<null | HTMLDivElement>(null)
 
@@ -91,16 +152,16 @@ export const RecommendationPane = ({ recommendationId }: Props) => {
             scrollToBottom()
     }, [comments]);
 
-    function postComment(text: string) {
+    const postComment = useCallback((text: string) => {
         if (text.length == 0) return;
 
-        text = "**John Snow:** " + text;
+        text = `**${username}:** ${text}`;
         setComments([...comments, text]);
         setComment("");
-    }
+    }, [username]);
 
     return (
-        <AwaitQuery query={remediationsQuery} fallback={<ModalFallback />}>
+        <AwaitQuery query={remediationsQuery as UseQueryResult<QueryDataType>} fallback={<ModalFallback />}>
             <>
                 <ShowIf condition={remediations.length > 0}>
                     <div className={styles.leftRightFlex}>
@@ -148,58 +209,66 @@ export const RecommendationPane = ({ recommendationId }: Props) => {
                 </ShowIf>
                 <div className={styles.remediationList}>
                     <ShowIf condition={isDefined(remediations)}>
-                        {remediations.map((remediation, i) =>
-                            <div className={styles.leftRightFlex} key={`title-${i}`}>
-                                <div className={styles.remediationItemContainer}>
-                                    <svg viewBox="0 16.28 46.826 7.343" width="46.826px" height="7.343px" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <line x1="20.6074" y1="19.743" x2="46.6274" y2="19.743" stroke="#C792FF" transform="matrix(1.0000000000000002, 0, 0, 1.0000000000000002, 0, 0)" />
-                                        <circle cx="20.3179" cy="20" r="3.37256" fill="#C792FF" transform="matrix(1.0000000000000002, 0, 0, 1.0000000000000002, 0, 0)" />
-                                    </svg>
-                                    <p className={styles.remediationCounter}>{i + 1}</p>
-                                    <p className={styles.remediationLabel}>{remediation.title}</p>
+                        {remediations.map((remediation, i) => {
+                            const { count, text } = parseMitigation(remediation, i);
+                            return (
+                                <div className={styles.remediationItemContainer} key={`title-${i}`}>
+                                    <div className={styles.remediationItemMarker}>
+                                        <svg viewBox="0 16.28 46.826 7.343" width="46.826px" height="7.343px" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <line x1="20.6074" y1="19.743" x2="46.6274" y2="19.743" stroke="#C792FF" transform="matrix(1.0000000000000002, 0, 0, 1.0000000000000002, 0, 0)" />
+                                            <circle cx="20.3179" cy="20" r="3.37256" fill="#C792FF" transform="matrix(1.0000000000000002, 0, 0, 1.0000000000000002, 0, 0)" />
+                                        </svg>
+                                        <p className={styles.remediationCounter}>{count}</p>
+                                    </div>
+                                    <p className={styles.remediationLabel}>{text}</p>
+                                    <div className={styles.remediationUsers}>
+                                        <UserPuckGroup>
+                                            <UserPuck imageSrc={UserPic1}></UserPuck>
+                                        </UserPuckGroup>
+                                    </div>
                                 </div>
-                                <div>
-                                    <UserPuckGroup>
-                                        <UserPuck imageSrc={UserPic1}></UserPuck>
-                                    </UserPuckGroup>
-                                </div>
-                            </div>
+                            );
+                        }
                         )}
                     </ShowIf>
                 </div>
-                <ShowIf condition={isDefined(remediations)}>
-                    <div className={styles.codeBlock}>
-                        <div className={styles.codeBlockTitle}>
-                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="2" y="1" width="44" height="44" rx="8" fill="#141419" />
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M28.2929 17.2929C28.6834 16.9023 29.3166 16.9023 29.7071 17.2929L34.7071 22.2929C35.0976 22.6834 35.0976 23.3166 34.7071 23.7071L29.7071 28.7071C29.3166 29.0976 28.6834 29.0976 28.2929 28.7071C27.9024 28.3166 27.9024 27.6834 28.2929 27.2929L32.5858 23L28.2929 18.7071C27.9024 18.3166 27.9024 17.6834 28.2929 17.2929Z" fill="#E87474" />
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M19.7071 17.2929C20.0976 17.6834 20.0976 18.3166 19.7071 18.7071L15.4142 23L19.7071 27.2929C20.0976 27.6834 20.0976 28.3166 19.7071 28.7071C19.3166 29.0976 18.6834 29.0976 18.2929 28.7071L13.2929 23.7071C12.9024 23.3166 12.9024 22.6834 13.2929 22.2929L18.2929 17.2929C18.6834 16.9023 19.3166 16.9023 19.7071 17.2929Z" fill="#E87474" />
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M26.2169 13.0238C26.7561 13.1436 27.096 13.6778 26.9762 14.2169L22.9762 32.2169C22.8564 32.756 22.3222 33.096 21.7831 32.9762C21.2439 32.8563 20.904 32.3222 21.0238 31.783L25.0238 13.783C25.1436 13.2439 25.6778 12.904 26.2169 13.0238Z" fill="#E87474" />
-                            </svg>
-                            <p>Copy this script!</p>
-                        </div>
-                        <div className={styles.codeBlockContainer}>
-                            {remediations.map((remediation, i) => {
-                                const { language, notes } = parseNotes(remediation.requesterNotes);
-                                remediation.lines = getLineCount(notes);
-                                const prevRemediationLines = remediations[i - 1]?.lines ?? 0;
-                                return (
-                                    <div
-                                        className={styles.codeSectionContainer}
-                                        key={`note-${i}`}
-                                    >
-                                        <CodeBlock
-                                            codeContainerStyle={{ background: "#141419" }}
-                                            language={language}
-                                            text={notes}
-                                            theme={dracula}
-                                            startingLineNumber={i > 0 ? prevRemediationLines + 1 : 1}
-                                        />
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </div>
+                <ShowIf condition={isDefined(remediations) && type == RecommendationType.RECOMMENDATION}>
+                    <Then using={(remediations as Extend<Remediation, LinesCount>[])}>
+                        {(remediations) =>
+                            <div className={styles.codeBlock}>
+                                <div className={styles.codeBlockTitle}>
+                                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="2" y="1" width="44" height="44" rx="8" fill="#141419" />
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M28.2929 17.2929C28.6834 16.9023 29.3166 16.9023 29.7071 17.2929L34.7071 22.2929C35.0976 22.6834 35.0976 23.3166 34.7071 23.7071L29.7071 28.7071C29.3166 29.0976 28.6834 29.0976 28.2929 28.7071C27.9024 28.3166 27.9024 27.6834 28.2929 27.2929L32.5858 23L28.2929 18.7071C27.9024 18.3166 27.9024 17.6834 28.2929 17.2929Z" fill="#E87474" />
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M19.7071 17.2929C20.0976 17.6834 20.0976 18.3166 19.7071 18.7071L15.4142 23L19.7071 27.2929C20.0976 27.6834 20.0976 28.3166 19.7071 28.7071C19.3166 29.0976 18.6834 29.0976 18.2929 28.7071L13.2929 23.7071C12.9024 23.3166 12.9024 22.6834 13.2929 22.2929L18.2929 17.2929C18.6834 16.9023 19.3166 16.9023 19.7071 17.2929Z" fill="#E87474" />
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M26.2169 13.0238C26.7561 13.1436 27.096 13.6778 26.9762 14.2169L22.9762 32.2169C22.8564 32.756 22.3222 33.096 21.7831 32.9762C21.2439 32.8563 20.904 32.3222 21.0238 31.783L25.0238 13.783C25.1436 13.2439 25.6778 12.904 26.2169 13.0238Z" fill="#E87474" />
+                                    </svg>
+                                    <p>Copy this script!</p>
+                                </div>
+                                <div className={styles.codeBlockContainer}>
+                                    {remediations.map((remediation, i) => {
+                                        const { language, notes } = parseNotes(remediation.requesterNotes);
+                                        remediation.lines = getLineCount(notes);
+                                        const prevRemediationLines = remediations[i - 1]?.lines ?? 0;
+                                        return (
+                                            <div
+                                                className={styles.codeSectionContainer}
+                                                key={`note-${i}`}
+                                            >
+                                                <CodeBlock
+                                                    codeContainerStyle={{ background: "#141419" }}
+                                                    language={language}
+                                                    text={notes}
+                                                    theme={dracula}
+                                                    startingLineNumber={i > 0 ? prevRemediationLines + 1 : 1}
+                                                />
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                        }
+                    </Then>
                 </ShowIf>
                 <div className={classNames(styles.stage, styles.commentList)}>
                     <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">

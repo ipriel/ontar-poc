@@ -22,7 +22,7 @@ export const UserPuck = ({
 }: Props) => {
     const [loaded, setLoaded] = useState<boolean>(false);
 
-    if (isDefined(userState))
+    if (!isDefined(userState))
         return (
             <img
                 src={imageSrc}

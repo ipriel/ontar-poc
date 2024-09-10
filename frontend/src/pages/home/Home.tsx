@@ -6,7 +6,7 @@ import classNames from "classnames";
 
 import { UserPuck } from "../../components/UserPuck";
 import { RiskyUsersPane } from "../../components/RiskyUsersPane";
-import { RecommendationPane } from "../../components/RecommendationPane";
+import { RecommendationPane, RecommendationType } from "../../components/RecommendationPane";
 import { UserPuckGroup } from "../../components/UserPuckGroup";
 import { RatioBarGraph } from "../../components/RatioBarGraph";
 import { SVG, registerSVGs } from "../../components/SVG";
@@ -19,11 +19,12 @@ import { useModal } from "../../components/Modal";
 import UserPic1 from "../../assets/user-1.png";
 import UserPic2 from "../../assets/user-2.png";
 import UserPic3 from "../../assets/user-3.png";
-import { Recommendation, Remediation } from "../../lib/models";
+import { ADRecommendation, Recommendation, Remediation } from "../../lib/models";
 import { jsonQuery, queryClient, useJsonQuery, useLastEventQuery } from "../../lib/react-query";
 import styles from "./Home.module.css";
 import svgCollection from "./Home.data";
 import { generateDueDate, getInterval, parseSeverity, riskyUserSelector, alertSelector } from "./Home.utils";
+import { Table } from "../../components/Table";
 
 registerSVGs(svgCollection);
 
@@ -31,42 +32,11 @@ const severity: Array<"Low" | "Medium" | "High"> = ["Low", "Medium", "High"];
 const improvement = [5, 10, 20];
 
 export const Home = () => {
+    const recommendationQuery = useJsonQuery<Recommendation[]>('/api/recommendations', ["live-attack", "recommendations"]);
     const riskyUserQuery = useJsonQuery('/api/riskyUsers', ["live-attack", "riskyUsers"], riskyUserSelector);
     const alertQuery = useJsonQuery('/api/alerts', ["live-attack", "alerts"], alertSelector);
     queryClient.prefetchQuery(jsonQuery<Remediation[]>('/api/remediations', ["live-attack", "remediations"]));
-    const recommendationQuery = useJsonQuery<Recommendation[]>('/api/recommendations', ["live-attack", "recommendations"], (data: Recommendation[])=>{
-        if(data != null && data.length == 0) {
-            return [{
-                id: "va-_-microsoft-_-windows_11",
-                productName: "Microsoft Windows 11",
-                recommendationName: "Install Updates",
-                weaknesses: 0,
-                vendor: "Microsoft",
-                recommendedVersion: "9.11",
-                recommendedVendor: "Microsoft",
-                recommendedProgram: "Windows 11",
-                recommendationCategory: "Operating System",
-                subCategory: "Operating System",
-                severityScore: 0,
-                publicExploit: false,
-                activeAlert: true,
-                associatedThreats: ["Zero day"],
-                remediationType: "update",
-                status: "open",
-                configScoreImpact: 5,
-                exposureImpact: 5,
-                totalMachineCount: 3,
-                exposedMachinesCount: 1,
-                nonProductivityImpactedAssets: 1,
-                relatedComponent: "none",
-                hasUnpatchableCve: false,
-                tags: ["windows"],
-                exposedCriticalDevices: 1
-            }];
-        }
-
-        return data;
-    });
+    const adRecommendationQuery = useJsonQuery<ADRecommendation[]>('/api/adRecommendations', ["live-attack", "adRecommendations"]);
 
     const { data: serverEvent } = useLastEventQuery();
     const { isLiveAttack, firstEvent } = useMemo(() => {
@@ -178,7 +148,7 @@ export const Home = () => {
                     }
                 >
                     {({ users, count }) =>
-                        <FlipCard.Container
+                        <FlipCard
                             isActive={count.total > 0}
                             onClick={() => {
                                 if (count.total == 0) return;
@@ -213,7 +183,7 @@ export const Home = () => {
                                     ]}
                                 />
                             </FlipCard.Back>
-                        </FlipCard.Container>
+                        </FlipCard>
                     }
                 </AwaitQuery>
                 <AwaitQuery
@@ -273,42 +243,41 @@ export const Home = () => {
                     </button>
                 </div>
                 <div className={(activeTab === 1) ? styles.tabContainerActive : styles.tabContainer}>
-                    <table className={styles.dashboardTable}>
-                        <thead>
-                            <tr className={styles.dashboardTableHeader}>
-                                <th>Task Name</th>
-                                <th>Due Date</th>
-                                <th>Severity Level</th>
-                                <th className={styles.dashboardCenteredHeader}>Score Improvement</th>
-                                <th>Assigned</th>
-                            </tr>
-                        </thead>
-                        <tbody className={styles.dashboardTableBody}>
+                    <Table>
+                        <Table.Head>
+                            <Table.Cell value={"Task Name"} />
+                            <Table.Cell value={"Due Date"} />
+                            <Table.Cell value={"Severity Level"} />
+                            <Table.Cell className={styles.dashboardCenteredHeader} value={"Score Improvement"} />
+                            <Table.Cell value={"Assigned"} />
+                        </Table.Head>
+                        <Table.Body className={styles.dashboardTableBody}>
                             <AwaitQuery
                                 query={recommendationQuery}
-                                fallback={
-                                    <tr className={styles.dashboardTableRow}>
-                                        <td colSpan={5} className={styles.loader}>&nbsp;</td>
-                                    </tr>
-                                }
+                                fallback={<Table.FallbackRow />}
                             >
                                 {(recommendations) => (
                                     <>
                                         {recommendations.map((row, i) => {
                                             const dueDate = generateDueDate();
+                                            const severityIndex = parseSeverity(row.severityScore);
                                             return (
-                                                <tr className={classNames(styles.dashboardTableRow, styles.clickable)} key={`recommendation-${i}`} onClick={() => {
-                                                    setModal({
-                                                        title: row.recommendationName,
-                                                        tags: [
-                                                            { label: `ID: ${row.id}` },
-                                                            { label: `${severity[parseSeverity(row.severityScore)]} Risk`, severity: severity[parseSeverity(row.severityScore)] }
-                                                        ],
-                                                        component: <RecommendationPane recommendationId={row.id} />
-                                                    });
-                                                }}>
-                                                    <td>{row.recommendationName}</td>
-                                                    <td>
+                                                <Table.Row
+                                                    className={classNames(styles.dashboardTableRow, styles.clickable)}
+                                                    key={`recommendation-${i}`}
+                                                    onClick={() => {
+                                                        setModal({
+                                                            title: row.recommendationName,
+                                                            tags: [
+                                                                { label: `ID: ${row.id}` },
+                                                                { label: `${severity[severityIndex]} Risk`, severity: severity[severityIndex] }
+                                                            ],
+                                                            component: <RecommendationPane recommendationId={row.id} type={RecommendationType.RECOMMENDATION} />
+                                                        });
+                                                    }}
+                                                >
+                                                    <Table.Cell value={row.recommendationName} />
+                                                    <Table.Cell>
                                                         <div className={styles.dashboardTableMixedCell}>
                                                             <ShowIf condition={isPast(dueDate) || isToday(dueDate)}>
                                                                 <SVG svgName="clock_snooze" />
@@ -318,35 +287,101 @@ export const Home = () => {
                                                             </ShowIf>
                                                             <p>{getInterval(dueDate)}</p>
                                                         </div>
-                                                    </td>
-                                                    <td>
+                                                    </Table.Cell>
+                                                    <Table.Cell>
                                                         <div className={styles.dashboardTableMixedCell}>
-                                                            <svg data-severity={severity[parseSeverity(row.severityScore)]} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <svg data-severity={severity[severityIndex]} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                 <path d="M12.7071 4.29289C12.3166 3.90237 11.6834 3.90237 11.2929 4.29289L4.29289 11.2929C3.90237 11.6834 3.90237 12.3166 4.29289 12.7071C4.68342 13.0976 5.31658 13.0976 5.70711 12.7071L11 7.41421L11 19C11 19.5523 11.4477 20 12 20C12.5523 20 13 19.5523 13 19L13 7.41421L18.2929 12.7071C18.6834 13.0976 19.3166 13.0976 19.7071 12.7071C20.0976 12.3166 20.0976 11.6834 19.7071 11.2929L12.7071 4.29289Z" fill="currentColor" />
                                                             </svg>
-                                                            <p>{severity[parseSeverity(row.severityScore)]}</p>
+                                                            <p>{severity[severityIndex]}</p>
                                                         </div>
-                                                    </td>
-                                                    <td>
+                                                    </Table.Cell>
+                                                    <Table.Cell>
                                                         <div className={styles.dashboardTablePillMini}>
                                                             <Icon iconName="Add" />
-                                                            <span>{improvement[parseSeverity(row.severityScore)]}</span>
+                                                            <span>{improvement[severityIndex]}</span>
                                                         </div>
-                                                    </td>
-                                                    <td>
+                                                    </Table.Cell>
+                                                    <Table.Cell>
                                                         <UserPuckGroup style="normal">
                                                             <UserPuck imageSrc={UserPic1} userState={"offline"}></UserPuck>
                                                         </UserPuckGroup>
-                                                    </td>
-                                                </tr>
+                                                    </Table.Cell>
+                                                </Table.Row>
                                             )
-                                        }
-                                        )}
+                                        })}
                                     </>
                                 )}
                             </AwaitQuery>
-                        </tbody>
-                    </table>
+                            <AwaitQuery
+                                query={adRecommendationQuery}
+                                fallback={<Table.FallbackRow />}
+                            >
+                                {(recommendations) => (
+                                    <>
+                                        {recommendations.map((row, i) => {
+                                            const dueDate = generateDueDate();
+                                            const severityScore = row.priority.charAt(0).toUpperCase() + row.priority.slice(1) as Capitalize<typeof row.priority>;
+                                            const improvementScore = improvement[severity.indexOf(severityScore)]
+                                            return (
+                                                <Table.Row
+                                                    className={classNames(styles.dashboardTableRow, styles.clickable)}
+                                                    key={`recommendation-${i}`}
+                                                    onClick={() => {
+                                                        setModal({
+                                                            title: row.displayName,
+                                                            tags: [
+                                                                { label: `ID: ${row.id}` },
+                                                                { label: `${severityScore} Risk`, severity: severityScore }
+                                                            ],
+                                                            component:
+                                                                <RecommendationPane
+                                                                    recommendationId={row.id}
+                                                                    data={row.actionSteps}
+                                                                    type={RecommendationType.AD_RECOMMENDATION}
+                                                                />
+                                                        });
+                                                    }}
+                                                >
+                                                    <Table.Cell value={row.displayName} />
+                                                    <Table.Cell>
+                                                        <div className={styles.dashboardTableMixedCell}>
+                                                            <ShowIf condition={isPast(dueDate) || isToday(dueDate)}>
+                                                                <SVG svgName="clock_snooze" />
+                                                                <Else>
+                                                                    <SVG svgName="clock_alarm" />
+                                                                </Else>
+                                                            </ShowIf>
+                                                            <p>{getInterval(dueDate)}</p>
+                                                        </div>
+                                                    </Table.Cell>
+                                                    <Table.Cell>
+                                                        <div className={styles.dashboardTableMixedCell}>
+                                                            <svg data-severity={severityScore} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M12.7071 4.29289C12.3166 3.90237 11.6834 3.90237 11.2929 4.29289L4.29289 11.2929C3.90237 11.6834 3.90237 12.3166 4.29289 12.7071C4.68342 13.0976 5.31658 13.0976 5.70711 12.7071L11 7.41421L11 19C11 19.5523 11.4477 20 12 20C12.5523 20 13 19.5523 13 19L13 7.41421L18.2929 12.7071C18.6834 13.0976 19.3166 13.0976 19.7071 12.7071C20.0976 12.3166 20.0976 11.6834 19.7071 11.2929L12.7071 4.29289Z" fill="currentColor" />
+                                                            </svg>
+                                                            <p>{severityScore}</p>
+                                                        </div>
+                                                    </Table.Cell>
+                                                    <Table.Cell>
+                                                        <div className={styles.dashboardTablePillMini}>
+                                                            <Icon iconName="Add" />
+                                                            <span>{improvementScore}</span>
+                                                        </div>
+                                                    </Table.Cell>
+                                                    <Table.Cell>
+                                                        <UserPuckGroup style="normal">
+                                                            <UserPuck imageSrc={UserPic1} userState={"offline"}></UserPuck>
+                                                        </UserPuckGroup>
+                                                    </Table.Cell>
+                                                </Table.Row>
+                                            )
+                                        })}
+                                    </>
+                                )}
+                            </AwaitQuery>
+                        </Table.Body>
+                    </Table>
                 </div>
                 <div className={(activeTab === 2) ? styles.tabContainerActive : styles.tabContainer}>
                     <table className={styles.dashboardTable}>
