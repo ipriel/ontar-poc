@@ -5,36 +5,12 @@ import styles from "./DataCard.module.css";
 import classNames from "classnames";
 import { isDefined } from "../../lib";
 
-const Front = ({
-    children,
-    className,
-    ...props
-}: PropsWithChildren<DataCardProps>) => {
-    return (
-        <DataCard {...props} className={classNames(className, styles.dataCardFront)}>
-            {children}
-        </DataCard>
-    );
-};
-
-const Back = ({
-    children,
-    className,
-    ...props
-}: PropsWithChildren<DataCardProps>) => {
-    return (
-        <DataCard {...props} className={classNames(className, styles.dataCardBack)}>
-            {children}
-        </DataCard>
-    );
-};
-
 interface FlipCardProps {
     isActive: boolean;
     onClick?: () => void;
 }
 
-const Container = ({ isActive, onClick, children }: PropsWithChildren<FlipCardProps>) => {
+export const FlipCard = ({ isActive, onClick, children }: PropsWithChildren<FlipCardProps>) => {
     const [FrontCard, BackCard] = useMemo(() => {
         let FrontCard: JSX.Element | null = null;
         let BackCard: JSX.Element | null = null;
@@ -46,9 +22,9 @@ const Container = ({ isActive, onClick, children }: PropsWithChildren<FlipCardPr
         Children.forEach(children, (child) => {
             if (!isValidElement(child)) return;
 
-            if (child.type === Front) {
+            if (child.type === FlipCard.Front) {
                 FrontCard = child;
-            } else if (child.type === Back) {
+            } else if (child.type === FlipCard.Back) {
                 BackCard = child;
             } else {
                 throw "Error: Flipcard can only contain a single FlipCard.Front and a single FlipCard.Back";
@@ -68,8 +44,26 @@ const Container = ({ isActive, onClick, children }: PropsWithChildren<FlipCardPr
     );
 };
 
-export const FlipCard = {
-    Container,
-    Front,
-    Back
-}; 
+FlipCard.Front = ({
+    children,
+    className,
+    ...props
+}: PropsWithChildren<DataCardProps>) => {
+    return (
+        <DataCard {...props} className={classNames(className, styles.dataCardFront)}>
+            {children}
+        </DataCard>
+    );
+};
+
+FlipCard.Back = ({
+    children,
+    className,
+    ...props
+}: PropsWithChildren<DataCardProps>) => {
+    return (
+        <DataCard {...props} className={classNames(className, styles.dataCardBack)}>
+            {children}
+        </DataCard>
+    );
+};
