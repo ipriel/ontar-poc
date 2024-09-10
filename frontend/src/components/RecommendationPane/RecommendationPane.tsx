@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback, ReactNode } from "react";
 import { Icon, IconButton } from "@fluentui/react";
 import { registerIcons } from '@fluentui/react/lib/Styling';
 import { CodeBlock, dracula } from "react-code-blocks";
@@ -106,20 +106,29 @@ function usePaneQuery(type: RecommendationType, id?: string, data?: Recommendati
 }
 
 function parseMitigation(remediation: Extend<Remediation, LinesCount> | RecommendationAction, index: number) {
-    const count = ("stepNumber" in remediation) ? remediation.stepNumber :  index + 1;
-    let text = "";
+    const count = ("stepNumber" in remediation) ? remediation.stepNumber : index + 1;
+    let label: ReactNode | undefined;
 
     // typeof remediation = Extend<Remediation, LinesCount>
-    if("title" in remediation) {
-        text = remediation.title
+    if ("title" in remediation) {
+        label = <>{remediation.title}</>
     }
     //typeof remediation = RecommendationAction
     else {
-        text += remediation.text.slice(remediation.text.indexOf(" ")+1);
-        text += remediation.actionUrl.displayName
+        const text = remediation.text.slice(remediation.text.indexOf(" ") + 1);
+        const link = (
+            <a
+                href={remediation.actionUrl.url}
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                {remediation.actionUrl.displayName}
+            </a>
+        );
+        label = <>{text}{link}</>
     }
 
-    return {count, text};
+    return { count, text: label };
 }
 
 export const RecommendationPane = ({ recommendationId, type, data }: RecommendationProps | ADRecommendationProps) => {
@@ -201,7 +210,7 @@ export const RecommendationPane = ({ recommendationId, type, data }: Recommendat
                 <div className={styles.remediationList}>
                     <ShowIf condition={isDefined(remediations)}>
                         {remediations.map((remediation, i) => {
-                            const {count, text} = parseMitigation(remediation, i);
+                            const { count, text } = parseMitigation(remediation, i);
                             return (
                                 <div className={styles.remediationItemContainer} key={`title-${i}`}>
                                     <div className={styles.remediationItemMarker}>
