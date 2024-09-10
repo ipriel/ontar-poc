@@ -78,6 +78,7 @@ class _AzureFunctionsSettings(BaseSettings):
     incidents_key: str|None = Field(default=None)
     recommendations_key: str|None = Field(default=None)
     remediations_key: str|None = Field(default=None)
+    adrecommendations_key: str|None = Field(default=None)
 
 class _AppSettings():
     search: _AzureSearchSettings = _AzureSearchSettings()

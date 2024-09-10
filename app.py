@@ -102,6 +102,15 @@ async def getIncidents():
         logger.exception("Exception in /api/incidents: %s", repr(e))
         return jsonify({"error": repr(e)}), 500
 
+@bp.route("/api/adRecommendations", methods=["GET"])
+async def getADRecommendations():
+    try:
+        data, status_code = fetchUpdate("getADRecommendations", app_settings.functions.adrecommendations_key, True)
+        return jsonify(data), status_code
+    except Exception as e:
+        logger.exception("Exception in /api/adRecommendations: %s", repr(e))
+        return jsonify({"error": repr(e)}), 500
+
 @bp.route("/api/recommendations", methods=["GET"])
 async def getRecommendations():
     try:

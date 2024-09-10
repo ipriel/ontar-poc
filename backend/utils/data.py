@@ -5,12 +5,14 @@ from kiota_serialization_json.json_serialization_writer_factory import JsonSeria
 from msgraph_beta.generated.models.risky_user import RiskyUser
 from msgraph_beta.generated.models.alert import Alert
 from msgraph_beta.generated.models.security.incident import Incident
+from msgraph_beta.generated.models.recommendation import Recommendation
+
 from typing import Self, Dict
 from enum import StrEnum
 
 _jsonSerializer = JsonSerializationWriterFactory().get_serialization_writer('application/json')
 
-def serialize(obj: RiskyUser | Alert | Incident):
+def serialize(obj: RiskyUser | Alert | Incident | Recommendation):
     obj.serialize(writer=_jsonSerializer)
     jsonStr = _jsonSerializer.get_serialized_content().decode()
     return json.loads(jsonStr)
