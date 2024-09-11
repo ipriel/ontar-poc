@@ -1,136 +1,34 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { Stack } from "@fluentui/react";
 import { SquareFilled } from "@fluentui/react-icons";
 
 import logo from '../../assets/logo-wide.png';
 import styles from "./Chat.module.css";
 
-import {
-    ChatMessage,
-    ConversationRequest,
-    conversationApi,
-    ChatResponse
-} from "../../lib";
-import { getSystemBaseMessage, getSystemMitigationData, SAMPLE_QUESTIONS } from './Chat.utils';
-import { Answer } from "../../components/Answer";
+import { getSystemMitigationData, SAMPLE_QUESTIONS, useChatApi } from './Chat.utils';
 import { QuestionInput } from "../../components/QuestionInput";
 import { useModal } from "../../components/Modal";
 import { CitationPane } from "../../components/CitationPane";
 import { ChatMitigationPane } from "../../components/ChatMitigationPane";
 import { ShowIf, Else } from '../../components/ShowIf/ShowIf';
 import { AssistantMessage, ErrorMessage, SystemBaseMessage, UserMessage } from "./ChatAnswers";
+import classNames from "classnames";
 
 export const Chat = () => {
-    const lastQuestionRef = useRef<string>("");
-    const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [showLoadingMessage, setShowLoadingMessage] = useState<boolean>(false);
-    const [answers, setAnswers] = useState<ChatMessage[]>([]);
     const [Modal, setModal] = useModal();
-    const abortFuncs = useRef([] as AbortController[]);
+    const [{answers, isLoading}, makeApiRequest, stopGenerating] = useChatApi()
 
-    const makeApiRequest = async (question: string) => {
-        lastQuestionRef.current = question;
-
-        setIsLoading(true);
-        setShowLoadingMessage(true);
-        const abortController = new AbortController();
-        abortFuncs.current.unshift(abortController);
-
-        const userMessage: ChatMessage = {
-            role: "user",
-            content: question
-        };
-
-        if (["What users were compromised?"].includes(question)) {
-            let result: ChatMessage[] = [];
-            if (question == "What users were compromised?") {
-                result.push(getSystemBaseMessage());
-            }
-
-            setAnswers([...answers, userMessage, ...result]);
-            setIsLoading(false);
-            setShowLoadingMessage(false);
-            abortFuncs.current = abortFuncs.current.filter(a => a !== abortController);
-            return abortController.abort();
-        }
-
-        const request: ConversationRequest = {
-            messages: [...answers.filter((answer) => ["user", "assistant"].includes(answer.role)), userMessage]
-        };
-
-        let result = {} as ChatResponse;
-        try {
-            const response = await conversationApi(request, abortController.signal);
-            if (response?.body) {
-
-                const reader = response.body.getReader();
-                let runningText = "";
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-
-                    var text = new TextDecoder("utf-8").decode(value);
-                    const objects = text.split("\n");
-                    objects.forEach((obj) => {
-                        try {
-                            runningText += obj;
-                            result = JSON.parse(runningText);
-                            setShowLoadingMessage(false);
-                            setAnswers([...answers, userMessage, ...result.choices[0].messages]);
-                            runningText = "";
-                        }
-                        catch { }
-                    });
-                }
-                setAnswers([...answers, userMessage, ...result.choices[0].messages]);
-            }
-
-        } catch (e) {
-            if (!abortController.signal.aborted) {
-                console.error(result);
-                let errorMessage = "An error occurred. Please try again. If the problem persists, please contact the site administrator.";
-                if (result.error?.message) {
-                    errorMessage = result.error.message;
-                }
-                else if (typeof result.error === "string") {
-                    errorMessage = result.error;
-                }
-                setAnswers([...answers, userMessage, {
-                    role: "error",
-                    content: errorMessage
-                }]);
-            } else {
-                setAnswers([...answers, userMessage]);
-            }
-        } finally {
-            setIsLoading(false);
-            setShowLoadingMessage(false);
-            abortFuncs.current = abortFuncs.current.filter(a => a !== abortController);
-        }
-
-        return abortController.abort();
-    };
-
-    const stopGenerating = () => {
-        abortFuncs.current.forEach(a => a.abort());
-        setShowLoadingMessage(false);
-        setIsLoading(false);
-    }
-
-    useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: "smooth" }), [showLoadingMessage]);
+    const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
+    useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: "smooth" }), [answers.length]);
 
     return (
         <div className={styles.container} role="main">
             <Stack
                 horizontal
-                className={styles.chatRoot}
-                style={{
-                    flex: lastQuestionRef.current ? 1 : 0
-                }}
+                className={classNames(styles.chatRoot, {[styles.chatRootActive]: answers.length > 0})}
             >
                 <div className={styles.chatContainer}>
-                    <ShowIf condition={!lastQuestionRef.current}>
+                    <ShowIf condition={answers.length == 0}>
                         <Stack className={styles.chatEmptyState}>
                             <img src={logo} />
                             <h2 className={styles.chatEmptyStateSubtitle}>How can I help you today?</h2>
@@ -171,20 +69,6 @@ export const Chat = () => {
                                         </ShowIf>
                                     </>
                                 ))}
-                                <ShowIf condition={showLoadingMessage}>
-                                    <div className={styles.chatMessageUser}>
-                                        <div className={styles.chatMessageUserMessage}>{lastQuestionRef.current}</div>
-                                    </div>
-                                    <div className={styles.chatMessageGpt}>
-                                        <Answer
-                                            answer={{
-                                                answer: "Generating answer...",
-                                                citations: []
-                                            }}
-                                            onCitationClicked={() => null}
-                                        />
-                                    </div>
-                                </ShowIf>
                                 <div ref={chatMessageStreamEnd} />
                             </div>
                         </Else>
@@ -211,7 +95,7 @@ export const Chat = () => {
                             onSend={question => makeApiRequest(question)}
                         />
                     </Stack>
-                    <ShowIf condition={!lastQuestionRef.current}>
+                    <ShowIf condition={answers.length == 0}>
                         <Stack horizontal className={styles.suggestionHeaderContainer}>
                             <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M10.5583 18.8682L10.4583 18.7181C9.76365 17.6761 9.41633 17.1551 8.95745 16.778C8.55121 16.4441 8.08311 16.1936 7.57995 16.0408C7.0116 15.8682 6.38546 15.8682 5.13317 15.8682H3.75835C2.63824 15.8682 2.07819 15.8682 1.65037 15.6502C1.27404 15.4584 0.968083 15.1525 0.776337 14.7761C0.55835 14.3483 0.55835 13.7883 0.55835 12.6682V4.06816C0.55835 2.94806 0.55835 2.38801 0.776337 1.96018C0.968083 1.58386 1.27404 1.2779 1.65037 1.08615C2.07819 0.868164 2.63824 0.868164 3.75835 0.868164H4.15835C6.39856 0.868164 7.51866 0.868164 8.37431 1.30414C9.12696 1.68763 9.73888 2.29955 10.1224 3.0522C10.5583 3.90785 10.5583 5.02795 10.5583 7.26816M10.5583 18.8682V7.26816M10.5583 18.8682L10.6584 18.7181C11.353 17.6761 11.7004 17.1551 12.1592 16.778C12.5655 16.4441 13.0336 16.1936 13.5367 16.0408C14.1051 15.8682 14.7312 15.8682 15.9835 15.8682H17.3583C18.4785 15.8682 19.0385 15.8682 19.4663 15.6502C19.8427 15.4584 20.1486 15.1525 20.3404 14.7761C20.5583 14.3483 20.5583 13.7883 20.5583 12.6682V4.06816C20.5583 2.94806 20.5583 2.38801 20.3404 1.96018C20.1486 1.58386 19.8427 1.2779 19.4663 1.08615C19.0385 0.868164 18.4785 0.868164 17.3583 0.868164H16.9583C14.7181 0.868164 13.598 0.868164 12.7424 1.30414C11.9897 1.68763 11.3778 2.29955 10.9943 3.0522C10.5583 3.90785 10.5583 5.02795 10.5583 7.26816" stroke="#C792FF" stroke-linecap="round" stroke-linejoin="round" />

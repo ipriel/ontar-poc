@@ -1,8 +1,16 @@
-import { ChatMessage, MitigationData, ToolMessageContent } from "../../lib";
+import {
+  ChatMessage,
+  ChatResponse,
+  conversationApi,
+  ConversationRequest,
+  MitigationData,
+  ToolMessageContent,
+} from "../../lib";
 import user1Pic from "../../assets/user-1.png";
 import user2Pic from "../../assets/user-2.png";
 import user3Pic from "../../assets/user-3.png";
 import user4Pic from "../../assets/user-4.png";
+import { useRef, useState } from "react";
 
 export const SAMPLE_QUESTIONS = [
   "What users were compromised?",
@@ -30,16 +38,64 @@ export const parseCitationFromMessage = (message: ChatMessage) => {
 export const getSystemBaseMessage = (): ChatMessage => {
   const content = JSON.stringify({
     title: "Here are the current impacted users from the phishing event",
-    tableHeaders: ["", "Full name", "Email", "Type", "IDM", "Risk Potential", "Audit Trail"],
+    tableHeaders: [
+      "",
+      "Full name",
+      "Email",
+      "Type",
+      "IDM",
+      "Risk Potential",
+      "Audit Trail",
+    ],
     tableBody: [
-      ["src:" + user1Pic, "Adam Berman", "adam@bank.com", "Super User", "Azure AD", "High", "Audit"],
-      ["The Superuser is a special user account with unrestricted access to all commands and files on the system. They have the highest level of control over the system and can perform any operation, including modifying critical system files and configurations."],
-      ["src:" + user2Pic, "Nora Trek", "nora@bank.com", "Elevated User", "Azure AD", "Medium", "Audit"],
-      ["*Admins* have elevated privileges beyond regular users. They can manage system settings, install and uninstall software, and perform various administrative tasks. They are responsible for maintaining the system, ensuring its security, and managing user accounts."],
-      ["src:" + user3Pic, "Will Orno", "will@bank.com", "User", "Azure AD", "Low", "Audit"],
-      ["Regular *Users* have limited permissions, typically only being able to access certain files, applications, and settings based on their user account's privileges."],
-      ["src:" + user4Pic, "Sarah James", "Sarah@bank.com", "User", "Azure AD", "Low", "Audit"],
-      ["Regular *Users* have limited permissions, typically only being able to access certain files, applications, and settings based on their user account's privileges."],
+      [
+        "src:" + user1Pic,
+        "Adam Berman",
+        "adam@bank.com",
+        "Super User",
+        "Azure AD",
+        "High",
+        "Audit",
+      ],
+      [
+        "The Superuser is a special user account with unrestricted access to all commands and files on the system. They have the highest level of control over the system and can perform any operation, including modifying critical system files and configurations.",
+      ],
+      [
+        "src:" + user2Pic,
+        "Nora Trek",
+        "nora@bank.com",
+        "Elevated User",
+        "Azure AD",
+        "Medium",
+        "Audit",
+      ],
+      [
+        "*Admins* have elevated privileges beyond regular users. They can manage system settings, install and uninstall software, and perform various administrative tasks. They are responsible for maintaining the system, ensuring its security, and managing user accounts.",
+      ],
+      [
+        "src:" + user3Pic,
+        "Will Orno",
+        "will@bank.com",
+        "User",
+        "Azure AD",
+        "Low",
+        "Audit",
+      ],
+      [
+        "Regular *Users* have limited permissions, typically only being able to access certain files, applications, and settings based on their user account's privileges.",
+      ],
+      [
+        "src:" + user4Pic,
+        "Sarah James",
+        "Sarah@bank.com",
+        "User",
+        "Azure AD",
+        "Low",
+        "Audit",
+      ],
+      [
+        "Regular *Users* have limited permissions, typically only being able to access certain files, applications, and settings based on their user account's privileges.",
+      ],
     ],
   });
 
@@ -50,7 +106,7 @@ export const getSystemBaseMessage = (): ChatMessage => {
 };
 
 export const getSystemMitigationData = (): MitigationData => {
-    const script = `#Read security group details from CSV file
+  const script = `#Read security group details from CSV file
   $CSVRecords = Import-CSV "C:\Temp\SecurityGroups.csv"
   $TotalItems = $CSVRecords.Count
   $i = 0
@@ -113,20 +169,131 @@ export const getSystemMitigationData = (): MitigationData => {
   }
   }
   `;
-  
-    return {
-      plan: [
-        "Revoke users active sessions and MFA tokens",
-        "Re-Register users to MFA ",
-        "Create a Conditional access policy to allow access only from NY offices and NY geo region ",
-        "Block direct and indirect users ",
-        "Reset users password ",
-        "Recall phishing emails sent by them to the organization boxes",
-        "Enable users ",
-        "Notify users of the login details ",
-      ],
-      scriptLang: "powershell",
-      script: script.toString(),
-    };
+
+  return {
+    plan: [
+      "Revoke users active sessions and MFA tokens",
+      "Re-Register users to MFA ",
+      "Create a Conditional access policy to allow access only from NY offices and NY geo region ",
+      "Block direct and indirect users ",
+      "Reset users password ",
+      "Recall phishing emails sent by them to the organization boxes",
+      "Enable users ",
+      "Notify users of the login details ",
+    ],
+    scriptLang: "powershell",
+    script: script.toString(),
   };
-  
+};
+
+const loadingMessage: ChatMessage[] = [
+  { role: "tool", content: "[]" },
+  { role: "assistant", content: "Generating answer..." },
+];
+
+export const useChatApi = (): [
+    {answers: ChatMessage[], isLoading: boolean},
+    (question: string) => Promise<void>,
+    () => void
+] => {
+  const abortFuncs = useRef([] as AbortController[]);
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [answers, setAnswers] = useState<ChatMessage[]>([]);
+
+  const makeApiRequest = async (question: string) => {
+    setIsLoading(true);
+
+    const userMessage: ChatMessage = {
+      role: "user",
+      content: question,
+    };
+
+    const newAnswers = [...answers, userMessage];
+    setAnswers([...newAnswers, ...loadingMessage]);
+
+    if (question == "What users were compromised?") {
+      let result: ChatMessage[] = [];
+      if (question == "What users were compromised?") {
+        result.push(getSystemBaseMessage());
+      }
+
+      setAnswers([...newAnswers, getSystemBaseMessage()]);
+      setIsLoading(false);
+      return;
+    }
+
+    const request: ConversationRequest = {
+      messages: [
+        ...newAnswers.filter((answer) =>
+          ["user", "assistant"].includes(answer.role)
+        ),
+        userMessage,
+      ],
+    };
+
+    const abortController = new AbortController();
+    abortFuncs.current.unshift(abortController);
+
+    let result = {} as ChatResponse;
+    try {
+      const response = await conversationApi(request, abortController.signal);
+      if (response?.body) {
+        const reader = response.body.getReader();
+        let runningText = "";
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          var text = new TextDecoder("utf-8").decode(value);
+          const objects = text.split("\n");
+          objects.forEach((obj) => {
+            try {
+              runningText += obj;
+              result = JSON.parse(runningText);
+              setAnswers([...newAnswers, ...result.choices[0].messages]);
+              runningText = "";
+            } catch {}
+          });
+        }
+        setAnswers([...newAnswers, ...result.choices[0].messages]);
+      }
+    } catch (e) {
+      if (!abortController.signal.aborted) {
+        console.error(result);
+        let errorMessage =
+          "An error occurred. Please try again. If the problem persists, please contact the site administrator.";
+        if (result.error?.message) {
+          errorMessage = result.error.message;
+        } else if (typeof result.error === "string") {
+          errorMessage = result.error;
+        }
+        setAnswers([
+          ...newAnswers,
+          {
+            role: "error",
+            content: errorMessage,
+          },
+        ]);
+      } else {
+        setAnswers(newAnswers);
+      }
+    } finally {
+      setIsLoading(false);
+      abortFuncs.current = abortFuncs.current.filter(
+        (a) => a !== abortController
+      );
+    }
+
+    return abortController.abort();
+  };
+
+  const stopGenerating = () => {
+    abortFuncs.current.forEach((a) => a.abort());
+    setIsLoading(false);
+  };
+
+  const data = { answers, isLoading };
+  return [data, makeApiRequest, stopGenerating];
+  //return {answers, isLoading, makeApiRequest, stopGenerating}
+};

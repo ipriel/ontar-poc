@@ -9,12 +9,16 @@
 }
 
 .chatRoot {
-    flex: 1;
+    flex: 0;
     display: flex;
     margin-top: 0px;
     margin-bottom: 20px;
     margin-inline: 20px;
     gap: 20px;
+}
+
+.chatRootActive {
+    flex: 1;
 }
 
 .chatContainer {
