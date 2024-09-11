@@ -1,5 +1,5 @@
 import { Outlet, Link, NavLink, useNavigate, useLocation } from "react-router-dom";
-import { Settings24Filled as SettingsIcon, ChevronDown24Regular as ChevronDownIcon, ChevronUp24Regular as ChevronUpIcon } from "@fluentui/react-icons";
+import { Settings24Filled as SettingsIcon, ChevronDown24Regular as ChevronDownIcon, ChevronUp24Regular as ChevronUpIcon, ShieldLockRegular } from "@fluentui/react-icons";
 import { Stack } from "@fluentui/react";
 import { useEffect, useState, useMemo, useContext } from "react";
 import { format, intervalToDuration } from "date-fns";
@@ -10,7 +10,7 @@ import styles from "./Layout.module.css";
 import { UserPuck } from "../../components/UserPuck";
 import { ShowIf, Else } from "../../components/ShowIf";
 import { registerSVGs, SVG } from "../../components/SVG";
-import { isDefined } from "../../lib";
+import { getUserInfo, isDefined } from "../../lib";
 import svgCollection from "./Layout.data";
 import { WebsocketContext, useLastEventQuery, VERSION_STR } from "../../lib";
 
@@ -21,18 +21,33 @@ const Layout = () => {
     const navigate = useNavigate();
     let location = useLocation();
     useContext(WebsocketContext);
-    const {data: serverEvent} = useLastEventQuery();
-    const {isLiveAttack, attackStartDate, riskScore} = useMemo(()=>{
-        if(isDefined(serverEvent)) { 
+    const { data: serverEvent } = useLastEventQuery();
+    const { isLiveAttack, attackStartDate, riskScore } = useMemo(() => {
+        if (isDefined(serverEvent)) {
             return {
                 isLiveAttack: serverEvent.isLiveAttack,
-                attackStartDate: serverEvent.firstEvent?.startTime, 
+                attackStartDate: serverEvent.firstEvent?.startTime,
                 riskScore: serverEvent.firstEvent?.securityScore
             };
         }
 
-        return {isLiveAttack: false, attackStartDate: undefined, riskScore: undefined};
+        return { isLiveAttack: false, attackStartDate: undefined, riskScore: undefined };
     }, [serverEvent]);
+    const [showAuthMessage, setShowAuthMessage] = useState<boolean>(true);
+
+    const getUserInfoList = async () => {
+        const userInfoList = await getUserInfo();
+        if (userInfoList.length === 0 && window.location.hostname !== "127.0.0.1") {
+            setShowAuthMessage(true);
+        }
+        else {
+            setShowAuthMessage(false);
+        }
+    }
+
+    useEffect(() => {
+        getUserInfoList();
+    }, []);
 
     const attackDuration = useMemo(() => {
         if (!isDefined(attackStartDate)) return undefined;
@@ -208,7 +223,7 @@ const Layout = () => {
                     <Stack horizontal verticalAlign="center" horizontalAlign="space-between">
                         <div className={styles.headerTitleContainer}>
                             <div className={styles.headerIconContainer}>
-                                <SVG svgName="live_virus" className={styles.headerIcon}/>
+                                <SVG svgName="live_virus" className={styles.headerIcon} />
                             </div>
                             <h1 className={styles.headerTitle}>{isLiveAttack ? 'Live Attack!' : 'All is well'}</h1>
                             <p className={styles.headerSubtitle}>Your threat activity {format(new Date(), "eeee, MMMM d, yyyy")}</p>
@@ -229,7 +244,7 @@ const Layout = () => {
                             </ShowIf>
                             <ShowIf condition={isDefined(riskScore)}>
                                 <div className={styles.riskScoreContainer}>
-                                    <SVG svgName="hacker"/>
+                                    <SVG svgName="hacker" />
                                     <p className={styles.riskScoreTitle}>Risk Score</p>
                                     <p className={styles.riskScoreContent}>{riskScore}</p>
                                 </div>
@@ -245,7 +260,24 @@ const Layout = () => {
                         </div>
                     </Stack>
                 </header>
-                <Outlet />
+                <ShowIf condition={showAuthMessage}>
+                    <Stack className={styles.chatEmptyState}>
+                        <ShieldLockRegular className={styles.chatIcon} style={{ color: '#C792FF', height: "150px", width: "150px" }} />
+                        <h1 className={styles.chatEmptyStateTitle}>Authentication Not Configured</h1>
+                        <h2 className={styles.chatEmptyStateSubtitle}>
+                            <span>This app does not have authentication configured.</span>
+                            <span>Please add an identity provider by finding your app in the</span>
+                            <a href="https://portal.azure.com/" target="_blank">Azure Portal</a>
+                            <span>and following</span>
+                            <a href="https://learn.microsoft.com/en-us/azure/app-service/scenario-secure-app-authentication-app-service#3-configure-authentication-and-authorization" target="_blank"> these instructions</a>
+                        </h2>
+                        <h2 className={styles.chatEmptyStateSubtitle} style={{ fontSize: "20px" }}><strong>Authentication configuration takes a few minutes to apply. </strong></h2>
+                        <h2 className={styles.chatEmptyStateSubtitle} style={{ fontSize: "20px" }}><strong>If you deployed in the last 10 minutes, please wait and reload the page after 10 minutes.</strong></h2>
+                    </Stack>
+                    <Else>
+                        <Outlet />
+                    </Else>
+                </ShowIf>
             </div>
         </Stack>
     );
