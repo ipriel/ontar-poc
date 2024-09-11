@@ -21,7 +21,7 @@ export type ToolMessageContent = {
 };
 
 export type ChatMessage = {
-  role: string;
+  role: "user" | "assistant" | "error" | "tool" | "system-base" | "system-mitigation";
   content: string;
   end_turn?: boolean;
 };
