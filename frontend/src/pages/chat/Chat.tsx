@@ -1,11 +1,6 @@
 import { useRef, useState, useEffect } from "react";
-import { IconButton, Stack } from "@fluentui/react";
+import { Stack } from "@fluentui/react";
 import { SquareFilled, ErrorCircleRegular } from "@fluentui/react-icons";
-
-import ReactMarkdown from "react-markdown";
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from "rehype-raw";
-import { CopyBlock, dracula } from "react-code-blocks";
 
 import logo from '../../assets/logo-wide.png';
 import styles from "./Chat.module.css";
@@ -16,21 +11,20 @@ import {
     conversationApi,
     ChatResponse
 } from "../../lib";
-import { getSystemBaseMessage, getSystemMitigationMessage, parseCitationFromMessage, SAMPLE_QUESTIONS } from './Chat.utils';
+import { getSystemBaseMessage, getSystemMitigationData, parseCitationFromMessage, SAMPLE_QUESTIONS } from './Chat.utils';
 import { Answer } from "../../components/Answer";
 import { QuestionInput } from "../../components/QuestionInput";
-import { Citation } from '../../lib/models';
+import { useModal } from "../../components/Modal";
+import { CitationPane } from "../../components/CitationPane";
+import { ChatMitigationPane } from "../../components/ChatMitigationPane";
 
 export const Chat = () => {
     const lastQuestionRef = useRef<string>("");
     const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [showLoadingMessage, setShowLoadingMessage] = useState<boolean>(false);
-    const [activeCitation, setActiveCitation] = useState<[content: string, id: string, title: string, filepath: string, url: string, metadata: string]>();
-    const [isCitationPanelOpen, setIsCitationPanelOpen] = useState<boolean>(false);
-    const [activeMitigation, setActiveMitigation] = useState<number>(-1);
-    const [activeTab, setActiveTab] = useState<number>(1);
     const [answers, setAnswers] = useState<ChatMessage[]>([]);
+    const [Modal, setModal] = useModal();
     const abortFuncs = useRef([] as AbortController[]);
 
     const makeApiRequest = async (question: string) => {
@@ -50,7 +44,6 @@ export const Chat = () => {
             let result: ChatMessage[] = [];
             if (question == "What users were compromised?") {
                 result.push(getSystemBaseMessage());
-                result.push(getSystemMitigationMessage());
             }
 
             setAnswers([...answers, userMessage, ...result]);
@@ -125,11 +118,6 @@ export const Chat = () => {
 
     useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: "smooth" }), [showLoadingMessage]);
 
-    const onShowCitation = (citation: Citation) => {
-        setActiveCitation([citation.content, citation.id, citation.title ?? "", citation.filepath ?? "", "", ""]);
-        setIsCitationPanelOpen(true);
-    };
-
     return (
         <div className={styles.container} role="main">
             <Stack
@@ -161,7 +149,12 @@ export const Chat = () => {
                                                         answer: answer.content,
                                                         citations: parseCitationFromMessage(answers[index - 1]),
                                                     }}
-                                                    onCitationClicked={c => onShowCitation(c)}
+                                                    onCitationClicked={({ title, content }) => {
+                                                        setModal({
+                                                            title: "Citation",
+                                                            component: <CitationPane title={title} content={content} />
+                                                        });
+                                                    }}
                                                 />
                                             </div>
                                         ) : answer.role === "error" ? (
@@ -203,58 +196,14 @@ export const Chat = () => {
                                                     </>
                                                 ))}
                                                 <div className={styles.chatMessageSystemFooter}>
-                                                    <button className={styles.chatMessageSystemButton} onClick={() => setActiveMitigation(index + 1)}>Mitigate Now</button>
+                                                    <button className={styles.chatMessageSystemButton} onClick={() => {
+                                                    setModal({
+                                                        title: "Mitigations",
+                                                        component: <ChatMitigationPane content={getSystemMitigationData()} />
+                                                    })
+                                                }}>Mitigate Now</button>
                                                 </div>
                                             </div>
-                                        ) : answer.role === "system-mitigation" && activeMitigation === index ? (
-                                            <div className={styles.chatMessageSystemMitigation}>
-                                                {[JSON.parse(answer.content)].map(content => (
-                                                    <div className={styles.tabLayout}>
-                                                        <div className={styles.tabSelectorContainer}>
-                                                            {["Plan", "Scripts"].map((label, index) => (
-                                                                <button
-                                                                    className={(activeTab === index + 1) ? styles.tabSelectorActive : styles.tabSelector}
-                                                                    onClick={() => setActiveTab(index + 1)}
-                                                                    data-tab={index + 1}
-                                                                >
-                                                                    {label}
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                        <IconButton
-                                                            className={styles.tabLayoutDismiss}
-                                                            iconProps={{ iconName: 'Cancel' }}
-                                                            aria-label="Close mitigations panel"
-                                                            onClick={() => {
-                                                                setActiveMitigation(-1);
-                                                                setActiveTab(1);
-                                                            }}
-                                                        />
-                                                        <div className={(activeTab === 1) ? styles.tabContainerActive : styles.tabContainer}>
-                                                            <h1 className={styles.tabTitle}>Mitigation plan</h1>
-                                                            <p>The mitigation flow is as follows:</p>
-                                                            <ol className={styles.tabList}>
-                                                                {content.plan.map((step: string) => (
-                                                                    <li className={styles.tabListItem}>{step}</li>
-                                                                ))}
-                                                            </ol>
-                                                        </div>
-                                                        <div className={(activeTab === 2) ? styles.tabContainerActive : styles.tabContainer}>
-                                                            <h1 className={styles.tabTitle}>Scripts</h1>
-                                                            <p>Below are the necessary scripts to implement the mitigations:</p>
-                                                            <div className={styles.codeBlock}>
-                                                                <CopyBlock
-                                                                    language={content.scriptLang}
-                                                                    text={content.script}
-                                                                    showLineNumbers={true}
-                                                                    theme={dracula}
-                                                                    codeBlock
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div >
                                         ) : null
                                     }
                                 </>
@@ -322,35 +271,8 @@ export const Chat = () => {
                         </>
                     )}
                 </div>
-                {answers.length > 0 && isCitationPanelOpen && activeCitation && (
-                    <Stack.Item className={styles.citationPanelWrapper}>
-                        <div className={styles.citationPanel} tabIndex={0} role="tabpanel" aria-label="Citations Panel">
-                            <Stack aria-label="Citations Panel Header Container" horizontal className={styles.citationPanelTitleContainer} horizontalAlign="space-between" verticalAlign="center">
-                                <span aria-label="Citations" className={styles.citationPanelTitle}>Citations</span>
-                                <IconButton className={styles.citationPanelDismiss} iconProps={{ iconName: 'Cancel' }} aria-label="Close citations panel" onClick={() => setIsCitationPanelOpen(false)} />
-                            </Stack>
-                            <div className={styles.citationPanelHeader}>
-                                {
-                                    activeCitation[2].replace("url:", "||url:").split("||").map(header => header.split(/(?<=^\w+):\s/)).map((header => (
-                                        <>
-                                            <span className={styles.citationPanelHeaderTitle} tabIndex={0}>{header[0].charAt(0).toUpperCase() + header[0].slice(1)}: </span>
-                                            <span className={styles.citationPanelHeaderContent}>{header[1]}</span>
-                                        </>
-                                    )))
-                                }
-                            </div>
-                            <div className={styles.citationPanelContent} tabIndex={0}>
-                                <ReactMarkdown
-                                    linkTarget="_blank"
-                                    children={activeCitation[0]}
-                                    remarkPlugins={[remarkGfm]}
-                                    rehypePlugins={[rehypeRaw]}
-                                />
-                            </div>
-                        </div>
-                    </Stack.Item>
-                )}
             </Stack>
+            <Modal />
         </div>
     );
 };

@@ -1,0 +1,77 @@
+.chatMessageSystemMitigation {
+    padding: 10px;
+    padding-left: 20px;
+}
+
+.chatMessageSystemMitigation > * {
+    font-size: 14px;
+    line-height: 28px;
+    white-space: normal;
+    word-wrap: break-word;
+    margin-block: 4px;
+}
+
+.chatMessageSystemMitigation > h1 {
+    color: #B692F6;
+}
+
+.chatMessageSystemMitigation > ol {
+    color: #706E86;
+    padding-inline-start: 24px;
+}
+
+.tabContainer {
+    display: none;
+    padding-top: 10px;
+}
+
+.tabContainerActive {
+    display: block;
+    padding-top: 10px;
+}
+
+.tabLayout {
+    position: relative;
+}
+
+.tabTitle {
+    font-size: 25px;
+}
+
+.tabListItem {
+    padding-inline-start: 20px;
+}
+
+.tabSelectorContainer {
+    border-bottom: 1px solid #C792FF;
+}
+
+.tabSelector {
+    color: #5C5A73;
+    border: 1px solid #5C5A73;
+    border-bottom-width: 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    background: #1A191F;
+    padding: 10px;
+}
+
+.tabSelectorActive {
+    color: #C792FF;
+    border: 1px solid #C792FF;
+    border-bottom-width: 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    outline: 1px solid #1A191F;
+    background: #1A191F;
+    padding: 10px;
+}
+
+.codeBlock > div > button {
+    right: 2.75em;
+}
+
+.codeBlock > div > span {
+    max-height: 48vh;
+    overflow: auto;
+}

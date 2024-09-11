@@ -26,6 +26,12 @@ export type ChatMessage = {
   end_turn?: boolean;
 };
 
+export type MitigationData = {
+    plan: string[];
+    script: string;
+    scriptLang: string;
+}
+
 export enum ChatCompletionType {
   ChatCompletion = "chat.completion",
   ChatCompletionChunk = "chat.completion.chunk",
