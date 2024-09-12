@@ -341,6 +341,7 @@
     font-style: normal;
     font-weight: 700;
     font-size: 36px;
+    color: white;
     display: flex;
     align-items: flex-end;
     text-align: center;
@@ -360,4 +361,21 @@
     text-align: center;
     color: white;
     width: 700px;
+}
+
+.chatEmptyStateSubtitle > a {
+    margin-inline: 0.5ch;
+}
+
+.chatEmptyStateSubtitle > a:link {
+    color: #89859F;
+}
+
+.chatEmptyStateSubtitle > a:hover,
+.chatEmptyStateSubtitle > a:focus-visible {
+    color: #5C5A73;
+}
+
+.chatEmptyStateSubtitle > a:visited {
+    color: #C792FF;
 }
