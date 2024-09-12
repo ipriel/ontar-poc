@@ -20,10 +20,10 @@ export const CitationPane = ({ content, title }: Props) => {
                                 const [headerTitle, headerContent] = header.split(/(?<=^\w+):\s/);
                                 return (
                                     <>
-                                        <span className={styles.citationPanelHeaderTitle} tabIndex={0}>
-                                            {headerTitle.charAt(0).toUpperCase() + headerTitle.slice(1)}:
-                                        </span>
-                                        <span className={styles.citationPanelHeaderContent}>{headerContent}</span>
+                                        <h1 className={styles.citationPanelHeaderTitle} tabIndex={0}>
+                                            {headerTitle.charAt(0).toUpperCase() + headerTitle.slice(1)}
+                                        </h1>
+                                        <p className={styles.citationPanelHeaderContent}>{headerContent}&nbsp;</p>
                                     </>
                                 );
                             })

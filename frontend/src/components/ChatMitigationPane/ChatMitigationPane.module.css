@@ -1,6 +1,5 @@
 .chatMessageSystemMitigation {
-    padding: 10px;
-    padding-left: 20px;
+    padding-top: 20px;
 }
 
 .chatMessageSystemMitigation > * {
@@ -15,63 +14,234 @@
     color: #B692F6;
 }
 
-.chatMessageSystemMitigation > ol {
-    color: #706E86;
-    padding-inline-start: 24px;
+.tabTriggerContainer {
+    border-bottom: 1px solid #66637b;
 }
 
-.tabContainer {
-    display: none;
-    padding-top: 10px;
+.tabTriggerContainer > button {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    margin-right: 1px;
 }
 
-.tabContainerActive {
-    display: block;
-    padding-top: 10px;
+.tabTriggerContainer > button[data-state="active"] {
+    translate: 0 1px;
+    padding-top: 11px;
 }
 
-.tabLayout {
+.tabPanel {
+    gap: 20px;
+}
+
+.tabPanel[data-state="active"] {
+    margin-top: 20px;
+}
+
+.stage {
+    display: grid;
+    grid-template-columns: min-content 1fr;
+    grid-template-rows: 1fr 1fr;
+    align-items: center;
+    column-gap: 10px;
+    padding-block: 4px;
+}
+
+.stage>svg {
+    grid-column: 1/2;
+    grid-row: 1/-1;
+}
+
+.stage>h1 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.stage>p {
+    margin-block: 0;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.tabList {
+    padding-left: 0;
+}
+
+@media screen and (max-height: 800px) {
+    .tabList {
+        padding-top: 5px;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+}
+
+.tabList>:first-child,
+.tabList>:last-child {
     position: relative;
 }
 
-.tabTitle {
-    font-size: 25px;
+.tabList>:first-child::before {
+    content: '▼';
+    position: absolute;
+    left: 16.2px;
+    top: -16.2px;
+    font-size: 8px;
+    color: #C792FF;
+}
+
+.tabList>:last-child::after {
+    content: '▲';
+    position: absolute;
+    left: 16.4px;
+    bottom: -16.4px;
+    font-size: 8px;
+    color: #C792FF;
 }
 
 .tabListItem {
-    padding-inline-start: 20px;
+    display: grid;
+    grid-template-columns: min-content 1fr 100px;
+    gap: 15px;
+    align-items: stretch;
+    margin-left: 1px;
+    margin-right: 8px;
+    padding-left: 0;
 }
 
-.tabSelectorContainer {
-    border-bottom: 1px solid #C792FF;
+.tabListMarker {
+    position: relative;
+    display: flex;
+    align-items: center;
 }
 
-.tabSelector {
+.tabListMarker::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20px;
+    height: 100%;
+    border-left: 1px solid #C792FF;
+}
+
+.tabListCounter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24px;
+    min-width: 24px;
+    border-radius: 8px;
+    padding: 3px;
+    font-size: 16px;
+    line-height: 18px;
+    background-color: #141419;
+    color: white;
+}
+
+.tabListLabel {
+    margin-block: 6px;
+    max-width: 510px;
+    text-wrap: wrap;
+    align-self: center;
+}
+
+.tabListLabel > a:link {
+    color: #89859F;
+}
+
+.tabListLabel > a:hover,
+.tabListLabel > a:focus-visible {
     color: #5C5A73;
-    border: 1px solid #5C5A73;
-    border-bottom-width: 0;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    background: #1A191F;
-    padding: 10px;
 }
 
-.tabSelectorActive {
+.tabListLabel > a:visited {
     color: #C792FF;
-    border: 1px solid #C792FF;
-    border-bottom-width: 0;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    outline: 1px solid #1A191F;
-    background: #1A191F;
-    padding: 10px;
+}
+
+.codeBlockContainer {
+    max-height: 100px;
+    overflow: auto;
+    margin-top: 5px;
+}
+
+.codeBlock {
+    margin-block: 6px;
+    border-radius: 8px;
+    background-color: #141419;
+}
+
+.codeBlock code {
+    white-space: pre-line !important;
+    word-break: break-all;
+    padding-block: 2px !important;
+}
+
+.codeBlock code > * {
+    font-size: 12px;
+}
+
+.codeBlock > div {
+    background: transparent;
+    padding: 2.5rem 0.5rem 1.5rem 0.25rem;
+}
+
+.codeBlock > div:has(code) {
+    font-size: 12px;
 }
 
 .codeBlock > div > button {
-    right: 2.75em;
+    border: none;
+    background: transparent;
 }
 
 .codeBlock > div > span {
+    background: transparent !important;
     max-height: 48vh;
     overflow: auto;
+}
+
+/* width */
+.chatMessageSystemMitigation *::-webkit-scrollbar {
+    width: 5px;
+    height: 0px;
+}
+
+/* Track */
+.chatMessageSystemMitigation *::-webkit-scrollbar-track,
+.chatMessageSystemMitigation *::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+
+.chatMessageSystemMitigation *::-webkit-scrollbar-track-piece {
+    background: #1A1A20;
+}
+
+.chatMessageSystemMitigation *::-webkit-scrollbar-thumb {
+    background: #706E86;
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+.chatMessageSystemMitigation *::-webkit-scrollbar-thumb:hover {
+    background: #363542;
+}
+
+:local(.codeBlock) code > :global(.linenumber) {
+    min-width: 1.25em !important;
+}
+
+.codeBlock:has(> .codeBlockContainer:empty) {
+    display: none;
+}
+
+.codeBlockTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: -1rem;
+    color: #E87474;
+}
+
+.codeBlockTitle>p {
+    margin-block: 0;
 }
