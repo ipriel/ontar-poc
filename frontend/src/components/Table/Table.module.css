@@ -1,6 +1,6 @@
 .table {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: min-content minmax(0,1fr);
     overflow-y: hidden;
     padding-bottom: 16px;
 }
@@ -25,7 +25,7 @@
 
 .body {
     position: relative;
-    overflow-y: scroll;
+    overflow-y: auto;
     margin-top: 8px;
 }
 
