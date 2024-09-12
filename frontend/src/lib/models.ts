@@ -21,10 +21,16 @@ export type ToolMessageContent = {
 };
 
 export type ChatMessage = {
-  role: string;
+  role: "user" | "assistant" | "error" | "tool" | "system-base";
   content: string;
   end_turn?: boolean;
 };
+
+export type MitigationData = {
+    plan: string[];
+    script: string;
+    scriptLang: string;
+}
 
 export enum ChatCompletionType {
   ChatCompletion = "chat.completion",

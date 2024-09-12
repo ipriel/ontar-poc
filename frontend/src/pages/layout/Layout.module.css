@@ -327,3 +327,55 @@
     top: -5px;
     right: 9px;
 }
+
+.chatEmptyState {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+}
+
+.chatEmptyStateTitle {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 36px;
+    color: white;
+    display: flex;
+    align-items: flex-end;
+    text-align: center;
+    line-height: 24px;
+    margin-block: 18px;
+}
+
+.chatEmptyStateSubtitle {
+    margin-top: 12px;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 38px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    width: 700px;
+}
+
+.chatEmptyStateSubtitle > a {
+    margin-inline: 0.5ch;
+}
+
+.chatEmptyStateSubtitle > a:link {
+    color: #89859F;
+}
+
+.chatEmptyStateSubtitle > a:hover,
+.chatEmptyStateSubtitle > a:focus-visible {
+    color: #5C5A73;
+}
+
+.chatEmptyStateSubtitle > a:visited {
+    color: #C792FF;
+}

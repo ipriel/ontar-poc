@@ -1,0 +1,28 @@
+.tabLayout {
+    position: relative;
+    display: grid;
+    grid-template-rows: min-content minmax(0, 1fr);
+    padding-inline: 14px;
+}
+
+.tabSelector {
+    display: inline-flex;
+    align-items: center;
+    gap: 24px;
+    padding: 10px 14px;
+    font-size: 15px;
+    border: none;
+    border-bottom: 1px solid #201F27;
+    color: #66637B;
+    background: #201F27;
+}
+
+.tabSelector[data-state="active"] {
+    color: #C792FF;
+    border-color: #C792FF;
+}
+
+.tabPanel {
+    position: relative;
+    display: grid;
+}

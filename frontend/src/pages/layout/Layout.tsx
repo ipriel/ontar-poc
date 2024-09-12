@@ -1,7 +1,7 @@
 import { Outlet, Link, NavLink, useNavigate, useLocation } from "react-router-dom";
-import { Settings24Filled as SettingsIcon, ChevronDown24Regular as ChevronDownIcon, ChevronUp24Regular as ChevronUpIcon } from "@fluentui/react-icons";
+import { Settings24Filled as SettingsIcon, ChevronDown24Regular as ChevronDownIcon, ChevronUp24Regular as ChevronUpIcon, ShieldLockRegular } from "@fluentui/react-icons";
 import { Stack } from "@fluentui/react";
-import { useEffect, useState, useMemo, useContext } from "react";
+import { useEffect, useState, useMemo, useContext, useCallback } from "react";
 import { format, intervalToDuration } from "date-fns";
 import classNames from "classnames";
 
@@ -10,7 +10,7 @@ import styles from "./Layout.module.css";
 import { UserPuck } from "../../components/UserPuck";
 import { ShowIf, Else } from "../../components/ShowIf";
 import { registerSVGs, SVG } from "../../components/SVG";
-import { isDefined } from "../../lib";
+import { getUserInfo, isDefined } from "../../lib";
 import svgCollection from "./Layout.data";
 import { WebsocketContext, useLastEventQuery, VERSION_STR } from "../../lib";
 
@@ -21,18 +21,38 @@ const Layout = () => {
     const navigate = useNavigate();
     let location = useLocation();
     useContext(WebsocketContext);
-    const {data: serverEvent} = useLastEventQuery();
-    const {isLiveAttack, attackStartDate, riskScore} = useMemo(()=>{
-        if(isDefined(serverEvent)) { 
+    const { data: serverEvent } = useLastEventQuery();
+    const { isLiveAttack, attackStartDate, riskScore } = useMemo(() => {
+        if (isDefined(serverEvent)) {
             return {
                 isLiveAttack: serverEvent.isLiveAttack,
-                attackStartDate: serverEvent.firstEvent?.startTime, 
+                attackStartDate: serverEvent.firstEvent?.startTime,
                 riskScore: serverEvent.firstEvent?.securityScore
             };
         }
 
-        return {isLiveAttack: false, attackStartDate: undefined, riskScore: undefined};
+        return { isLiveAttack: false, attackStartDate: undefined, riskScore: undefined };
     }, [serverEvent]);
+    const [showAuthMessage, setShowAuthMessage] = useState<boolean>(true);
+
+    const getUserInfoList = async () => {
+        const userInfoList = await getUserInfo();
+        if (userInfoList.length === 0 && window.location.hostname !== "127.0.0.1") {
+            setShowAuthMessage(true);
+        }
+        else {
+            setShowAuthMessage(false);
+        }
+    }
+
+    useEffect(() => {
+        getUserInfoList();
+    }, []);
+
+    const showVersion = useCallback(()=>{
+        console.log(`Current Version: v${VERSION_STR}`);
+        alert(`Current Version: v${VERSION_STR}`);
+    }, [VERSION_STR])
 
     const attackDuration = useMemo(() => {
         if (!isDefined(attackStartDate)) return undefined;
@@ -180,7 +200,7 @@ const Layout = () => {
                         </div>
                         <p className={styles.menuListItemText}>Settings</p>
                     </li>
-                    <li className={styles.menuListItem} onClick={() => alert(`Current Version: v${VERSION_STR}`)}>
+                    <li className={styles.menuListItem} onClick={showVersion}>
                         <div className={styles.menuListItemIcon}>
                             <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path fill-rule="evenodd" clip-rule="evenodd" d="M11.0583 0.368164C4.98322 0.368164 0.0583496 5.29303 0.0583496 11.3682C0.0583496 17.4433 4.98322 22.3682 11.0583 22.3682C17.1335 22.3682 22.0583 17.4433 22.0583 11.3682C22.0583 5.29303 17.1335 0.368164 11.0583 0.368164ZM9.96498 7.63939C10.3722 7.40007 10.8509 7.31259 11.3165 7.39244C11.782 7.47229 12.2042 7.71432 12.5084 8.07565C12.8126 8.43699 12.979 8.89432 12.9783 9.36664L12.9783 9.36813C12.9783 9.83726 12.6132 10.3263 11.9236 10.7861C11.6093 10.9957 11.2878 11.1571 11.041 11.2668C10.919 11.321 10.8187 11.3611 10.7513 11.3868C10.7213 11.3982 10.6913 11.4092 10.6611 11.4198C10.1378 11.5948 9.85513 12.1608 10.0297 12.6844C10.2043 13.2083 10.7706 13.4915 11.2946 13.3168L11.4632 13.2557C11.5599 13.2189 11.694 13.1652 11.8532 13.0944C12.1689 12.9541 12.5974 12.7406 13.033 12.4502C13.8433 11.91 14.9779 10.8994 14.9783 9.36904C14.9796 8.4246 14.6467 7.51018 14.0384 6.78765C13.4301 6.06498 12.5856 5.58093 11.6546 5.42123C10.7235 5.26153 9.76602 5.43649 8.95162 5.91513C8.13721 6.39376 7.51848 7.14517 7.20501 8.03628C7.02174 8.55727 7.29551 9.12819 7.8165 9.31146C8.33749 9.49473 8.90841 9.22096 9.09168 8.69997C9.24841 8.25441 9.55778 7.87871 9.96498 7.63939ZM11.0583 15.3681C10.5061 15.3681 10.0583 15.8158 10.0583 16.3681C10.0583 16.9204 10.5061 17.3681 11.0583 17.3681H11.0683C11.6206 17.3681 12.0683 16.9204 12.0683 16.3681C12.0683 15.8158 11.6206 15.3681 11.0683 15.3681H11.0583Z" fill="currentColor" />
@@ -208,7 +228,7 @@ const Layout = () => {
                     <Stack horizontal verticalAlign="center" horizontalAlign="space-between">
                         <div className={styles.headerTitleContainer}>
                             <div className={styles.headerIconContainer}>
-                                <SVG svgName="live_virus" className={styles.headerIcon}/>
+                                <SVG svgName="live_virus" className={styles.headerIcon} />
                             </div>
                             <h1 className={styles.headerTitle}>{isLiveAttack ? 'Live Attack!' : 'All is well'}</h1>
                             <p className={styles.headerSubtitle}>Your threat activity {format(new Date(), "eeee, MMMM d, yyyy")}</p>
@@ -229,7 +249,7 @@ const Layout = () => {
                             </ShowIf>
                             <ShowIf condition={isDefined(riskScore)}>
                                 <div className={styles.riskScoreContainer}>
-                                    <SVG svgName="hacker"/>
+                                    <SVG svgName="hacker" />
                                     <p className={styles.riskScoreTitle}>Risk Score</p>
                                     <p className={styles.riskScoreContent}>{riskScore}</p>
                                 </div>
@@ -245,7 +265,24 @@ const Layout = () => {
                         </div>
                     </Stack>
                 </header>
-                <Outlet />
+                <ShowIf condition={showAuthMessage}>
+                    <Stack className={styles.chatEmptyState}>
+                        <ShieldLockRegular className={styles.chatIcon} style={{ color: '#C792FF', height: "150px", width: "150px" }} />
+                        <h1 className={styles.chatEmptyStateTitle}>Authentication Not Configured</h1>
+                        <h2 className={styles.chatEmptyStateSubtitle}>
+                            <span>This app does not have authentication configured.</span>
+                            <span>Please add an identity provider by finding your app in the</span>
+                            <a href="https://portal.azure.com/" target="_blank">Azure Portal</a>
+                            <span>and following</span>
+                            <a href="https://learn.microsoft.com/en-us/azure/app-service/scenario-secure-app-authentication-app-service#3-configure-authentication-and-authorization" target="_blank"> these instructions</a>
+                        </h2>
+                        <h2 className={styles.chatEmptyStateSubtitle} style={{ fontSize: "20px" }}><strong>Authentication configuration takes a few minutes to apply. </strong></h2>
+                        <h2 className={styles.chatEmptyStateSubtitle} style={{ fontSize: "20px" }}><strong>If you deployed in the last 10 minutes, please wait and reload the page after 10 minutes.</strong></h2>
+                    </Stack>
+                    <Else>
+                        <Outlet />
+                    </Else>
+                </ShowIf>
             </div>
         </Stack>
     );
