@@ -153,58 +153,6 @@ div.dataCardAccent>:first-child {
     margin-block: 0;
 }
 
-.tabContainer {
-    display: none;
-}
-
-.tabContainerActive {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-}
-
-.tabLayout {
-    position: relative;
-    display: grid;
-    grid-template-rows: min-content minmax(0, 1fr);
-    padding-inline: 14px;
-}
-
-.tabLayoutDismiss {
-    position: absolute;
-    top: 4px;
-    right: 8px;
-    width: 18px;
-    height: 18px;
-    color: #5C5A73;
-    cursor: pointer;
-}
-
-.tabTitle {
-    font-size: 25px;
-}
-
-.tabListItem {
-    padding-inline-start: 20px;
-}
-
-.tabSelector {
-    display: inline-flex;
-    align-items: center;
-    gap: 24px;
-    padding: 10px 14px;
-    font-size: 15px;
-    border: none;
-    border-bottom: 1px solid #201F27;
-    color: #66637B;
-    background: #201F27;
-}
-
-.tabSelectorActive {
-    color: #C792FF;
-    border-color: #C792FF;
-}
-
 .dashboardCenteredHeader {
     text-align: center;
 }

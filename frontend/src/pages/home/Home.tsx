@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Icon, Stack } from '@fluentui/react';
 import { ChevronDown24Regular as ChevronDownIcon } from "@fluentui/react-icons";
 import { isPast, isToday } from "date-fns";
@@ -25,6 +25,7 @@ import styles from "./Home.module.css";
 import svgCollection from "./Home.data";
 import { generateDueDate, getInterval, parseSeverity, riskyUserSelector, alertSelector } from "./Home.utils";
 import { Table } from "../../components/Table";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../components/Tabs";
 
 registerSVGs(svgCollection);
 
@@ -43,9 +44,8 @@ export const Home = () => {
         if (isDefined(serverEvent)) return serverEvent;
 
         return { isLiveAttack: false, firstEvent: undefined };
-    }, [serverEvent]);
+    }, [serverEvent?.firstEvent, serverEvent?.isLiveAttack]);
 
-    const [activeTab, setActiveTab] = useState<number>(1);
     const [Modal, setModal] = useModal();
 
     return (
@@ -211,23 +211,15 @@ export const Home = () => {
                 // className={classNames({[styles.dataCardAccent]: compromisedAccessCount > 0})}
                 />
             </div>
-            <div className={styles.tabLayout}>
-                <div className={styles.tabSelectorContainer}>
-                    <button
-                        className={classNames(styles.tabSelector, { [styles.tabSelectorActive]: activeTab === 1 })}
-                        onClick={() => setActiveTab(1)}
-                        data-tab={1}
-                    >
+            <Tabs defaultValue="actions">
+                <TabsList>
+                    <TabsTrigger value="actions">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M8.4944 1.00012L8.45941 0.999871C8.33255 0.998618 8.06944 0.99602 7.81988 1.0821C7.60969 1.1546 7.41825 1.27292 7.25941 1.42849C7.07081 1.61321 6.95546 1.84971 6.89985 1.96373L6.88443 1.99513L2.67028 10.4234C2.58696 10.5899 2.49673 10.7703 2.43463 10.9293C2.36951 11.096 2.27511 11.381 2.32509 11.7194C2.3854 12.1275 2.61117 12.4928 2.94927 12.7293C3.22952 12.9253 3.52672 12.9684 3.70493 12.9847C3.87491 13.0002 4.07655 13.0002 4.26277 13.0001L9.15594 13.0001L6.54214 21.7128C6.40953 22.1548 6.59665 22.6302 6.99501 22.8633C7.39336 23.0963 7.89946 23.0265 8.21981 22.6943L20.4386 10.023C20.6218 9.83296 20.8031 9.64503 20.936 9.48021C21.056 9.33128 21.2921 9.02216 21.32 8.59877C21.3513 8.12348 21.155 7.66157 20.7912 7.35421C20.467 7.08041 20.0806 7.03579 19.8901 7.01882C19.6792 7.00003 19.4181 7.00007 19.1541 7.00011L13.443 7.00012L15.1863 2.35124C15.3015 2.04414 15.2587 1.7001 15.0719 1.43052C14.8851 1.16095 14.5779 1.00012 14.25 1.00012H8.4944Z" fill="currentColor" />
                         </svg>
                         <span>Immediate Actions</span>
-                    </button>
-                    <button
-                        className={classNames(styles.tabSelector, { [styles.tabSelectorActive]: activeTab === 2 })}
-                        onClick={() => setActiveTab(2)}
-                        data-tab={2}
-                    >
+                    </TabsTrigger>
+                    <TabsTrigger value="collaborators">
                         <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" clip-rule="evenodd" d="M18.5836 14.8768C18.7213 14.3419 19.2664 14.0199 19.8013 14.1576C21.9576 14.7126 23.552 16.6688 23.552 19V21C23.552 21.5523 23.1043 22 22.552 22C21.9998 22 21.552 21.5523 21.552 21V19C21.552 17.6035 20.5969 16.4275 19.3028 16.0945C18.7679 15.9568 18.4459 15.4116 18.5836 14.8768Z" fill="currentColor" />
                             <path fill-rule="evenodd" clip-rule="evenodd" d="M15.1251 2.91554C15.3323 2.40361 15.9153 2.1566 16.4273 2.36382C18.2578 3.10481 19.552 4.90006 19.552 7C19.552 9.09994 18.2578 10.8952 16.4273 11.6362C15.9153 11.8434 15.3323 11.5964 15.1251 11.0845C14.9179 10.5725 15.1649 9.98953 15.6768 9.7823C16.7781 9.33652 17.552 8.25744 17.552 7C17.552 5.74256 16.7781 4.66348 15.6768 4.2177C15.1649 4.01047 14.9179 3.42748 15.1251 2.91554Z" fill="currentColor" />
@@ -240,9 +232,9 @@ export const Home = () => {
                             <rect x="1.052" y="0.5" width="31" height="31" rx="15.5" stroke="#66637B" stroke-dasharray="2 2" />
                             <path d="M17.3853 10.1666C17.3853 9.70641 17.0122 9.33331 16.5519 9.33331C16.0917 9.33331 15.7186 9.70641 15.7186 10.1666V15.1666H10.7186C10.2583 15.1666 9.88525 15.5397 9.88525 16C9.88525 16.4602 10.2583 16.8333 10.7186 16.8333H15.7186V21.8333C15.7186 22.2936 16.0917 22.6666 16.5519 22.6666C17.0122 22.6666 17.3853 22.2936 17.3853 21.8333V16.8333H22.3853C22.8455 16.8333 23.2186 16.4602 23.2186 16C23.2186 15.5397 22.8455 15.1666 22.3853 15.1666H17.3853V10.1666Z" fill="#66637B" />
                         </svg>
-                    </button>
-                </div>
-                <div className={(activeTab === 1) ? styles.tabContainerActive : styles.tabContainer}>
+                    </TabsTrigger>
+                </TabsList>
+                <TabsContent value="actions">
                     <Table>
                         <Table.Head>
                             <Table.Cell value={"Task Name"} />
@@ -382,30 +374,28 @@ export const Home = () => {
                             </AwaitQuery>
                         </Table.Body>
                     </Table>
-                </div>
-                <div className={(activeTab === 2) ? styles.tabContainerActive : styles.tabContainer}>
-                    <table className={styles.dashboardTable}>
-                        <thead>
-                            <tr className={styles.dashboardTableHeader}>
-                                <th>Name</th>
-                                <th>Role</th>
-                                <th>Date Started</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className={styles.dashboardTableBody}>
-                            <tr className={styles.dashboardTableRow}>
-                                <td className={styles.dashboardTableMixedCell}>
+                </TabsContent>
+                <TabsContent value="collaborators">
+                    <Table>
+                        <Table.Head>
+                            <Table.Cell>Name</Table.Cell>
+                            <Table.Cell>Role</Table.Cell>
+                            <Table.Cell>Date Started</Table.Cell>
+                            <Table.Cell>Status</Table.Cell>
+                            <Table.Cell>Actions</Table.Cell>
+                        </Table.Head>
+                        <Table.Body>
+                            <Table.Row>
+                                <Table.Cell className={styles.dashboardTableMixedCell}>
                                     <UserPuck imageSrc={UserPic1}></UserPuck>
                                     <p>Cameron Williamson</p>
-                                </td>
-                                <td>CEO</td>
-                                <td>Jan 20, 2022</td>
-                                <td>
+                                </Table.Cell>
+                                <Table.Cell>CEO</Table.Cell>
+                                <Table.Cell>Jan 20, 2022</Table.Cell>
+                                <Table.Cell>
                                     <p className={styles.dashboardTablePill} data-state="Active">Active</p>
-                                </td>
-                                <td className={styles.dashboardTableActionContainer}>
+                                </Table.Cell>
+                                <Table.Cell className={styles.dashboardTableActionContainer}>
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M10 15L6.92474 18.1137C6.49579 18.548 6.28131 18.7652 6.09695 18.7805C5.93701 18.7938 5.78042 18.7295 5.67596 18.6076C5.55556 18.4672 5.55556 18.162 5.55556 17.5515V15.9916C5.55556 15.444 5.10707 15.0477 4.5652 14.9683V14.9683C3.25374 14.7762 2.22378 13.7463 2.03168 12.4348C2 12.2186 2 11.9605 2 11.4444V6.8C2 5.11984 2 4.27976 2.32698 3.63803C2.6146 3.07354 3.07354 2.6146 3.63803 2.32698C4.27976 2 5.11984 2 6.8 2H14.2C15.8802 2 16.7202 2 17.362 2.32698C17.9265 2.6146 18.3854 3.07354 18.673 3.63803C19 4.27976 19 5.11984 19 6.8V11M19 22L16.8236 20.4869C16.5177 20.2742 16.3647 20.1678 16.1982 20.0924C16.0504 20.0255 15.8951 19.9768 15.7356 19.9474C15.5558 19.9143 15.3695 19.9143 14.9969 19.9143H13.2C12.0799 19.9143 11.5198 19.9143 11.092 19.6963C10.7157 19.5046 10.4097 19.1986 10.218 18.8223C10 18.3944 10 17.8344 10 16.7143V14.2C10 13.0799 10 12.5198 10.218 12.092C10.4097 11.7157 10.7157 11.4097 11.092 11.218C11.5198 11 12.0799 11 13.2 11H18.8C19.9201 11 20.4802 11 20.908 11.218C21.2843 11.4097 21.5903 11.7157 21.782 12.092C22 12.5198 22 13.0799 22 14.2V16.9143C22 17.8462 22 18.3121 21.8478 18.6797C21.6448 19.1697 21.2554 19.5591 20.7654 19.762C20.3978 19.9143 19.9319 19.9143 19 19.9143V22Z" stroke="#88859F" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
@@ -417,19 +407,19 @@ export const Home = () => {
                                         <path fill-rule="evenodd" clip-rule="evenodd" d="M0 2C0 0.89543 0.89543 0 2 0C3.10457 0 4 0.89543 4 2C4 3.10457 3.10457 4 2 4C0.89543 4 0 3.10457 0 2Z" fill="#88859F" />
                                         <path fill-rule="evenodd" clip-rule="evenodd" d="M0 16C0 14.8954 0.89543 14 2 14C3.10457 14 4 14.8954 4 16C4 17.1046 3.10457 18 2 18C0.89543 18 0 17.1046 0 16Z" fill="#88859F" />
                                     </svg>
-                                </td>
-                            </tr>
-                            <tr className={styles.dashboardTableRow}>
-                                <td className={styles.dashboardTableMixedCell}>
+                                </Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell className={styles.dashboardTableMixedCell}>
                                     <UserPuck imageSrc={UserPic3}></UserPuck>
                                     <p>Sam Brown</p>
-                                </td>
-                                <td>Cyber Expert</td>
-                                <td>April 1, 2024</td>
-                                <td>
+                                </Table.Cell>
+                                <Table.Cell>Cyber Expert</Table.Cell>
+                                <Table.Cell>April 1, 2024</Table.Cell>
+                                <Table.Cell>
                                     <p className={styles.dashboardTablePill} data-state="Pending">Pending</p>
-                                </td>
-                                <td className={styles.dashboardTableActionContainer}>
+                                </Table.Cell>
+                                <Table.Cell className={styles.dashboardTableActionContainer}>
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M10 15L6.92474 18.1137C6.49579 18.548 6.28131 18.7652 6.09695 18.7805C5.93701 18.7938 5.78042 18.7295 5.67596 18.6076C5.55556 18.4672 5.55556 18.162 5.55556 17.5515V15.9916C5.55556 15.444 5.10707 15.0477 4.5652 14.9683V14.9683C3.25374 14.7762 2.22378 13.7463 2.03168 12.4348C2 12.2186 2 11.9605 2 11.4444V6.8C2 5.11984 2 4.27976 2.32698 3.63803C2.6146 3.07354 3.07354 2.6146 3.63803 2.32698C4.27976 2 5.11984 2 6.8 2H14.2C15.8802 2 16.7202 2 17.362 2.32698C17.9265 2.6146 18.3854 3.07354 18.673 3.63803C19 4.27976 19 5.11984 19 6.8V11M19 22L16.8236 20.4869C16.5177 20.2742 16.3647 20.1678 16.1982 20.0924C16.0504 20.0255 15.8951 19.9768 15.7356 19.9474C15.5558 19.9143 15.3695 19.9143 14.9969 19.9143H13.2C12.0799 19.9143 11.5198 19.9143 11.092 19.6963C10.7157 19.5046 10.4097 19.1986 10.218 18.8223C10 18.3944 10 17.8344 10 16.7143V14.2C10 13.0799 10 12.5198 10.218 12.092C10.4097 11.7157 10.7157 11.4097 11.092 11.218C11.5198 11 12.0799 11 13.2 11H18.8C19.9201 11 20.4802 11 20.908 11.218C21.2843 11.4097 21.5903 11.7157 21.782 12.092C22 12.5198 22 13.0799 22 14.2V16.9143C22 17.8462 22 18.3121 21.8478 18.6797C21.6448 19.1697 21.2554 19.5591 20.7654 19.762C20.3978 19.9143 19.9319 19.9143 19 19.9143V22Z" stroke="#88859F" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
@@ -441,19 +431,19 @@ export const Home = () => {
                                         <path fill-rule="evenodd" clip-rule="evenodd" d="M0 2C0 0.89543 0.89543 0 2 0C3.10457 0 4 0.89543 4 2C4 3.10457 3.10457 4 2 4C0.89543 4 0 3.10457 0 2Z" fill="#88859F" />
                                         <path fill-rule="evenodd" clip-rule="evenodd" d="M0 16C0 14.8954 0.89543 14 2 14C3.10457 14 4 14.8954 4 16C4 17.1046 3.10457 18 2 18C0.89543 18 0 17.1046 0 16Z" fill="#88859F" />
                                     </svg>
-                                </td>
-                            </tr>
-                            <tr className={styles.dashboardTableRow}>
-                                <td className={styles.dashboardTableMixedCell}>
+                                </Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell className={styles.dashboardTableMixedCell}>
                                     <UserPuck imageSrc={UserPic2}></UserPuck>
                                     <p>Leslie Alexander</p>
-                                </td>
-                                <td>WAF Admin</td>
-                                <td>November 5, 2023</td>
-                                <td>
+                                </Table.Cell>
+                                <Table.Cell>WAF Admin</Table.Cell>
+                                <Table.Cell>November 5, 2023</Table.Cell>
+                                <Table.Cell>
                                     <p className={styles.dashboardTablePill} data-state="Active">Active</p>
-                                </td>
-                                <td className={styles.dashboardTableActionContainer}>
+                                </Table.Cell>
+                                <Table.Cell className={styles.dashboardTableActionContainer}>
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M10 15L6.92474 18.1137C6.49579 18.548 6.28131 18.7652 6.09695 18.7805C5.93701 18.7938 5.78042 18.7295 5.67596 18.6076C5.55556 18.4672 5.55556 18.162 5.55556 17.5515V15.9916C5.55556 15.444 5.10707 15.0477 4.5652 14.9683V14.9683C3.25374 14.7762 2.22378 13.7463 2.03168 12.4348C2 12.2186 2 11.9605 2 11.4444V6.8C2 5.11984 2 4.27976 2.32698 3.63803C2.6146 3.07354 3.07354 2.6146 3.63803 2.32698C4.27976 2 5.11984 2 6.8 2H14.2C15.8802 2 16.7202 2 17.362 2.32698C17.9265 2.6146 18.3854 3.07354 18.673 3.63803C19 4.27976 19 5.11984 19 6.8V11M19 22L16.8236 20.4869C16.5177 20.2742 16.3647 20.1678 16.1982 20.0924C16.0504 20.0255 15.8951 19.9768 15.7356 19.9474C15.5558 19.9143 15.3695 19.9143 14.9969 19.9143H13.2C12.0799 19.9143 11.5198 19.9143 11.092 19.6963C10.7157 19.5046 10.4097 19.1986 10.218 18.8223C10 18.3944 10 17.8344 10 16.7143V14.2C10 13.0799 10 12.5198 10.218 12.092C10.4097 11.7157 10.7157 11.4097 11.092 11.218C11.5198 11 12.0799 11 13.2 11H18.8C19.9201 11 20.4802 11 20.908 11.218C21.2843 11.4097 21.5903 11.7157 21.782 12.092C22 12.5198 22 13.0799 22 14.2V16.9143C22 17.8462 22 18.3121 21.8478 18.6797C21.6448 19.1697 21.2554 19.5591 20.7654 19.762C20.3978 19.9143 19.9319 19.9143 19 19.9143V22Z" stroke="#88859F" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
@@ -465,12 +455,12 @@ export const Home = () => {
                                         <path fill-rule="evenodd" clip-rule="evenodd" d="M0 2C0 0.89543 0.89543 0 2 0C3.10457 0 4 0.89543 4 2C4 3.10457 3.10457 4 2 4C0.89543 4 0 3.10457 0 2Z" fill="#88859F" />
                                         <path fill-rule="evenodd" clip-rule="evenodd" d="M0 16C0 14.8954 0.89543 14 2 14C3.10457 14 4 14.8954 4 16C4 17.1046 3.10457 18 2 18C0.89543 18 0 17.1046 0 16Z" fill="#88859F" />
                                     </svg>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                                </Table.Cell>
+                            </Table.Row>
+                        </Table.Body>
+                    </Table>
+                </TabsContent>
+            </Tabs>
             <Modal />
         </div>
     );
