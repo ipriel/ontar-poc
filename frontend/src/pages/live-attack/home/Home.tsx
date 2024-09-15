@@ -1,36 +1,37 @@
-import { useMemo } from "react";
+import { useMemo } from 'react';
 import { Icon, Stack } from '@fluentui/react';
 import { ChevronDown24Regular as ChevronDownIcon } from "@fluentui/react-icons";
 import { isPast, isToday } from "date-fns";
-import classNames from "classnames";
+import classNames from 'classnames';
 
-import { UserPuck } from "../../components/UserPuck";
-import { RiskyUsersPane } from "../../components/RiskyUsersPane";
-import { RecommendationPane, RecommendationType } from "../../components/RecommendationPane";
-import { UserPuckGroup } from "../../components/UserPuckGroup";
-import { RatioBarGraph } from "../../components/RatioBarGraph";
-import { SVG, registerSVGs } from "../../components/SVG";
-import { DataCard, FallbackCard, FlipCard } from "../../components/DataCard";
-import { ShowIf, Else } from "../../components/ShowIf";
-import { AwaitQuery } from "../../components/AwaitQuery";
-import { isDefined } from "../../lib";
-import { useModal } from "../../components/Modal";
+import { RiskyUsersPane } from "../../../components/RiskyUsersPane";
+import { RecommendationPane, RecommendationType } from "../../../components/RecommendationPane";
+import { UserPuckGroup } from "../../../components/UserPuckGroup";
+import { RatioBarGraph } from "../../../components/RatioBarGraph";
+import { SVG, registerSVGs } from "../../../components/SVG";
+import { DataCard, FallbackCard, FlipCard } from "../../../components/DataCard";
+import { ShowIf, Else } from "../../../components/ShowIf";
+import { AwaitQuery } from "../../../components/AwaitQuery";
+import { Table } from "../../../components/Table";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../../components/Tabs";
+import { useModal } from '../../../components/Modal';
+import { UserPuck } from '../../../components/UserPuck';
+import { ADRecommendation, Recommendation, Remediation } from "../../../lib/models";
+import { jsonQuery, queryClient, useJsonQuery, useLastEventQuery } from "../../../lib/react-query";
+import { isDefined } from '../../../lib/utils';
+import UserPic1 from "../../../assets/user-1.png";
+import UserPic2 from "../../../assets/user-2.png";
+import UserPic3 from "../../../assets/user-3.png";
 
-import UserPic1 from "../../assets/user-1.png";
-import UserPic2 from "../../assets/user-2.png";
-import UserPic3 from "../../assets/user-3.png";
-import { ADRecommendation, Recommendation, Remediation } from "../../lib/models";
-import { jsonQuery, queryClient, useJsonQuery, useLastEventQuery } from "../../lib/react-query";
+
 import styles from "./Home.module.css";
 import svgCollection from "./Home.data";
 import { generateDueDate, getInterval, parseSeverity, riskyUserSelector, alertSelector } from "./Home.utils";
-import { Table } from "../../components/Table";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../components/Tabs";
-
-registerSVGs(svgCollection);
 
 const severity: Array<"Low" | "Medium" | "High"> = ["Low", "Medium", "High"];
 const improvement = [5, 10, 20];
+
+registerSVGs(svgCollection);
 
 export const Home = () => {
     const recommendationQuery = useJsonQuery<Recommendation[]>('/api/recommendations', ["live-attack", "recommendations"]);
@@ -49,36 +50,7 @@ export const Home = () => {
     const [Modal, setModal] = useModal();
 
     return (
-        <div className={styles.container} role="main">
-            <Stack
-                horizontal
-                verticalAlign="center"
-                horizontalAlign="space-between"
-                className={styles.rulerContainer}
-            >
-                <div className={styles.rulerSectionContainer}>
-                    <div className={styles.rulerSearchbar}>
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M8.16669 0.666656C4.02455 0.666656 0.666687 4.02452 0.666687 8.16666C0.666687 12.3088 4.02455 15.6667 8.16669 15.6667C9.93753 15.6667 11.565 15.0529 12.8481 14.0266L15.9108 17.0892C16.2362 17.4147 16.7638 17.4147 17.0893 17.0892C17.4147 16.7638 17.4147 16.2362 17.0893 15.9107L14.0266 12.8481C15.053 11.565 15.6667 9.9375 15.6667 8.16666C15.6667 4.02452 12.3088 0.666656 8.16669 0.666656ZM2.33335 8.16666C2.33335 4.945 4.94503 2.33332 8.16669 2.33332C11.3883 2.33332 14 4.945 14 8.16666C14 11.3883 11.3883 14 8.16669 14C4.94503 14 2.33335 11.3883 2.33335 8.16666Z" fill="#89859F" />
-                        </svg>
-                        <input type="search" name="" id="" placeholder="Search" />
-                    </div>
-                    <div className={styles.avatarGroup}>
-                        <UserPuckGroup style="dense">
-                            <UserPuck imageSrc={UserPic1} userState={"online"}></UserPuck>
-                            <UserPuck imageSrc={UserPic2} userState={"offline"}></UserPuck>
-                            <UserPuck imageSrc={UserPic3} userState={"online"}></UserPuck>
-                        </UserPuckGroup>
-                    </div>
-                </div>
-                <div className={classNames(styles.rulerSectionContainer, styles.rulerSectionButtonContainer)}>
-                    {["dashboard_home", "dashboard_kanban", "dashboard_gantt", "hacker_small",
-                        "dashboard_attack_flow", "dashboard_server_tree", "dashboard_map"]
-                        .map((svg, i) => (
-                            <SVG svgName={svg} key={`pane-${i}`} />
-                        ))}
-                </div>
-            </Stack>
+        <>
             <Stack
                 horizontal
                 verticalAlign="center"
@@ -462,8 +434,8 @@ export const Home = () => {
                 </TabsContent>
             </Tabs>
             <Modal />
-        </div>
+        </>
     );
-};
+}
 
 export default Home;

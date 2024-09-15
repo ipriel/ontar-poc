@@ -17,9 +17,13 @@ const Chat = lazy(() =>
     import("./pages/chat/Chat")
 );
 
-const Home = lazy(() => 
-    import("./pages/home/Home")
+const LiveAttackLayout = lazy(() => 
+    import("./pages/live-attack/layout/Layout")
 );
+
+const Home = lazy(() =>
+    import("./pages/live-attack/home/Home")
+)
 
 initializeIcons();
 
@@ -28,15 +32,25 @@ const router = createBrowserRouter([
         element: <Layout />,
         children: [
             {
-                path: "/",
+                index: true,
                 Component: Chat
             },
             {
-                path: "/home",
-                Component: HomeLayout
+                path: "attack",
+                Component: LiveAttackLayout,
+                children: [
+                    {
+                        index: true,
+                        Component: Home
+                    },
+                    {
+                        path: "home",
+                        Component: Home
+                    },
+                ]
             },
             {
-                path: "/chat",
+                path: "chat",
                 Component: Chat
             },
             {

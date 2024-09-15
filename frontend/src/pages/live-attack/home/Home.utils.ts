@@ -1,5 +1,5 @@
 
-import { RiskyUser, Alert } from "../../lib/models";
+import { RiskyUser, Alert } from "../../../lib/models";
 import { format, differenceInCalendarDays, isPast, isToday, addHours } from "date-fns";
 
 // Utilities
