@@ -1,6 +1,6 @@
 import React, { lazy } from "react";
 import ReactDOM from "react-dom/client";
-import { createHashRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { initializeIcons } from "@fluentui/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 
@@ -23,7 +23,7 @@ const Home = lazy(() =>
 
 initializeIcons();
 
-const router = createHashRouter([
+const router = createBrowserRouter([
     {
         element: <Layout />,
         children: [
@@ -33,7 +33,7 @@ const router = createHashRouter([
             },
             {
                 path: "/home",
-                Component: Home
+                Component: HomeLayout
             },
             {
                 path: "/chat",
