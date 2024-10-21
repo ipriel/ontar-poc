@@ -41,45 +41,6 @@
     line-height: 28px;
 }
 
-.tagContainer {
-    grid-row: 2/3;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    border-radius: 16px;
-    padding: 2px 8px;
-    font-size: 10px;
-    line-height: 20px;
-    text-align: center;
-    cursor: pointer;
-    width: fit-content;
-    background-color: #363542;
-    color: #89859F;
-
-}
-
-.tag[data-severity="High"] {
-    background-color: #C85757;
-    color: #FFB4B4 !important;
-
-}
-
-.tag[data-severity="Medium"] {
-    background-color: #906209;
-    color: #FFA903 !important;
-}
-
-.tag[data-severity="Low"] {
-    background-color: #6FCF97;
-    color: #185C34 !important;
-}
-
 .modalDismissButton {
     grid-row: 1/-1;
     grid-column: 2/3;

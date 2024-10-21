@@ -28,6 +28,16 @@
     z-index: 2;
 }
 
-.userPuckGroup.dense >svg {
+.userPuckGroup.dense > svg {
     z-index: 1;
+}
+
+.overflowIndicator {
+    height: 32px;
+    width: 32px;
+    padding: 6px;
+    border-radius: 18px;
+    background: #19181F;
+    color: #E87474;
+    border: 1px dashed #E87474;
 }
