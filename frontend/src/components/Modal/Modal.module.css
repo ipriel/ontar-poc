@@ -1,0 +1,75 @@
+.modalWrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 99999;
+    background-color: rgba(32, 31, 39, 0.9);
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.modalContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 24px;
+    background-color: #2A2934;
+    border-left: 1px solid#363542;
+    width: 620px;
+}
+
+.modalContainer>* {
+    color: #706E86;
+}
+
+.modalHeader {
+    display: grid;
+    grid-template-columns: 1fr min-content;
+    grid-template-rows: 1fr min-content;
+    align-items: center;
+    row-gap: 4px;
+}
+
+.modalTitle {
+    grid-row: 1/2;
+    margin-block: 0;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 28px;
+}
+
+.modalDismissButton {
+    grid-row: 1/-1;
+    grid-column: 2/3;
+    width: 18px;
+    height: 18px;
+    color: #5C5A73;
+    cursor: pointer;
+}
+
+.modalDismissButton:hover {
+    background: transparent;
+    color: #AEACC5;
+}
+
+.tagContainer+.modalDismissButton {
+    margin-top: -4px;
+}
+
+.loader {
+    width: 120px;
+    height: 20px;
+    -webkit-mask: linear-gradient(90deg, #201f27 70%, #201f2700 0) left/20% 100%;
+    mask: linear-gradient(90deg, #201f27 70%, #201f2700 0) left/20% 100%;
+    background: linear-gradient(#89859f 0 0) left -25% top 0 /20% 100% no-repeat #363542;
+    animation: modalLoader 1.5s infinite steps(6);
+}
+
+@keyframes modalLoader {
+    100% {
+        background-position: right -25% top 0
+    }
+}

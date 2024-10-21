@@ -8,10 +8,11 @@
 .sidebarLayout {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
+    justify-content: start;
+    gap: 10px;
     border-right: 1px solid #706E86;
-    padding: 0 24px;
+    padding-inline: 24px;
+    padding-block: 0px 16px;
 }
 
 .sidebarHeaderContainer {
@@ -26,10 +27,8 @@
 }
 
 .sidebarLogoContainer {
-    display: flex;
-    gap: 16px;
-    align-items: center;
     text-decoration: none;
+    padding-inline: 0;
 }
 
 .sidebarLogoText {
@@ -47,6 +46,7 @@
 
 .sidebarToggle {
     cursor: pointer;
+    margin-block: auto;
 }
 
 .companyDropdownContainer {
@@ -61,6 +61,7 @@
     background-color: #19171B;
     border-radius: 8px;
     cursor: pointer;
+    margin-bottom: 16px;
 }
 
 [data-sidebar="false"] .companyDropdownContainer {
@@ -91,6 +92,11 @@
 .menuList {
     padding: 0;
     color: #706E86;
+    margin-block: 0;
+}
+
+.sidebarLayout > .menuList:last-child {
+    margin-top: auto;
 }
 
 .menuListItem {
@@ -102,13 +108,11 @@
     cursor: pointer;
 }
 
-.menuListItemActive {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-    color: #C792FF;
+.hiddenMenuListItem {
+    visibility: hidden;
 }
+
+
 
 [data-sidebar="false"] .menuListItem,
 [data-sidebar="false"] .menuListItemActive {
@@ -125,18 +129,52 @@
 
 .menuListItemText {
     margin-block: 10px;
+    text-decoration: none;
+    color: #706E86;
+}
+
+.menuListItem:hover {
+    color: #C792FF !important;
+}
+
+.menuListItem:hover .menuListItemEmphasis {
+    background-color: #C792FF !important;
+}
+
+.menuListItem:hover > .menuListItemIcon,
+.menuListItem:hover > .menuListItemText {
+    color: #C792FF;
+}
+
+:global(.active) {
+    color: #C792FF !important;
+}
+
+:global(.active:active),
+:global(.active:hover) {
+    color: #8B66B3 !important;
+}
+
+:global(.active) > :local(.menuListItemEmphasis) {
+    background-color: #C792FF;
+}
+
+:global(.active:active) > :local(.menuListItemEmphasis),
+:global(.active:hover) > :local(.menuListItemEmphasis) {
+    background-color: #8B66B3 !important;
+}
+
+:local(.menuListItemIcon):has(+ :global(.active:active)),
+:local(.menuListItemIcon):has(+ :global(.active:hover)) {
+    color: #8B66B3 !important;
+}
+
+:local(.menuListItemIcon):has(+ :global(.active)) {
+    color: #C792FF;
 }
 
 [data-sidebar="false"] .menuListItemText {
     display: none;
-}
-
-.menuListItemImage {
-    display: block;
-    border-radius: 50%;
-    filter: grayscale();
-    width: 32px;
-    height: 32px;
 }
 
 [data-sidebar="false"] .menuListItemImage {
@@ -163,7 +201,6 @@
 .mainLayout {
     display: flex;
     flex-direction: column;
-    height: 100%;
 }
 
 .headerTitleContainer {
@@ -206,6 +243,65 @@
     /* margin-left: 36px; */
 }
 
+.headerDataContainer {
+    display: flex;
+    align-items: center;
+    gap: 21px;
+}
+
+.headerDataIcon {
+    transform: translateX(11px);
+}
+
+.headerDataBlock {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.headerDataBlock:nth-child(2n+1):before {
+    content: '';
+    position: absolute;
+    height: 100%;
+    top: 0;
+    left: -10px;
+    border-left: 1px solid #706E8680;
+}
+
+.headerDataTitle {
+    font-size: 11px;
+    line-height: 12px;
+    color: #5C5A73;
+}
+
+.headerDataContent {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 24px;
+    margin-block: 0;
+    color: #9997AF;
+}
+
+.riskScoreContainer {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-left: 30px;
+}
+
+.riskScoreTitle {
+    font-size: 20px;
+    font-weight: 500;
+    margin-block: 0;
+    color: #5C5A73;
+}
+
+.riskScoreContent {
+    font-size: 27px;
+    margin-block: 0;
+    color: white;
+}
+
 .chatButtonContainer {
     position: relative;
     display: flex;
@@ -230,4 +326,56 @@
     position: absolute;
     top: -5px;
     right: 9px;
+}
+
+.chatEmptyState {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+}
+
+.chatEmptyStateTitle {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 36px;
+    color: white;
+    display: flex;
+    align-items: flex-end;
+    text-align: center;
+    line-height: 24px;
+    margin-block: 18px;
+}
+
+.chatEmptyStateSubtitle {
+    margin-top: 12px;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 38px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    width: 700px;
+}
+
+.chatEmptyStateSubtitle > a {
+    margin-inline: 0.5ch;
+}
+
+.chatEmptyStateSubtitle > a:link {
+    color: #89859F;
+}
+
+.chatEmptyStateSubtitle > a:hover,
+.chatEmptyStateSubtitle > a:focus-visible {
+    color: #5C5A73;
+}
+
+.chatEmptyStateSubtitle > a:visited {
+    color: #C792FF;
 }

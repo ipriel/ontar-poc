@@ -1,0 +1,122 @@
+.dataCard {
+    position: relative;
+    display: grid;
+    grid-template-rows: min-content min-content;
+    grid-template-columns: max-content auto;
+    background: #1A1A20;
+    border-radius: 8px;
+    padding: 24px;
+}
+
+.dataCard>p {
+    margin-block: 0;
+    color: #706E86;
+}
+
+.dataCardImage {
+    grid-column: 2;
+    grid-row: 1/span 2;
+    justify-self: end;
+    align-self: center;
+}
+
+.dataCardValue {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 32px;
+}
+
+.dataCardAccent>.dataCardValue {
+    color: #E87474;
+}
+
+.dataCardLabel {
+    grid-column: 1/2;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+}
+
+.hasBadge:after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    bottom: -1px;
+    right: -1px;
+    background-color: var(--color, #8AC898);
+    border: 2px solid black;
+}
+
+.flipCard {
+    position: relative;
+    cursor: pointer;
+}
+
+.dataCardIcon {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: fit-content;
+    color: #706E86;
+}
+
+.flipCard:hover > .dataCardFront,
+.flipCard > :hover > .dataCardFront,
+.dataCardBack {
+    display: none;
+}
+
+.flipCard:hover > .dataCardBack,
+.flipCard > :hover > .dataCardBack {
+    display: block;
+}
+
+.dataCardBack {
+    background: #26242E;
+    border: 2px solid #1A1A20;
+    padding-block: 14.1px 13.1px;
+}
+
+.dataCardBack > * {
+    color: #706E86;
+}
+
+.fallbackCard {
+    grid-template-columns: 1fr;
+}
+
+.loader {
+  width: 32px;
+  aspect-ratio: 1;
+  display: grid;
+  border: 3px solid #0000;
+  border-radius: 50%;
+  border-color: #706E86 #0000;
+  animation: rotateSpinner 2s infinite linear;
+}
+
+.loader::before,
+.loader::after {    
+  content: "";
+  grid-area: 1/1;
+  margin: 3px;
+  border: inherit;
+  border-radius: 50%;
+}
+
+.loader::before {
+  border-color: #e87474 #0000;
+  animation: inherit; 
+  animation-duration: 1s;
+  animation-direction: reverse;
+}
+
+.loader::after {
+  margin: 8px;
+}
+
+@keyframes rotateSpinner { 
+  100%{transform: rotate(1turn)}
+}

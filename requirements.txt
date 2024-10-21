@@ -1,6 +1,11 @@
+aiofiles==24.1.0
 azure-identity==1.14.0b2
-Flask==2.3.2
-openai==0.27.7
 azure-search-documents==11.4.0b6
 azure-storage-blob==12.17.0
-python-dotenv==1.0.0
+Hypercorn==0.17.3
+openai==0.27.7
+Quart==0.19.6
+pydantic-settings==2.4.0
+pendulum==3.0.0
+msgraph-beta-sdk==1.5.2
+jsonpickle==3.2.2

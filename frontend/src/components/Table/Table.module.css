@@ -1,0 +1,114 @@
+.table {
+    display: grid;
+    grid-template-rows: min-content minmax(0,1fr);
+    overflow-y: hidden;
+    padding-bottom: 16px;
+}
+
+.header {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    background-color: black;
+}
+
+.header>.cell {
+    font-weight: 400;
+    line-height: 20px;
+    padding-block: 14px;
+    color: #AEACC5;
+}
+
+.header > :last-child {
+    width: 150px;
+    text-align: center;
+}
+
+.body {
+    position: relative;
+    overflow-y: auto;
+}
+
+.body:has(> .fallback) {
+    margin-top: 0px;
+}
+
+/* width */
+.body::-webkit-scrollbar {
+    width: 5px;
+    height: 0px;
+}
+
+/* Track */
+.body::-webkit-scrollbar-track,
+.body::-webkit-scrollbar-corner {
+    background: transparent;
+    margin-top: -4px;
+}
+
+
+.body::-webkit-scrollbar-track-piece {
+    background: #1A1A20;
+}
+
+/* Handle */
+.body::-webkit-scrollbar-thumb {
+    background: #706E86;
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+.body::-webkit-scrollbar-thumb:hover {
+    background: #363542;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    align-items: center;
+    background-color: #201f27;
+}
+
+.row p {
+    margin-block: 0;
+}
+
+.row>td:last-child>p {
+    border: 1px solid #4398F7;
+    color: #4398F7;
+    border-radius: 16px;
+    padding: 5px;
+    text-align: center;
+    user-select: none;
+    cursor: pointer;
+}
+
+.row.clickable {
+    cursor: pointer;
+}
+
+.cell {
+    padding: 5px 15px;
+    text-align: left;
+    font-size: 14px;
+    color: #89859F;
+}
+
+.fallback > .loader {
+    grid-column: 1/-1;
+    height: 44px;
+    margin: 0;
+    background:
+        linear-gradient(90deg, transparent 33%, #5c5a73 50%, transparent 66%);
+    background-size: 300% 100%;
+    animation: tableLoader 3s infinite linear;
+}
+
+.fallback + .fallback > .loader {
+    height:0px;
+}
+
+@keyframes tableLoader {
+    0% {
+        background-position: right
+    }
+}

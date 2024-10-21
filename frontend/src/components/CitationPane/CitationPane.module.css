@@ -1,0 +1,128 @@
+.citationPanel {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding-right: 16px;
+    gap: 20px;
+    flex: auto;
+    align-self: stretch;
+    flex-grow: 0.3;
+    max-height: 80vh;
+}
+
+.citationPanelTitleContainer {
+    position: sticky;
+    top: 0px;
+    background: #1A191F;
+    padding-block: 10px 15px;
+    margin-bottom: -20px;
+    border-bottom: 1px solid #3C3C47;
+    box-shadow: 0px 10px #1A191F;
+    align-self: stretch;
+}
+
+.citationPanelTitle {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 24px;
+    color: White;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+}
+
+.citationPanelDismiss {
+    width: 18px;
+    height: 18px;
+    color: #5C5A73;
+    cursor: pointer;
+}
+
+.citationPanelDismiss:hover {
+    background-color: #D1D1D1;
+}
+
+.citationPanelHeader {
+    padding-block: 12px;
+    margin-top: 12px;
+    border-bottom: 1px solid #66637b;
+}
+
+.citationPanelHeaderTitle {
+    font-size: 1.75rem;
+    margin-block: 0.2em;
+}
+
+.citationPanelHeaderContent {
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+    margin-block: 0.2em;
+}
+
+.citationPanelContent {
+    color: #D1D1D1;
+    flex-grow: 0;
+    padding-right: 1rem;
+    overflow: auto;
+    overflow-wrap: anywhere;
+    white-space: break-spaces;
+}
+
+/* width */
+.citationPanelContent::-webkit-scrollbar {
+    width: 5px;
+    height: 0px;
+}
+
+/* Track */
+.citationPanelContent::-webkit-scrollbar-track,
+.citationPanelContent::-webkit-scrollbar-corner {
+    background: transparent;
+    /* margin-top: -4px; */
+}
+
+
+.citationPanelContent::-webkit-scrollbar-track-piece {
+    background: #141419;
+}
+
+/* Handle */
+.citationPanelContent::-webkit-scrollbar-thumb {
+    background: #706E86;
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+.citationPanelContent::-webkit-scrollbar-thumb:hover {
+    background: #363542;
+}
+
+.citationPanelContent a {
+    padding-inline: 5px;
+}
+
+.citationPanelContent a:link {
+    color: #89859F;
+}
+
+.citationPanelContent a:hover,
+.citationPanelContent a:focus-visible {
+    color: #5C5A73;
+}
+
+.citationPanelContent a:visited {
+    color: #C792FF;
+}
+
+[data-severity="high"] {
+    color: #FF958F!important;
+}
+
+[data-severity="medium"] {
+    color: #FFCB7C!important;
+}
+
+[data-severity="low"] {
+    color: #8AC898!important;
+}

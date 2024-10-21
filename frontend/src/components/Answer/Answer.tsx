@@ -4,7 +4,7 @@ import { FontIcon, Stack, Text } from "@fluentui/react";
 
 import styles from "./Answer.module.css";
 
-import { AskResponse, Citation } from "../../api";
+import { AskResponse, Citation } from "../../lib";
 import { parseAnswer } from "./AnswerParser";
 
 import ReactMarkdown from "react-markdown";

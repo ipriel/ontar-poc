@@ -1,0 +1,154 @@
+.subPageContainer {
+    position: relative;
+    display: grid;
+    grid-auto-flow: row;
+    grid-template-rows: auto auto minmax(0,1fr);
+    color: #F2F2F2;
+    gap: 10px;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.notificationContainer {
+    display: none;
+    margin-inline: 14px;
+    padding-inline: 16px;
+    background: #1A1A20;
+    border-radius: 0.5rem;
+}
+
+.notificationContainerActive {
+    display: flex;
+}
+
+.notificationMessage {
+    display: flex;
+    gap: 16px;
+    font-size: 14px;
+}
+
+.dataCardContainer {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-inline: 14px;
+}
+
+p.dataCardAccent,
+div.dataCardAccent>:first-child {
+    color: #E87474;
+}
+
+.dataCard {
+    position: relative;
+    display: grid;
+    grid-template-rows: min-content min-content;
+    grid-template-columns: max-content auto;
+    background: #1A1A20;
+    border-radius: 0.5rem;
+    padding: 24px;
+}
+
+.dataCardTall {
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content auto;
+    grid-row: span 2;
+}
+
+.dataCardTall>.dataCardImage {
+    grid-column: 1;
+    grid-row: 2/3;
+    justify-self: center;
+    align-self: center;
+}
+
+.dataCardTall>.dataCardLabel {
+    justify-self: center;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 24px;
+    margin-block: 0;
+}
+
+.dashboardCenteredHeader {
+    text-align: center;
+}
+
+.dashboardTableHead, .dashboardTableRow {
+    grid-template-columns: 1fr 208px 131px 167px 150px;
+}
+
+.dashboardTableBody {
+    margin-top: 8px;
+}
+
+.dashboardTablePill {
+    border: 1px solid;
+    border-radius: 16px;
+    padding: 2px 16px;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    min-width: fit-content;
+    max-width: 90px;
+}
+
+.dashboardTablePillMini {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+    padding: 5px 10px;
+    margin-inline: auto;
+    font-size: 12px;
+    border: 1px solid #89859F;
+    border-radius: 18px;
+}
+
+.dashboardTableMixedCell {
+    display: grid;
+    grid-template-columns: 25px 1fr;
+    gap: 16px;
+    align-items: center;
+}
+
+.dashboardTableMixedCell:has(> img) {
+    grid-template-columns: min-content 1fr;
+}
+
+.dashboardTableMixedCell>svg {
+    justify-self: center;
+}
+
+.dashboardTableUser>p {
+    font-size: 16px;
+    line-height: 20px;
+}
+
+.dashboardTableActionContainer {
+    display: flex;
+    gap: 24px;
+    width: 150px;
+    justify-content: center;
+}
+
+[data-severity="High"],
+[data-state="Inactive"] {
+    border-color: #FF958F !important;
+    color: #FF958F !important;
+}
+
+[data-severity="Medium"],
+[data-state="Pending"] {
+    border-color: #FFCB7C !important;
+    color: #FFCB7C !important;
+}
+
+[data-severity="Low"],
+[data-state="Active"] {
+    border-color: #8AC898 !important;
+    color: #8AC898 !important;
+}
