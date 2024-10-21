@@ -1,0 +1,371 @@
+.subPageContainer {
+    display: grid;
+    grid-template-columns: minmax(300px, min-content) 1fr;
+    padding-inline: 14px;
+    background: #19181F;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.groupLogoCard {
+    padding-block: 18px;
+    border-radius: 16px;
+    background: #201F27;
+}
+
+.groupLogoCard > * {
+    display: flex;
+    justify-content: center;
+    margin-inline: auto;
+}
+
+.groupLogoCard > h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-block: 12px 0;
+    color: #706E86;
+}
+
+.narrowCard {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: 16px;
+    background: #201F27;
+}
+
+.narrowCard > h3 {
+    font-size: 18px;
+    font-weight: 400;
+    color: #706E86;
+    margin-block: 0;
+}
+
+.narrowCard > p {
+    font-size: 20px;
+    font-weight: 600;
+    margin-block: 0;
+    color: #706E86;
+}
+
+.narrowCard[data-status="active"] > p {
+    color: #6FCF97;
+}
+
+.narrowCard[data-status="inactive"] > p {
+    color: #FF958F;
+}
+
+.narrowCard[data-status]::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+}
+
+.narrowCard[data-status="active"]::after {
+    background: #6FCF97;
+}
+
+.narrowCard[data-status="inactive"]::after {
+    background: #FF958F;
+}
+
+.mainContent {
+    gap: 24px;
+    padding-block: 20px;
+}
+
+.tabList {
+    display: flex;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 16px;
+    background: #201F27;
+}
+
+.tabTrigger {
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 8px 24px;
+    color: #706E86;
+    border-bottom: none;
+    background: transparent;
+}
+
+.tabTrigger[data-state="active"] {
+    color: #C792FF;
+    background: #482869;
+}
+
+[role="tabpanel"][data-state="inactive"] {
+    display: none;
+}
+
+.tabContent {
+    grid-template-columns: repeat(var(--col-count, 1), 1fr);
+    grid-template-rows: min-content auto;
+    gap: 20px;
+    max-height: calc(100vh - 250px);
+    max-height: calc(100dvh - 250px);
+}
+
+.activityTab {
+    grid-template-rows: auto;
+}
+
+.col3 {
+    --col-count: 3;
+}
+
+.col4 {
+    --col-count: 4;
+}
+
+.dataCard {
+    background: #201F27;
+    padding: 24px 16px;
+    row-gap: 4px;
+}
+
+.contentCard {
+    padding: 16px 24px;
+    border-radius: 16px;
+    background: #201F27;
+}
+
+.contentCardHeader {
+    display: flex;
+    align-items: center;
+    margin-top: 0;
+    gap: 10px;
+}
+
+.scrollableCard {
+    overflow-y: scroll;
+}
+
+.contentCard > p {
+    color: #8986A7;
+}
+
+.fullWidth {
+    grid-column: 1/-1;
+}
+
+.twoColumn {
+    display: flex;
+    gap: 24px;
+}
+
+.hasDivider {
+    position: relative;
+}
+
+.hasDivider::before {
+    content: '';
+    position: absolute;
+    top: 30px;
+    left: calc(50% + 3px);
+    height: calc(100% - 60px);
+    width: 1px;
+    border-left: 1px solid #736B88;
+}
+
+.toolbar,
+.toolbar > div {
+    display: flex;
+    align-items: center;
+}
+
+.toolbar {
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.toolbar > div {
+    gap: 10px;
+}
+
+.toolbar h3 {
+    margin: 0;
+}
+
+.textBlock {
+    margin-right: 14px;
+    color: #706E86;
+}
+
+.accent {
+    color: white;
+}
+
+.dashboardTableMixedCell {
+    display: grid;
+    grid-template-columns: 25px 1fr;
+    gap: 10px;
+    align-items: center;
+}
+
+.dashboardTableMixedCell:has(> img) {
+    grid-template-columns: min-content 1fr;
+}
+
+.dashboardTableMixedCell>svg,
+.dashboardTableMixedCell>img {
+    justify-self: center;
+    height: 21px;
+}
+
+.dashboardTablePill {
+    border: 1px solid;
+    border-radius: 16px;
+    padding: 2px 16px;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    min-width: fit-content;
+    max-width: 90px;
+}
+
+.summaryContainer {
+    display: grid;
+    grid-auto-flow: row;
+    grid-template-rows: auto minmax(0,1fr);
+    color: #F2F2F2;
+    gap: 24px;
+    grid-column: 1/-1;
+}
+
+.attackTableHead, .attackTableRow {
+    grid-template-columns: 1fr 200px 164px 217px 191px 96px;
+    background: #19181F;
+    color: #AEACC5;
+}
+
+.attackTableHead > :last-child {
+    width: auto;
+}
+
+.attackTableBody {
+    max-height: calc(100vh - 540px);
+}
+
+.attackTableRow {
+    padding-block: 22px;
+}
+
+.attackLogo {
+    height: 32px;
+}
+
+.dataGridContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    overflow-y: scroll;
+    max-height: calc(100vh - 350px);
+    padding-right: 16px;
+}
+
+.dataGridCard {
+    border-radius: 16px;
+    background-color: #19181F;
+    padding: 16px 24px;
+}
+
+.dataGridHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.dataGrid {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 2fr;
+    column-gap: 20px;
+}
+
+.dataGrid::before {
+    content: '';
+    position: absolute;
+    left: calc(50% - 10px);
+    height: 100%;
+    width: 1px;
+    border-left: 1px solid #736B88;
+}
+
+.dataGrid > span {
+    margin-block: 4px;
+}
+
+.chartContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+    color: #706E86;
+    margin-block: 18px;
+}
+
+.chartContainer h3 {
+    font-weight: 600;
+    font-size: 24px;
+    margin: 0;
+}
+
+.chartContainer h4 {
+    font-weight: 700;
+    font-size: 32px;
+    color: #9593AE;
+    margin: 0;
+}
+
+.chart {
+    width: 266px;
+}
+
+.chartLegend {
+    display: grid;
+    grid-template-columns: repeat(3, min-content 3fr 1fr);
+    gap: 6px
+}
+
+.chartLegend > i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.chartLegend :nth-child(3n) {
+    padding-right: 40px;
+}
+
+[data-status="Blocked"] {
+    border-color: #FF958F !important;
+    color: #FF958F !important;
+}
+
+[data-severity="Critical"]>* {
+    color: #FF958F !important;
+}
+
+[data-status="Open"], 
+[data-state="Paid"] {
+    border-color: #8AC898 !important;
+    color: #8AC898 !important;
+}

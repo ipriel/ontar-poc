@@ -7,7 +7,7 @@
 
 .header {
     display: grid;
-    grid-template-columns: 1fr 208px 131px 167px 150px;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     background-color: black;
 }
 
@@ -18,7 +18,7 @@
     color: #AEACC5;
 }
 
-.header>.cell:last-child {
+.header > :last-child {
     width: 150px;
     text-align: center;
 }
@@ -26,7 +26,6 @@
 .body {
     position: relative;
     overflow-y: auto;
-    margin-top: 8px;
 }
 
 .body:has(> .fallback) {
@@ -64,7 +63,7 @@
 
 .row {
     display: grid;
-    grid-template-columns: 1fr 208px 131px 167px 150px;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     align-items: center;
     background-color: #201f27;
 }

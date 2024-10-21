@@ -50,7 +50,7 @@ export const Home = () => {
     const [Modal, setModal] = useModal();
 
     return (
-        <>
+        <div className={styles.subPageContainer}>
             <Stack
                 horizontal
                 verticalAlign="center"
@@ -208,7 +208,7 @@ export const Home = () => {
                 </TabsList>
                 <TabsContent value="actions">
                     <Table>
-                        <Table.Head>
+                        <Table.Head className={styles.dashboardTableHead}>
                             <Table.Cell value={"Task Name"} />
                             <Table.Cell value={"Due Date"} />
                             <Table.Cell value={"Severity Level"} />
@@ -356,7 +356,7 @@ export const Home = () => {
                             <Table.Cell>Status</Table.Cell>
                             <Table.Cell>Actions</Table.Cell>
                         </Table.Head>
-                        <Table.Body>
+                        <Table.Body className={styles.dashboardTableBody}>
                             <Table.Row>
                                 <Table.Cell className={styles.dashboardTableMixedCell}>
                                     <UserPuck imageSrc={UserPic1}></UserPuck>
@@ -434,7 +434,7 @@ export const Home = () => {
                 </TabsContent>
             </Tabs>
             <Modal />
-        </>
+        </div>
     );
 }
 

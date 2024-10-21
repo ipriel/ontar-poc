@@ -1,3 +1,12 @@
+.subPageContainer {
+    position: relative;
+    display: grid;
+    grid-auto-flow: row;
+    grid-template-rows: auto auto minmax(0,1fr);
+    color: #F2F2F2;
+    gap: 10px;
+}
+
 .clickable {
     cursor: pointer;
 }
@@ -65,6 +74,14 @@ div.dataCardAccent>:first-child {
 
 .dashboardCenteredHeader {
     text-align: center;
+}
+
+.dashboardTableHead, .dashboardTableRow {
+    grid-template-columns: 1fr 208px 131px 167px 150px;
+}
+
+.dashboardTableBody {
+    margin-top: 8px;
 }
 
 .dashboardTablePill {

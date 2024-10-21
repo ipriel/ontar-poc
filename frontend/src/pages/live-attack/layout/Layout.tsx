@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
 import { Stack } from '@fluentui/react';
 import classNames from "classnames";
 
@@ -14,8 +14,26 @@ import svgCollection from "./Layout.data";
 
 registerSVGs(svgCollection);
 
-export const Layout = () => {
+const routes = [
+    {svg: "dashboard_home", uri: "home", importPath: "../home/Home" },
+    {svg: "dashboard_kanban", uri: "kanban", importPath: "../kanban/Kanban" },
+    {svg: "dashboard_gantt", uri: "gantt"},
+    {svg: "hacker_small", uri: "info", importPath: "../info/Info"},
+    {svg: "dashboard_attack_flow", uri: "flow"},
+    {svg: "dashboard_server_tree", uri: "servers"},
+    {svg: "dashboard_map", uri: "map"}
+];
 
+(async () => {
+    await import("../home/Home");
+    await import("../kanban/Kanban");
+    await import("../info/Info");
+    await import("../flow/Flow");
+    await import("../servers/Servers");
+    await import("../map/Map");
+})()
+
+export const Layout = () => {
     return (
         <div className={styles.container} role="main">
             <Stack
@@ -40,14 +58,14 @@ export const Layout = () => {
                     </div>
                 </div>
                 <div className={classNames(styles.rulerSectionContainer, styles.rulerSectionButtonContainer)}>
-                    {["dashboard_home", "dashboard_kanban", "dashboard_gantt", "hacker_small",
-                        "dashboard_attack_flow", "dashboard_server_tree", "dashboard_map"]
-                        .map((svg, i) => (
-                            <SVG svgName={svg} key={`pane-${i}`} />
-                        ))}
+                    {routes.map((route) => (
+                        <NavLink to={'/attack/'+route.uri} className={styles.link}>
+                            <SVG svgName={route.svg} key={route.uri} />
+                        </NavLink>
+                    ))}
                 </div>
             </Stack>
-            <Outlet/>
+            <Outlet />
         </div>
     );
 };

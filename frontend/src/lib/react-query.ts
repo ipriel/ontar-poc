@@ -26,7 +26,7 @@ export const LoaderWithQuery = _LoaderWithQuery(queryClient);
 export function jsonQuery<TQueryReturn, TSelectedData = TQueryReturn>(url: string, queryKey: string[], select?: (data: TQueryReturn)=>TSelectedData): UndefinedInitialDataOptions<TQueryReturn, Error, TSelectedData, QueryKey> {
   return {
     queryKey,
-    queryFn: async () => fetch(url).then(data => data.json() as TQueryReturn),
+    queryFn: async ({ signal }) => fetch(url, { signal }).then(data => data.json() as Promise<TQueryReturn>),
     structuralSharing: false,
     select,
   };
@@ -34,10 +34,6 @@ export function jsonQuery<TQueryReturn, TSelectedData = TQueryReturn>(url: strin
 
 export function useJsonQuery<TQueryReturn, TSelectedData = TQueryReturn>(url: string, queryKey: string[], select?: (data: TQueryReturn)=>TSelectedData) {
   const query = jsonQuery<TQueryReturn, TSelectedData>(url, queryKey, select);
-  useQuery({
-    queryKey: ["a"],
-    queryFn: ()=>{}
-  })
   return useQuery(query);
 }
   
